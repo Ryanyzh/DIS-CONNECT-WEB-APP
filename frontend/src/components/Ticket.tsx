@@ -1,5 +1,5 @@
 // ticket lifecycle
-type TicketStatus =
+export type TicketStatus =
   | "Open"
   | "In Review"
   | "Waiting for Response"
@@ -7,7 +7,7 @@ type TicketStatus =
   | "Closed";
 
 // ticket tags
-type TicketTag =
+export type TicketTag =
   | "Reimbursement"
   | "Exchange"
   | "Policy"
@@ -15,7 +15,7 @@ type TicketTag =
   | "General Query";
 
 // A HrOfficer object, represents a HR officer in the system, can contain info like name, email, etc.
-interface HrOfficer {
+export interface HrOfficer {
   id: string;
   name: string;
   email: string;
@@ -24,7 +24,7 @@ interface HrOfficer {
 }
 
 // fields that a ticket will have when created
-interface TicketFields {
+export interface TicketProps {
   id: string; // ticket id in the form of {Tag}-{year of deadline}-{numerical id (number of tickets created in that year with that tag)}
   title: string;
   tag: TicketTag;
@@ -35,3 +35,42 @@ interface TicketFields {
   lastUpdated: Date;
   officer: HrOfficer; // the HR officer assigned to the ticket
 }
+
+function Ticket({ ticket }: {ticket: TicketProps} ) {
+  return (
+    <div>
+      {/* Ticket ID */}
+      <div>
+        <span>
+          {ticket.id}
+        </span>
+      </div>
+
+      {/* Ticket title */}
+      <h3>
+        {ticket.title}
+      </h3>
+
+      {/* Ticket tag */}
+      <div>
+        <span>
+          {ticket.tag}
+        </span>
+      </div>
+
+      {/* Assigned Officer and last updated */}
+      <div>
+        <div>
+          <span>
+            {ticket.officer.name}
+          </span>
+        </div>
+        <span>
+          last updated: {ticket.lastUpdated.toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default Ticket;
