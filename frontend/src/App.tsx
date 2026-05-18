@@ -6,7 +6,8 @@ function App() {
     id: "REB-2024-0012",
     title: "Hostel Reimbursement Year 1 Semester 1",
     tag: "Reimbursement",
-    description: "Requesting reimbursement for hostel fees for Year 1 Semester 1",
+    description:
+      "Requesting reimbursement for hostel fees for Year 1 Semester 1",
     priority: 3,
     status: "In Review",
     deadline: new Date(),
@@ -15,13 +16,13 @@ function App() {
       id: "0",
       name: "Eileen T.",
       email: "eileen.t@example.com",
-      department: "HR"
-    }
+      department: "HR",
+    },
   };
 
   return (
-    <div>
-      <div>
+    <div className="min-h-screen w-screen bg-zinc-950 flex items-center justify-center">
+      <div className="w-full max-w-sm">
         <Ticket ticket={testTicket} />
       </div>
     </div>

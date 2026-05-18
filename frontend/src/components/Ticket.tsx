@@ -37,31 +37,39 @@ export interface TicketProps {
 }
 
 function Ticket({ ticket }: {ticket: TicketProps} ) {
+  const tagStyles: Record<TicketTag, string> = {
+    "Reimbursement": "bg-blue-950/40 text-blue-300 border-blue-900/40",
+    "Exchange": "bg-amber-950/40 text-amber-300 border-amber-900/40",
+    "Policy": "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
+    "Finance": "bg-rose-950/40 text-rose-300 border-rose-900/40",
+    "General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40"
+  };
+  
   return (
-    <div>
+    <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/80 shadow-md hover:border-zinc-100/80 transition-all w-full text-zinc-100 flex flex-col justify-between relative select-none">
       {/* Ticket ID */}
-      <div>
-        <span>
+      <div className="mb-2">
+        <span className="text-xs font-mono tracking-wider text-zinc-500">
           {ticket.id}
         </span>
       </div>
 
       {/* Ticket title */}
-      <h3>
+      <div className="text-lg font-normal leading-snug tracking-tight text-zinc-200 mb-4 line-clamp-2">
         {ticket.title}
-      </h3>
+      </div>
 
       {/* Ticket tag */}
-      <div>
-        <span>
+      <div className="mb-5">
+        <span className={`text-xs px-2.5 py-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}>
           {ticket.tag}
         </span>
       </div>
 
       {/* Assigned Officer and last updated */}
-      <div>
+      <div className="flex justify-between items-center pt-3 border-t border-zinc-800/60 text-sm text-zinc-400">
         <div>
-          <span>
+          <span className="font-medium text-zinc-300">
             {ticket.officer.name}
           </span>
         </div>
