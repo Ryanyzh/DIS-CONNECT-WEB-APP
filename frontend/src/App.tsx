@@ -1,5 +1,5 @@
-import Ticket from "./components/Ticket";
-import type { TicketProps } from "./components/Ticket";
+import TicketCard from "./components/TicketCard";
+import type { TicketProps } from "./components/TicketCard";
 
 function App() {
   const testTicket: TicketProps = {
@@ -10,7 +10,7 @@ function App() {
       "Requesting reimbursement for hostel fees for Year 1 Semester 1",
     priority: 3,
     status: "In Review",
-    deadline: new Date(),
+    deadline: new Date(new Date().getTime() - 1 * 60000), // 1 minute ago
     lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
     officer: {
       id: "0",
@@ -23,7 +23,7 @@ function App() {
   return (
     <div className="min-h-screen w-screen bg-zinc-950 flex items-center justify-center">
       <div className="w-full max-w-sm">
-        <Ticket ticket={testTicket} />
+        <TicketCard ticket={testTicket} />
       </div>
     </div>
   );

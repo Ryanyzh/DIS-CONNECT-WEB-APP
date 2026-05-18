@@ -36,7 +36,7 @@ export interface TicketProps {
   officer: HrOfficer; // the HR officer assigned to the ticket
 }
 
-function Ticket({ ticket }: {ticket: TicketProps} ) {
+function TicketCard({ ticket }: {ticket: TicketProps} ) {
   const tagStyles: Record<TicketTag, string> = {
     "Reimbursement": "bg-blue-950/40 text-blue-300 border-blue-900/40",
     "Exchange": "bg-amber-950/40 text-amber-300 border-amber-900/40",
@@ -44,9 +44,18 @@ function Ticket({ ticket }: {ticket: TicketProps} ) {
     "Finance": "bg-rose-950/40 text-rose-300 border-rose-900/40",
     "General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40"
   };
+
+  const isOverdue = ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
   
   return (
     <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/80 shadow-md hover:border-zinc-100/80 transition-all w-full text-zinc-100 flex flex-col justify-between relative select-none">
+      {/* Warning icon for overdue tickets */}
+      {isOverdue && (
+        <div className="absolute top-4 right-4 bg-rose-500/10 text-rose-500 w-8 h-8 rounded-full flex items-center justify-center text-md font-bold border border-rose-500/20">
+          !
+        </div>
+      )}
+      
       {/* Ticket ID */}
       <div className="mb-2">
         <span className="text-xs font-mono tracking-wider text-zinc-500">
@@ -59,10 +68,13 @@ function Ticket({ ticket }: {ticket: TicketProps} ) {
         {ticket.title}
       </div>
 
-      {/* Ticket tag */}
-      <div className="mb-5">
+      {/* Ticket tag and deadline */}
+      <div className="mb-5 flex justify-between items-center">
         <span className={`text-xs px-2.5 py-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}>
           {ticket.tag}
+        </span>
+        <span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
+          by: {ticket.deadline.toLocaleString()}
         </span>
       </div>
 
@@ -81,4 +93,4 @@ function Ticket({ ticket }: {ticket: TicketProps} ) {
   );
 }
 
-export default Ticket;
+export default TicketCard;
