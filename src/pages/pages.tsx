@@ -3,6 +3,7 @@ import PageShell from "./PageShell";
 import OverviewPage from "./Overview";
 import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
 import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
+import { UsersPage } from "./users/Users";
 
 const createPage = (title: string, description: string) => {
   return function Page() {
@@ -10,7 +11,7 @@ const createPage = (title: string, description: string) => {
   };
 };
 
-export { OverviewPage, CreateStudentAccountPage, CreateHrOfficerAccountPage };
+export { OverviewPage, CreateStudentAccountPage, CreateHrOfficerAccountPage, UsersPage };
 
 export const AllTicketsPage = createPage(
   "All Tickets",
@@ -122,12 +123,11 @@ export const NotificationSettingsPage = createPage(
   "Configure notification preferences and delivery channels."
 );
 
-export const UsersPage = createPage("Users", "Manage user accounts and team members.");
 export const HrOfficersPage = createPage(
   "HR Officers",
   "View and manage HR officer profiles and assignments."
 );
-export const RolesPage = createPage("Roles", "Create and assign roles across the dashboard.");
+export const RolesPage = createPage("Roles", "Create and assign roles across the dashboard");
 export const PermissionsPage = createPage(
   "Permissions",
   "Control authorization rules and access levels."
