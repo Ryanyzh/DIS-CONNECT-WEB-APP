@@ -122,18 +122,12 @@ export const NotificationSettingsPage = createPage(
   "Configure notification preferences and delivery channels."
 );
 
-export const UsersPage = createPage(
-  "Users",
-  "Manage user accounts and team members."
-);
+export const UsersPage = createPage("Users", "Manage user accounts and team members.");
 export const HrOfficersPage = createPage(
   "HR Officers",
   "View and manage HR officer profiles and assignments."
 );
-export const RolesPage = createPage(
-  "Roles",
-  "Create and assign roles across the dashboard."
-);
+export const RolesPage = createPage("Roles", "Create and assign roles across the dashboard.");
 export const PermissionsPage = createPage(
   "Permissions",
   "Control authorization rules and access levels."

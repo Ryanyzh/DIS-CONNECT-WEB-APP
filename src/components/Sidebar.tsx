@@ -1,5 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import DisconnectLogo from "../assets/disconnect-logo.svg";
+import DisconnectName from "../assets/disconnect-name.svg";
 
 const expandableSections = [
   {
@@ -95,11 +97,9 @@ export default function Sidebar() {
       {/* Logo Section */}
       <div className="border-b border-wise-ink/10 p-4 flex items-center gap-2.5">
         <div className="flex h-10 w-10 items-center justify-center rounded-wiseXl bg-wise-green text-wise-ink flex-shrink-0">
-          <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+          <img src={DisconnectLogo} alt="Disconnect Logo" className="h-8 w-8 text-wise-ink" />
         </div>
-        <span className="text-lg font-bold">TailAdmin</span>
+        <img src={DisconnectName} alt="Disconnect Name" className="h-24 ml-1 text-wise-ink" />
       </div>
 
       <div className="flex-1 space-y-6 p-4">
@@ -120,7 +120,12 @@ export default function Sidebar() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
                 {isOpen && (

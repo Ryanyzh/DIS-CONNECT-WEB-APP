@@ -12,7 +12,13 @@ export default function Layout() {
   }, [darkMode]);
 
   return (
-    <div className={darkMode ? "min-h-screen bg-wise-ink text-wise-canvas font-sans" : "min-h-screen bg-wise-canvas text-wise-ink font-sans"}>
+    <div
+      className={
+        darkMode
+          ? "min-h-screen bg-wise-ink text-wise-canvas font-sans"
+          : "min-h-screen bg-wise-canvas text-wise-ink font-sans"
+      }
+    >
       <div className="flex h-screen flex-row">
         <Sidebar />
         <div className="flex flex-1 flex-col">

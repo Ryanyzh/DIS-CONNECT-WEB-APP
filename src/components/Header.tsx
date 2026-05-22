@@ -26,16 +26,27 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-wise-ink/10 bg-wise-canvas shadow-sm dark:border-wise-canvasSoft/20 dark:bg-wise-ink">
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-
         {/* Search Bar */}
         <div className="flex-1 max-w-2xl">
-          <div className={`flex items-center rounded-xl border bg-white transition ${
-            searchFocus
-              ? "border-wise-active dark:border-wise-mute"
-              : "border-wise-ink/20 dark:border-wise-mute"
-          } dark:bg-wise-ink`}>
-            <svg className="ml-3 h-5 w-5 flex-shrink-0 text-wise-ink dark:text-wise-canvas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <div
+            className={`flex items-center rounded-xl border bg-white transition ${
+              searchFocus
+                ? "border-wise-active dark:border-wise-mute"
+                : "border-wise-ink/20 dark:border-wise-mute"
+            } dark:bg-wise-ink`}
+          >
+            <svg
+              className="ml-3 h-5 w-5 flex-shrink-0 text-wise-ink dark:text-wise-canvas"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <input
               type="text"
@@ -44,7 +55,9 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
               onBlur={() => setSearchFocus(false)}
               className="flex-1 bg-transparent px-4 py-2 text-sm text-wise-ink placeholder:text-wise-mute outline-none dark:placeholder:text-wise-neutral dark:text-white"
             />
-            <span className="flex items-center gap-1 px-4 text-xs font-medium text-wise-mute dark:text-wise-neutral">⌘ K</span>
+            <span className="flex items-center gap-1 px-4 text-xs font-medium text-wise-mute dark:text-wise-neutral">
+              ⌘ K
+            </span>
           </div>
         </div>
 
@@ -55,9 +68,20 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
             onClick={onToggleDarkMode}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-wise-ink/20 bg-wise-canvas text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral dark:border-wise-canvasSoft/30 dark:bg-wise-ink dark:text-white dark:hover:bg-[#1a1f14]"
           >
-            
-            <svg className="w-6 h-6 text-wise-ink dark:text-wise-mute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-              <path fill-rule="evenodd" d="M13 3a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0V3ZM6.343 4.929A1 1 0 0 0 4.93 6.343l1.414 1.414a1 1 0 0 0 1.414-1.414L6.343 4.929Zm12.728 1.414a1 1 0 0 0-1.414-1.414l-1.414 1.414a1 1 0 0 0 1.414 1.414l1.414-1.414ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm-9 4a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H3Zm16 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2ZM7.757 17.657a1 1 0 1 0-1.414-1.414l-1.414 1.414a1 1 0 1 0 1.414 1.414l1.414-1.414Zm9.9-1.414a1 1 0 0 0-1.414 1.414l1.414 1.414a1 1 0 0 0 1.414-1.414l-1.414-1.414ZM13 19a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2Z" clip-rule="evenodd"/>
+            <svg
+              className="w-6 h-6 text-wise-ink dark:text-wise-mute"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M13 3a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0V3ZM6.343 4.929A1 1 0 0 0 4.93 6.343l1.414 1.414a1 1 0 0 0 1.414-1.414L6.343 4.929Zm12.728 1.414a1 1 0 0 0-1.414-1.414l-1.414 1.414a1 1 0 0 0 1.414 1.414l1.414-1.414ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm-9 4a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2H3Zm16 0a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2h-2ZM7.757 17.657a1 1 0 1 0-1.414-1.414l-1.414 1.414a1 1 0 1 0 1.414 1.414l1.414-1.414Zm9.9-1.414a1 1 0 0 0-1.414 1.414l1.414 1.414a1 1 0 0 0 1.414-1.414l-1.414-1.414ZM13 19a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2Z"
+                clip-rule="evenodd"
+              />
             </svg>
           </button>
 
@@ -69,34 +93,68 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
             >
               <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0"></div>
               <span className="hidden sm:inline">Musharof</span>
-              <svg className={`h-4 w-4 transition-transform ${showUserMenu ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg
+                className={`h-4 w-4 transition-transform ${showUserMenu ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-56 rounded-wiseXl border border-wise-ink/20 bg-wise-canvas shadow-lg dark:border-wise-canvasSoft/20 dark:bg-wise-ink">
                 <div className="border-b border-wise-ink/10 px-4 py-4 dark:border-wise-canvasSoft/20">
-                  <p className="font-semibold text-wise-ink dark:text-wise-canvas">Musharof Chowdhury</p>
-                  <p className="text-sm text-wise-body dark:text-wise-canvasSoft">randomuser@pimjo.com</p>
+                  <p className="font-semibold text-wise-ink dark:text-wise-canvas">
+                    Musharof Chowdhury
+                  </p>
+                  <p className="text-sm text-wise-body dark:text-wise-canvasSoft">
+                    randomuser@pimjo.com
+                  </p>
                 </div>
                 <div className="space-y-1 p-2">
                   <button className="flex w-full items-center gap-3 rounded-wiseXl px-3 py-2 text-body-md text-wise-ink transition hover:bg-wise-canvasSoft dark:text-wise-canvas dark:hover:bg-[#1a1f14]">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
                     Edit profile
                   </button>
                   <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                     Account settings
                   </button>
                   <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     Support
                   </button>
@@ -107,7 +165,12 @@ export default function Header({ darkMode, onToggleDarkMode }: HeaderProps) {
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
                     </svg>
                     Sign out
                   </button>
