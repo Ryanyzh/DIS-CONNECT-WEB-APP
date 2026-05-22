@@ -60,6 +60,8 @@ const expandableSections = [
     label: "Users & Roles",
     items: [
       { label: "Users", path: "/users/users" },
+      { label: "Create Student Account", path: "/users/create-student" },
+      { label: "Create HR Officer Account", path: "/users/create-hr-officer" },
       { label: "HR Officers", path: "/users/hr-officers" },
       { label: "Roles", path: "/users/roles" },
       { label: "Permissions", path: "/users/permissions" },

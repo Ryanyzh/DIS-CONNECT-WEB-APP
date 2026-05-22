@@ -1,5 +1,8 @@
+import { useState } from "react";
 import PageShell from "./PageShell";
 import OverviewPage from "./Overview";
+import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
+import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
 
 const createPage = (title: string, description: string) => {
   return function Page() {
@@ -7,7 +10,7 @@ const createPage = (title: string, description: string) => {
   };
 };
 
-export { OverviewPage };
+export { OverviewPage, CreateStudentAccountPage, CreateHrOfficerAccountPage };
 
 export const AllTicketsPage = createPage(
   "All Tickets",

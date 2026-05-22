@@ -3,9 +3,7 @@ import Layout from "./components/Layout";
 import {
   OverviewPage,
   AllTicketsPage,
-  AssignedTicketsPage,
   OpenTicketsPage,
-  EscalatedTicketsPage,
   SlaMonitoringPage,
   ArchivedTicketsPage,
   ScholarDirectoryPage,
@@ -32,6 +30,8 @@ import {
   HrOfficersPage,
   RolesPage,
   PermissionsPage,
+  CreateStudentAccountPage,
+  CreateHrOfficerAccountPage,
   TicketCategoriesPage,
   PrioritiesPage,
   SlaPoliciesPage,
@@ -50,9 +50,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<OverviewPage />} />
           <Route path="/tickets/all" element={<AllTicketsPage />} />
-          <Route path="/tickets/assigned" element={<AssignedTicketsPage />} />
           <Route path="/tickets/open" element={<OpenTicketsPage />} />
-          <Route path="/tickets/escalated" element={<EscalatedTicketsPage />} />
           <Route path="/tickets/sla" element={<SlaMonitoringPage />} />
           <Route path="/tickets/archived" element={<ArchivedTicketsPage />} />
           <Route path="/scholars/directory" element={<ScholarDirectoryPage />} />
@@ -76,6 +74,8 @@ function App() {
           <Route path="/notifications/alerts" element={<AlertsPage />} />
           <Route path="/notifications/settings" element={<NotificationSettingsPage />} />
           <Route path="/users/users" element={<UsersPage />} />
+          <Route path="/users/create-student" element={<CreateStudentAccountPage />} />
+          <Route path="/users/create-hr-officer" element={<CreateHrOfficerAccountPage />} />
           <Route path="/users/hr-officers" element={<HrOfficersPage />} />
           <Route path="/users/roles" element={<RolesPage />} />
           <Route path="/users/permissions" element={<PermissionsPage />} />
