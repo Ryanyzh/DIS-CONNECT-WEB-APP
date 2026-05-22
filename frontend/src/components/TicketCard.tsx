@@ -1,3 +1,5 @@
+import type { HrOfficer } from "../types/HrOfficer";
+
 // ticket lifecycle
 export type TicketStatus =
   | "Open"
@@ -13,15 +15,6 @@ export type TicketTag =
   | "Policy"
   | "Finance"
   | "General Query";
-
-// A HrOfficer object, represents a HR officer in the system, can contain info like name, email, etc.
-export interface HrOfficer {
-  id: string;
-  name: string;
-  email: string;
-  department: string;
-  avatarUrl?: string; // optional field for profile picture
-}
 
 // fields that a ticket will have when created
 export interface TicketProps {

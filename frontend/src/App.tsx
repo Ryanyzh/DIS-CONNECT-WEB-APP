@@ -1,6 +1,7 @@
 import TicketCard from "./components/TicketCard";
 import type { TicketProps } from "./components/TicketCard";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const testTicket: TicketProps = {
@@ -22,7 +23,7 @@ function App() {
   };
 
   return (
-    <Login />
+    <Dashboard />
     
     // <div className="min-h-screen w-screen bg-zinc-950 flex items-center justify-center">
     //   <div className="w-full max-w-sm">
