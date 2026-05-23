@@ -41,7 +41,7 @@ function TicketCard({ ticket }: {ticket: TicketProps} ) {
   const isOverdue = ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
   
   return (
-    <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/80 shadow-md hover:border-zinc-100/80 transition-all w-full text-zinc-100 flex flex-col justify-between relative select-none">
+    <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative mt-4">
       {/* Warning icon for overdue tickets */}
       {isOverdue && (
         <div className="absolute top-4 right-4 bg-rose-500/10 text-rose-500 w-8 h-8 rounded-full flex items-center justify-center text-md font-bold border border-rose-500/20">
@@ -57,16 +57,16 @@ function TicketCard({ ticket }: {ticket: TicketProps} ) {
       </div>
 
       {/* Ticket title */}
-      <div className="text-lg font-normal leading-snug tracking-tight text-zinc-200 mb-4 line-clamp-2">
+      <div className="text-lg font-semibold leading-snug tracking-tight text-zinc-200 mb-4 line-clamp-2 ">
         {ticket.title}
       </div>
 
       {/* Ticket tag and deadline */}
       <div className="mb-5 flex justify-between items-center">
-        <span className={`text-xs px-2.5 py-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}>
+        <span className={`text-xs px-2.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}>
           {ticket.tag}
         </span>
-        <span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
+        <span className={`text-right text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
           by: {ticket.deadline.toLocaleString()}
         </span>
       </div>
@@ -74,11 +74,11 @@ function TicketCard({ ticket }: {ticket: TicketProps} ) {
       {/* Assigned Officer and last updated */}
       <div className="flex justify-between items-center pt-3 border-t border-zinc-800/60 text-sm text-zinc-400">
         <div>
-          <span className="font-medium text-zinc-300">
+          <span className="font-medium text-zinc-300 mr-1">
             {ticket.officer.name}
           </span>
         </div>
-        <span>
+        <span className="text-right">
           last updated: {ticket.lastUpdated.toLocaleString()}
         </span>
       </div>

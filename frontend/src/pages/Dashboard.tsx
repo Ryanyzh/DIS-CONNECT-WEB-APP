@@ -22,6 +22,57 @@ const testTickets: TicketProps[] = [
       department: "HR",
     },
   },
+  {
+    id: "REB-2024-0013",
+    title: "Hostel Reimbursement Year 1 Semester 2",
+    tag: "Reimbursement",
+    description:
+      "Requesting reimbursement for hostel fees for Year 1 Semester 2",
+    priority: 3,
+    status: "In Review",
+    deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
+    lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
+    officer: {
+      id: "0",
+      name: "Eileen T.",
+      email: "eileen.t@example.com",
+      department: "HR",
+    },
+  },
+  {
+    id: "REB-2024-0014",
+    title: "Hostel Reimbursement Year 2 Semester 1",
+    tag: "Reimbursement",
+    description:
+      "Requesting reimbursement for hostel fees for Year 2 Semester 1",
+    priority: 3,
+    status: "In Review",
+    deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
+    lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
+    officer: {
+      id: "0",
+      name: "Eileen T.",
+      email: "eileen.t@example.com",
+      department: "HR",
+    },
+  },
+  {
+    id: "REB-2024-0015",
+    title: "Hostel Reimbursement Year 2 Semester 2",
+    tag: "Reimbursement",
+    description:
+      "Requesting reimbursement for hostel fees for Year 2 Semester 2",
+    priority: 3,
+    status: "In Review",
+    deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
+    lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
+    officer: {
+      id: "0",
+      name: "Eileen T.",
+      email: "eileen.t@example.com",
+      department: "HR",
+    },
+  },
   // Waiting for Response
   {
     id: "EXCH-2024-0051",
@@ -63,7 +114,7 @@ const testTickets: TicketProps[] = [
     tag: "Exchange",
     description: "Requesting permission for overseas exchange",
     priority: 5,
-    status: "In Review",
+    status: "Waiting for Response",
     deadline: new Date(new Date().getTime() - 10 * 60000), // 10 minutes ago
     lastUpdated: new Date(new Date().getTime() - 20 * 60000), // 20 minutes ago
     officer: {
@@ -75,11 +126,48 @@ const testTickets: TicketProps[] = [
   },
 ];
 
+// each column of tickets will have a filter to get the relevant tickets
+const columns: {
+  title: string;
+  titleColor: string;
+  filterFunc: (ticket: TicketProps) => boolean;
+  bgColor: string;
+}[] = [
+  {
+    title: "In Review",
+    titleColor: "text-blue-400",
+    filterFunc: (ticket: TicketProps) => ticket.status == "In Review",
+    bgColor: "bg-blue-400/1",
+  },
+  {
+    title: "Waiting",
+    titleColor: "text-amber-400",
+    filterFunc: (ticket: TicketProps) =>
+      ticket.status == "Waiting for Response",
+    bgColor: "bg-amber-400/1",
+  },
+  {
+    title: "Resolved",
+    titleColor: "text-emerald-400",
+    filterFunc: (ticket: TicketProps) => ticket.status == "Resolved",
+    bgColor: "bg-emerald-400/1",
+  },
+  {
+    title: "Overdue",
+    titleColor: "text-rose-500",
+    filterFunc: (ticket: TicketProps) =>
+      ticket.deadline < new Date() &&
+      ticket.status != "Resolved" &&
+      ticket.status != "Closed",
+    bgColor: "bg-rose-500/1",
+  },
+];
+
 function Dashboard() {
   return (
-    <div className="h-screen w-screen bg-zinc-950 flex flex-col text-zinc-200">
+    <div className="bg-zinc-950 h-dvh w-dvw flex flex-col text-zinc-200">
       {/* Top banner */}
-      <div className="max-h-22 w-screen border-b border-zinc-700 flex flex-row items-center">
+      <div className="max-h-22 w-full border-b border-zinc-700 flex flex-row items-center">
         <img
           src={logo}
           alt="dis-connect logo"
@@ -91,8 +179,25 @@ function Dashboard() {
       </div>
 
       {/* Ticket Board */}
-      <div className="grid grid-cols-4 gap-4">
-        
+      <div className="bg-zinc-800/20 border border-zinc-700/20 rounded-xl my-4 mx-4 h-full min-h-0 p-4">
+        <div className="text-xl font-semibold mb-4">Ticket Board</div>
+        <div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
+          {columns.map(({ title, titleColor, filterFunc, bgColor }) => {
+            const filteredTickets: TicketProps[] = testTickets.filter(filterFunc);
+
+            return (
+              <div key={title} className={`${bgColor} flex flex-1 flex-col border border-zinc-700/40 rounded-xl h-full min-h-0 overflow-y-auto`}>
+                {/* Column Header */}
+                <div className={`${titleColor} mx-3 mt-3 font-semibold text-lg`}>{title} ({filteredTickets.length})</div>
+
+                {/* Ticket cards */}
+                <div>
+                  {filteredTickets.map(filteredTicket => <TicketCard key={filteredTicket.id} ticket={filteredTicket} />)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
