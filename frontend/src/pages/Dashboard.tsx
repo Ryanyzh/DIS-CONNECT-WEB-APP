@@ -179,7 +179,7 @@ function Dashboard() {
       </div>
 
       {/* Ticket Board */}
-      <div className="bg-zinc-800/20 border border-zinc-700/20 rounded-xl my-4 mx-4 h-full min-h-0 p-4">
+      <div className="bg-zinc-800/20 border border-zinc-700/20 rounded-xl m-4 h-full min-h-0 p-4">
         <div className="text-xl font-semibold mb-4">Ticket Board</div>
         <div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
           {columns.map(({ title, titleColor, filterFunc, bgColor }) => {
