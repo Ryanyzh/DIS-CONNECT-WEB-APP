@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import TicketCard from "../components/TicketCard";
 import type { TicketProps, TicketStatus } from "../components/TicketCard";
 import logo from "../assets/dis-connect.png";
@@ -172,6 +172,30 @@ function Dashboard() {
     navigate("/");
   };
 
+  // state holding array of tickets, initially empty array
+  const [tickets, setTickets] = useState<TicketProps[]>([]);
+
+  // fetch the tickets from the backend
+  useEffect(() => {
+    fetch("/api/tickets")
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedTickets: TicketProps[] = data.map((ticket: any) => {
+          return {
+            ...ticket,
+            deadline: new Date(ticket.deadline),
+            lastUpdated: new Date(ticket.lastUpdated),
+          } 
+        });
+
+        setTickets(formattedTickets);
+      })
+      .catch((err) => {
+        console.error("Error retrieving tickets: ", err);
+      });
+  }, []);
+
+
   return (
     <div className="bg-zinc-950 h-dvh w-dvw flex flex-col text-zinc-200">
       {/* Top banner */}
@@ -202,7 +226,7 @@ function Dashboard() {
         <div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
           {columns.map(({ title, titleColor, filterFunc, bgColor }) => {
             const filteredTickets: TicketProps[] =
-              testTickets.filter(filterFunc);
+              tickets.filter(filterFunc);
 
             return (
               <div
