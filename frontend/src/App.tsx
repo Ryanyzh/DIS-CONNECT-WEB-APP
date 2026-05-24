@@ -2,6 +2,7 @@ import TicketCard from "./components/TicketCard";
 import type { TicketProps } from "./components/TicketCard";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   const testTicket: TicketProps = {
@@ -23,7 +24,12 @@ function App() {
   };
 
   return (
-    <Dashboard />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
     
     // <div className="min-h-screen w-screen bg-zinc-950 flex items-center justify-center">
     //   <div className="w-full max-w-sm">

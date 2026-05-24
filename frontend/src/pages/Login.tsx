@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import logo from "../assets/dis-connect.png";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   // temporary function to handle submitting, need to implement authentication later
   const submit = (e: React.SubmitEvent) => {
     e.preventDefault();
     console.log("Logged in: ", { email, password });
+    navigate("/dashboard");
   };
 
   return (

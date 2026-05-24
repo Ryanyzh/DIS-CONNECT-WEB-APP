@@ -41,7 +41,7 @@ function TicketCard({ ticket }: {ticket: TicketProps} ) {
   const isOverdue = ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
   
   return (
-    <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative mt-4">
+    <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative">
       {/* Warning icon for overdue tickets */}
       {isOverdue && (
         <div className="absolute top-4 right-4 bg-rose-500/10 text-rose-500 w-8 h-8 rounded-full flex items-center justify-center text-md font-bold border border-rose-500/20">

@@ -2,6 +2,7 @@ import React from "react";
 import TicketCard from "../components/TicketCard";
 import type { TicketProps, TicketStatus } from "../components/TicketCard";
 import logo from "../assets/dis-connect.png";
+import { useNavigate } from "react-router-dom";
 
 const testTickets: TicketProps[] = [
   // In Review
@@ -164,18 +165,35 @@ const columns: {
 ];
 
 function Dashboard() {
+  const navigate = useNavigate();
+
+  const logout = (e: React.SubmitEvent) => {
+    e.preventDefault();
+    navigate("/");
+  };
+
   return (
     <div className="bg-zinc-950 h-dvh w-dvw flex flex-col text-zinc-200">
       {/* Top banner */}
-      <div className="max-h-22 w-full border-b border-zinc-700 flex flex-row items-center">
-        <img
-          src={logo}
-          alt="dis-connect logo"
-          className="w-20 h-20 object-contain m-4"
-        />
-        <span className="text-[#c7ed41] text-3xl font-extrabold">
-          DIS-CONNECT
-        </span>
+      <div className="max-h-22 w-full border-b border-zinc-700 flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center h-full min-h-0">
+          <img
+            src={logo}
+            alt="dis-connect logo"
+            className="w-20 h-20 object-contain m-4"
+          />
+          <span className="text-[#c7ed41] text-3xl font-extrabold">
+            DIS-CONNECT
+          </span>
+        </div>
+        <form onSubmit={logout}>
+          <button
+            type="submit"
+            className="m-4 text-center border border-[#c7ed41]/20 cursor-pointer rounded-md bg-zinc-800/50 hover:bg-zinc-800/60 p-1.5 transition-all"
+          >
+            Sign out
+          </button>
+        </form>
       </div>
 
       {/* Ticket Board */}
@@ -183,16 +201,29 @@ function Dashboard() {
         <div className="text-xl font-semibold mb-4">Ticket Board</div>
         <div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
           {columns.map(({ title, titleColor, filterFunc, bgColor }) => {
-            const filteredTickets: TicketProps[] = testTickets.filter(filterFunc);
+            const filteredTickets: TicketProps[] =
+              testTickets.filter(filterFunc);
 
             return (
-              <div key={title} className={`${bgColor} flex flex-1 flex-col border border-zinc-700/40 rounded-xl h-full min-h-0 overflow-y-auto`}>
+              <div
+                key={title}
+                className={`${bgColor} flex flex-1 flex-col border border-zinc-700/40 rounded-xl h-full min-h-0`}
+              >
                 {/* Column Header */}
-                <div className={`${titleColor} mx-3 mt-3 font-semibold text-lg`}>{title} ({filteredTickets.length})</div>
+                <div
+                  className={`${titleColor} p-3 font-semibold text-lg w-full`}
+                >
+                  {title} ({filteredTickets.length})
+                </div>
 
                 {/* Ticket cards */}
-                <div>
-                  {filteredTickets.map(filteredTicket => <TicketCard key={filteredTicket.id} ticket={filteredTicket} />)}
+                <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto">
+                  {filteredTickets.map((filteredTicket) => (
+                    <TicketCard
+                      key={filteredTicket.id}
+                      ticket={filteredTicket}
+                    />
+                  ))}
                 </div>
               </div>
             );
