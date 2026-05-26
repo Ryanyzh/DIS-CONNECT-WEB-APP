@@ -1,4 +1,5 @@
 import type { HrOfficer } from "../types/HrOfficer";
+import React, { useState } from "react";
 
 // ticket lifecycle
 export type TicketStatus =
@@ -29,31 +30,63 @@ export interface TicketProps {
   officer: HrOfficer; // the HR officer assigned to the ticket
 }
 
-function TicketCard({ ticket }: {ticket: TicketProps} ) {
+function TicketCard({ ticket }: { ticket: TicketProps }) {
   const tagStyles: Record<TicketTag, string> = {
-    "Reimbursement": "bg-blue-950/40 text-blue-300 border-blue-900/40",
-    "Exchange": "bg-amber-950/40 text-amber-300 border-amber-900/40",
-    "Policy": "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
-    "Finance": "bg-rose-950/40 text-rose-300 border-rose-900/40",
-    "General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40"
+    Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
+    Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
+    Policy: "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
+    Finance: "bg-rose-950/40 text-rose-300 border-rose-900/40",
+    "General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40",
   };
 
-  const isOverdue = ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
-  
+  const statusStyles: Record<TicketStatus, string> = {
+    Open: "text-pink-400",
+    "In Review": "text-blue-400",
+    "Waiting for Response": "text-amber-400",
+    Resolved: "text-emerald-400",
+    Closed: "text-violet-500",
+  };
+
+  const [status, setStatus] = useState<TicketStatus>(ticket.status);
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatus(e.target.value as TicketStatus);
+  };
+
+  const isOverdue =
+    ticket.deadline < new Date() &&
+    ticket.status !== "Resolved" &&
+    ticket.status !== "Closed";
+
   return (
     <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative">
-      {/* Warning icon for overdue tickets */}
-      {isOverdue && (
-        <div className="absolute top-4 right-4 bg-rose-500/10 text-rose-500 w-8 h-8 rounded-full flex items-center justify-center text-md font-bold border border-rose-500/20">
-          !
-        </div>
-      )}
-      
-      {/* Ticket ID */}
-      <div className="mb-2">
+      {/* Ticket ID and status dropdown */}
+      <div className="flex flex-row justify-between mb-2 items-center">
         <span className="text-xs font-mono tracking-wider text-zinc-500">
           {ticket.id}
         </span>
+        {/* Dropdown button for changing ticket status */}
+        <select
+          name="status"
+          value={status}
+          onChange={handleStatusChange}
+          className={`flex font-semibold text-right w-full py-2 text-xs leading-snug tracking-tight ${statusStyles[status]}`}
+        >
+          <option value="Open" className="text-zinc-200">
+            Open
+          </option>
+          <option value="In Review" className="text-zinc-200">
+            In Review
+          </option>
+          <option value="Waiting for Response" className="text-zinc-200">
+            Waiting for Response
+          </option>
+          <option value="Resolved" className="text-zinc-200">
+            Resolved
+          </option>
+          <option value="Closed" className="text-zinc-200">
+            Closed
+          </option>
+        </select>
       </div>
 
       {/* Ticket title */}
@@ -63,10 +96,14 @@ function TicketCard({ ticket }: {ticket: TicketProps} ) {
 
       {/* Ticket tag and deadline */}
       <div className="mb-5 flex justify-between items-center">
-        <span className={`text-xs px-2.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}>
+        <span
+          className={`text-xs px-2.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}
+        >
           {ticket.tag}
         </span>
-        <span className={`text-right text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
+        <span
+          className={`text-right text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}
+        >
           by: {ticket.deadline.toLocaleString()}
         </span>
       </div>
