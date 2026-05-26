@@ -72,7 +72,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
       })
 
       if (response.ok) {
-        // refresh the dashboard to show updated status
+        // ticket status successfully updated, refresh the dashboard to show updated status
         onStatusChange();
       }
     } catch (error) {
