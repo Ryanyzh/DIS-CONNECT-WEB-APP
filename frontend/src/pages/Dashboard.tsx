@@ -174,6 +174,7 @@ function Dashboard() {
 
   // state holding array of tickets, initially empty array
   const [tickets, setTickets] = useState<TicketProps[]>([]);
+  const [refresh, setRefresh] = useState(0); // state to trigger refresh when status of ticket is changed
 
   // fetch the tickets from the backend
   useEffect(() => {
@@ -193,8 +194,12 @@ function Dashboard() {
       .catch((err) => {
         console.error("Error retrieving tickets: ", err);
       });
-  }, []);
+  }, [refresh]);
 
+  const triggerRefresh = () => {
+    // increment refresh by 1 to trigger useEffect to reload
+    setRefresh((prev) => prev + 1);
+  };
 
   return (
     <div className="bg-zinc-950 h-dvh w-dvw flex flex-col text-zinc-200">
@@ -246,6 +251,7 @@ function Dashboard() {
                     <TicketCard
                       key={filteredTicket.id}
                       ticket={filteredTicket}
+                      onStatusChange={triggerRefresh}
                     />
                   ))}
                 </div>

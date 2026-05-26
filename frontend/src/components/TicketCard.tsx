@@ -30,7 +30,13 @@ export interface TicketProps {
   officer: HrOfficer; // the HR officer assigned to the ticket
 }
 
-function TicketCard({ ticket }: { ticket: TicketProps }) {
+// props for TicketCard component, for things specific to the UI of the ticket card
+export interface TicketCardProps {
+  ticket: TicketProps;
+  onStatusChange: () => void; // function to call when status is changed to reload dashboard
+}
+
+function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
   const tagStyles: Record<TicketTag, string> = {
     Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
     Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
@@ -46,10 +52,34 @@ function TicketCard({ ticket }: { ticket: TicketProps }) {
     Resolved: "text-emerald-400",
     Closed: "text-violet-500",
   };
+  
+  const [newStatus, setStatus] = useState<TicketStatus>(ticket.status);
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedStatus = e.target.value as TicketStatus;
+    setStatus(selectedStatus);
+    if (selectedStatus == ticket.status) {
+      return; // don't need to do anything, status unchanged
+    }
 
-  const [status, setStatus] = useState<TicketStatus>(ticket.status);
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatus(e.target.value as TicketStatus);
+    try {
+      // send HTTP PATCH request to backend to update ticket status
+      const response = await fetch(`/api/tickets/${ticket.id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({status: selectedStatus}),
+      })
+
+      if (response.ok) {
+        // refresh the dashboard to show updated status
+        onStatusChange();
+      }
+    } catch (error) {
+      console.error("Error updating ticket status: ", error);
+      // revert status change in UI
+      setStatus(ticket.status);
+    }
   };
 
   const isOverdue =
@@ -67,9 +97,9 @@ function TicketCard({ ticket }: { ticket: TicketProps }) {
         {/* Dropdown button for changing ticket status */}
         <select
           name="status"
-          value={status}
+          value={ticket.status}
           onChange={handleStatusChange}
-          className={`flex font-semibold text-right w-full py-2 text-xs leading-snug tracking-tight ${statusStyles[status]}`}
+          className={`flex font-semibold text-right w-full py-2 text-xs leading-snug tracking-tight ${statusStyles[ticket.status]}`}
         >
           <option value="Open" className="text-zinc-200">
             Open
