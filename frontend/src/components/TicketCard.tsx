@@ -27,7 +27,7 @@ export interface TicketProps {
   status: TicketStatus;
   deadline: Date; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
   lastUpdated: Date;
-  officer: HrOfficer; // the HR officer assigned to the ticket
+  officer?: HrOfficer; // the HR officer assigned to the ticket
 }
 
 // props for TicketCard component, for things specific to the UI of the ticket card
@@ -91,7 +91,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
     <div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative">
       {/* Ticket ID and status dropdown */}
       <div className="flex flex-row justify-between mb-2 items-center">
-        <span className="text-xs font-mono tracking-wider text-zinc-500">
+        <span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-500">
           {ticket.id}
         </span>
         {/* Dropdown button for changing ticket status */}
@@ -99,7 +99,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
           name="status"
           value={ticket.status}
           onChange={handleStatusChange}
-          className={`flex font-semibold text-right w-full py-2 text-xs leading-snug tracking-tight ${statusStyles[ticket.status]}`}
+          className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status]}`}
         >
           <option value="Open" className="text-zinc-200">
             Open
@@ -141,9 +141,15 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
       {/* Assigned Officer and last updated */}
       <div className="flex justify-between items-center pt-3 border-t border-zinc-800/60 text-sm text-zinc-400">
         <div>
-          <span className="font-medium text-zinc-300 mr-1">
-            {ticket.officer.name}
-          </span>
+          {ticket.officer ? (
+            <span className="font-medium text-zinc-300 mr-1">
+              {ticket.officer.name}
+            </span>
+          ) : (
+            <span className="font-medium text-pink-400 mr-1">
+              Unassigned
+            </span>
+          )}
         </div>
         <span className="text-right">
           last updated: {ticket.lastUpdated.toLocaleString()}
