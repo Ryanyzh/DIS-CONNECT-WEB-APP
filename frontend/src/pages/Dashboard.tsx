@@ -135,6 +135,12 @@ const columns: {
   bgColor: string;
 }[] = [
   {
+    title: "Open",
+    titleColor: "text-pink-400",
+    filterFunc: (ticket: TicketProps) => ticket.status == "Open",
+    bgColor: "bg-pink-400/1",
+  },
+  {
     title: "In Review",
     titleColor: "text-blue-400",
     filterFunc: (ticket: TicketProps) => ticket.status == "In Review",
@@ -174,6 +180,7 @@ function Dashboard() {
 
   // state holding array of tickets, initially empty array
   const [tickets, setTickets] = useState<TicketProps[]>([]);
+  const [refresh, setRefresh] = useState(0); // state to trigger refresh when status of ticket is changed
 
   // fetch the tickets from the backend
   useEffect(() => {
@@ -193,8 +200,12 @@ function Dashboard() {
       .catch((err) => {
         console.error("Error retrieving tickets: ", err);
       });
-  }, []);
+  }, [refresh]);
 
+  const triggerRefresh = () => {
+    // increment refresh by 1 to trigger useEffect to reload
+    setRefresh((prev) => prev + 1);
+  };
 
   return (
     <div className="bg-zinc-950 h-dvh w-dvw flex flex-col text-zinc-200">
@@ -223,7 +234,7 @@ function Dashboard() {
       {/* Ticket Board */}
       <div className="bg-zinc-800/20 border border-zinc-700/20 rounded-xl m-4 h-full min-h-0 p-4">
         <div className="text-xl font-semibold mb-4">Ticket Board</div>
-        <div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
+        <div className="grid grid-cols-5 gap-4 justify-between h-full max-h-93/100 min-h-0">
           {columns.map(({ title, titleColor, filterFunc, bgColor }) => {
             const filteredTickets: TicketProps[] =
               tickets.filter(filterFunc);
@@ -246,6 +257,7 @@ function Dashboard() {
                     <TicketCard
                       key={filteredTicket.id}
                       ticket={filteredTicket}
+                      onStatusChange={triggerRefresh}
                     />
                   ))}
                 </div>
