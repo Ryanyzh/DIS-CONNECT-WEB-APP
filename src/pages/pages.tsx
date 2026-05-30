@@ -4,6 +4,7 @@ import OverviewPage from "./Overview";
 import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
 import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
 import { UsersPage } from "./users/Users";
+import { OpenTicketsPage } from "./tickets/OpenTickets";
 
 const createPage = (title: string, description: string) => {
   return function Page() {
@@ -11,7 +12,7 @@ const createPage = (title: string, description: string) => {
   };
 };
 
-export { OverviewPage, CreateStudentAccountPage, CreateHrOfficerAccountPage, UsersPage };
+export { OverviewPage, CreateStudentAccountPage, CreateHrOfficerAccountPage, UsersPage, OpenTicketsPage };
 
 export const AllTicketsPage = createPage(
   "All Tickets",
@@ -20,10 +21,6 @@ export const AllTicketsPage = createPage(
 export const AssignedTicketsPage = createPage(
   "Assigned to Me",
   "Review all tickets currently assigned to your account."
-);
-export const OpenTicketsPage = createPage(
-  "Open Tickets",
-  "Track all tickets that are still open and require follow-up."
 );
 export const EscalatedTicketsPage = createPage(
   "Escalated Tickets",
