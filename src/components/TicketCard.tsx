@@ -85,9 +85,9 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 				{/* Dropdown button for changing ticket status */}
 				<select
 					name="status"
-					value={ticket.status}
+					value={newStatus}
 					onChange={handleStatusChange}
-					className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status]}`}
+					className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]}`}
 				>
 					<option value="Open" className="text-zinc-200">
 						Open
