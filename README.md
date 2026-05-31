@@ -27,14 +27,14 @@ An ticketing dashboard to track, manage, and route scholar enquiries. Built with
 
 ---
 
-## 🚀 Key Features Implemented
+## Key Features Implemented
 
 * **Dynamic Ticket Dashboard:** Real-time columnar ticket layout filtering utilizing specialized mapping criteria configurations (`columns`).
 * **Ticket Status Dropdown Menus:** HTML `<select>` dropdown menus to update ticket status in real-time.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 ├── DIS-CONNECT-WEB-APP/          # Active React Project Root
@@ -75,7 +75,7 @@ An ticketing dashboard to track, manage, and route scholar enquiries. Built with
 
 ---
 
-## 🛠️ Local Development Installation
+## Local Development Installation
 
 ### 1. Repository Setup
 
@@ -100,7 +100,7 @@ Open your browser terminal interface at the local address provided by Vite (typi
 
 ---
 
-## 📡 API Core Endpoints Documentation
+## API Core Endpoints Documentation
 
 ### 1. Fetch All Operational Tickets
 
