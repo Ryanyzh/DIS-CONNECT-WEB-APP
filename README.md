@@ -111,13 +111,10 @@ Open your browser terminal interface at the local address provided by Vite (typi
 ### 2. Update Ticket Status Pipeline
 
 * **Route:** `PATCH /api/tickets/{ticket_id}/status`
-* **Request Guard Body:** ```json
+* **Request Guard Body:** `
 {
 "status": "In Review"
-}
-```
-
-```
+}`
 
 
 * **Validation Failure:** `422 Unprocessable Entity` (Pydantic Schema Error)
