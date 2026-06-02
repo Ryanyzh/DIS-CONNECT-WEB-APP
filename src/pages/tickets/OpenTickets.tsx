@@ -160,6 +160,7 @@ const columns: {
 export function OpenTicketsPage() {
 	// state holding array of tickets, initially empty array
 	const [tickets, setTickets] = useState<TicketProps[]>([]);
+	const [refresh, setRefresh] = useState(0); // state to trigger refresh when status changes
 
 	// fetch the tickets from the backend
 	useEffect(() => {
@@ -179,7 +180,12 @@ export function OpenTicketsPage() {
 			.catch((err) => {
 				console.error("Error retrieving tickets: ", err);
 			});
-	}, []);
+	}, [refresh]);
+
+	const triggerRefresh = () => {
+		// increment refresh state by 1 to trigger useEffect to refetch tickets when ticket status is changed
+		setRefresh((prev) => prev + 1);
+	};
 
 	return (
 		<PageShell title="Open Tickets" description="View and manage open tickets.">
@@ -187,7 +193,7 @@ export function OpenTicketsPage() {
 				{/* Ticket Board */}
 				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 p-xl">
 					<div className="text-xl font-semibold mb-4">Ticket Board</div>
-					<div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[79vh] min-h-0">
+					<div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[90vh] min-h-0">
 						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
 							const filteredTickets: TicketProps[] = tickets.filter(filterFunc);
 
@@ -209,33 +215,7 @@ export function OpenTicketsPage() {
 											<TicketCard
 												key={filteredTicket.id}
 												ticket={filteredTicket}
-												onStatusChange={() => {
-													// Refresh the ticket list when status changes
-													fetch("/api/tickets")
-														.then((res) => res.json())
-														.then((data) => {
-															const formattedTickets: TicketProps[] =
-																data.map((ticket: any) => {
-																	return {
-																		...ticket,
-																		deadline: new Date(
-																			ticket.deadline
-																		),
-																		lastUpdated: new Date(
-																			ticket.lastUpdated
-																		),
-																	};
-																});
-
-															setTickets(formattedTickets);
-														})
-														.catch((err) => {
-															console.error(
-																"Error retrieving tickets: ",
-																err
-															);
-														});
-												}}
+												onStatusChange={triggerRefresh}
 											/>
 										))}
 									</div>
