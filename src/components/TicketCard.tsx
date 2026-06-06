@@ -87,7 +87,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					name="status"
 					value={newStatus}
 					onChange={handleStatusChange}
-					className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]}`}
+					className={`bg-zinc-900 line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]}`}
 				>
 					<option value="Open" className="text-zinc-200">
 						Open
@@ -115,7 +115,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 			{/* Ticket tag and deadline */}
 			<div className="mb-5 flex justify-between items-center">
 				<span
-					className={`text-xs px-2.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}
+					className={`text-xs px-1.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}
 				>
 					{ticket.tag}
 				</span>

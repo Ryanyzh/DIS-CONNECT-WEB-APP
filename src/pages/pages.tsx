@@ -4,6 +4,8 @@ import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
 import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
 import { UsersPage } from "./users/Users";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
+import { AllTicketsPage } from "./tickets/AllTickets";
+import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
 
 const createPage = (title: string, description: string) => {
 	return function Page() {
@@ -17,12 +19,10 @@ export {
 	CreateHrOfficerAccountPage,
 	UsersPage,
 	OpenTicketsPage,
+	AllTicketsPage,
+	ArchivedTicketsPage,
 };
 
-export const AllTicketsPage = createPage(
-	"All Tickets",
-	"View every ticket in the system and filter by status, category, or owner."
-);
 export const AssignedTicketsPage = createPage(
 	"Assigned to Me",
 	"Review all tickets currently assigned to your account."
@@ -35,11 +35,6 @@ export const SlaMonitoringPage = createPage(
 	"SLA Monitoring",
 	"Keep SLA compliance visible and catch upcoming or breached deadlines."
 );
-export const ArchivedTicketsPage = createPage(
-	"Archived / Closed Tickets",
-	"Browse tickets that have been resolved, archived, or closed."
-);
-
 export const ScholarDirectoryPage = createPage(
 	"Scholar Directory",
 	"Search and browse scholar records in the directory."
