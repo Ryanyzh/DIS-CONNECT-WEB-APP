@@ -5,17 +5,15 @@ import { useTickets } from "../../hooks/useTickets";
 
 export function AllTicketsPage() {
 	const { tickets, triggerRefresh } = useTickets("/api/tickets");
-	const [filteredTickets, setFilteredTickets] = useState<TicketProps[]>(tickets);
 	const [statusFilter, setStatusFilter] = useState<string>("All");
+	const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
 	const changeStatusFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		if (e.target.value == "All") {
-			setFilteredTickets(tickets);
-			setStatusFilter(e.target.value);
-			return;
-		}
 		setStatusFilter(e.target.value);
-		setFilteredTickets(tickets.filter((ticket) => ticket.status == e.target.value));
+	};
+
+	const changeCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setCategoryFilter(e.target.value);
 	};
 
 	return (
@@ -30,25 +28,41 @@ export function AllTicketsPage() {
 						<div className="text-xl font-semibold mb-4">Ticket Board</div>
 
 						{/* Ticket filters */}
-						<div>
+						<div className="flex flex-row gap-4 items-center mb-4">
 							<select
 								name="statusFilter"
 								value={statusFilter}
 								onChange={changeStatusFilter}
-								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight"
+								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
 							>
-								<option value="All">All</option>
+								<option value="All">Status: All</option>
+								<option value="Open">Status: Open</option>
+								<option value="In Review">Status: In Review</option>
+								<option value="Waiting for Response">Status: Waiting for Response</option>
+								<option value="Resolved">Status: Resolved</option>
+								<option value="Closed">Status: Closed</option>
+							</select>
+							<select
+								name="categoryFilter"
+								value={categoryFilter}
+								onChange={changeCategoryFilter}
+								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
+							>
+								<option value="All">Category: All</option>
+								<option value="Reimbursement">Category: Reimbursement</option>
+								<option value="Exchange">Category: Exchange</option>
+								<option value="Policy">Category: Policy</option>
+								<option value="Finance">Category: Finance</option>
+								<option value="General Query">Category: General Query</option>
 							</select>
 						</div>
 					</div>
 					<div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[90vh] min-h-0 overflow-y-auto">
-						{filteredTickets.map((ticket) => (
-							<TicketCard
-								key={ticket.id}
-								ticket={ticket}
-								onStatusChange={triggerRefresh}
-							/>
-						))}
+						{tickets.filter((ticket) => statusFilter == "All" || ticket.status == statusFilter)
+							.filter((ticket) => categoryFilter == "All" || ticket.tag == categoryFilter)
+							.map((ticket) => (
+								<TicketCard key={ticket.id} ticket={ticket} onStatusChange={triggerRefresh} />
+							))}
 					</div>
 				</div>
 			</div>
