@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import PageShell from "../PageShell";
 import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
@@ -163,7 +162,7 @@ export function OpenTicketsPage() {
 
 	return (
 		<PageShell title="Open Tickets" description="View and manage open tickets.">
-			<div className="bg-wise-canvas h-full w-full flex flex-col text-zinc-200">
+			<div className="bg-wise-canvas h-full w-full flex flex-col">
 				{/* Ticket Board */}
 				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 p-xl">
 					<div className="text-xl font-semibold mb-4">Ticket Board</div>
