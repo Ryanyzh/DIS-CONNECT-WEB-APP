@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PageShell from "./PageShell";
 import OverviewPage from "./Overview";
 import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
@@ -6,6 +8,7 @@ import { UsersPage } from "./users/Users";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+import { signOut } from "../lib/authRepository";
 
 const createPage = (title: string, description: string) => {
 	return function Page() {
@@ -162,7 +165,16 @@ export const SecurityPage = createPage(
 	"Security",
 	"Manage login security, passwords, and session controls."
 );
-export const LogoutPage = createPage(
-	"Logout",
-	"Sign out of the dashboard and secure your session."
-);
+export function LogoutPage() {
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		signOut().finally(() => navigate("/login", { replace: true }));
+	}, [navigate]);
+
+	return (
+		<div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+			<span className="text-zinc-400 text-sm">Signing out...</span>
+		</div>
+	);
+}
