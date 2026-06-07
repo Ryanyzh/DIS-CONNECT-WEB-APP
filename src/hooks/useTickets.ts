@@ -13,8 +13,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
             const response = await fetch(endpointUrl, {
                 method: "GET",
                 headers: {
-                    "Authorization": idToken ? `Bearer ${idToken}` : "",
-                    "Content-Type": "application/json"
+                    "authorization": idToken ? `Bearer ${idToken}` : "",
                 }
             });
             if (!response.ok) {
@@ -23,11 +22,17 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
             const data = await response.json();
             const formattedTickets: TicketProps[] = data.tickets.map((ticket: any) => {
                 return {
-                    ...ticket,
-                    deadline: new Date(ticket.deadline),
-                    lastUpdated: new Date(ticket.lastUpdated)
+                    id: ticket.ticket_code,
+                    title: ticket.subject,
+                    tag: ticket.category.category_name,
+                    description: ticket.description,
+                    priority: ticket.priority.level,
+                    status: ticket.status.status_name,
+                    deadline: new Date(ticket.due_at),
+                    lastUpdated: new Date(ticket.updated_at),
+                    officer: ticket.assigned_to
                 }
-            })
+            });
             setTickets(formattedTickets);
         } catch (err) {
             console.error("Error retrieving tickets: ", err);

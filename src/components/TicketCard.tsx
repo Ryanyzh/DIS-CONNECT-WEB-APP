@@ -1,5 +1,6 @@
 import type { HrOfficer } from "../types/HrOfficer";
 import React, { useState } from "react";
+import { getIdToken } from "../lib/authRepository";
 
 // ticket lifecycle
 export type TicketStatus = "Open" | "In Review" | "Waiting for Response" | "Resolved" | "Closed";
@@ -9,7 +10,7 @@ export type TicketTag = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "G
 
 // fields that a ticket will have when created
 export interface TicketProps {
-	id: string; // ticket id in the form of {Tag}-{year of deadline}-{numerical id (number of tickets created in that year with that tag)}
+	id: string;
 	title: string;
 	tag: TicketTag;
 	description: string; // description of the issue
@@ -52,10 +53,13 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 		}
 
 		try {
+			const idToken = await getIdToken();
+			
 			// send HTTP PATCH request to backend to update ticket status
-			const response = await fetch(`/api/tickets/${ticket.id}/status`, {
+			const response = await fetch(`/api/v1/tickets/${ticket.id}/status`, {
 				method: "PATCH",
 				headers: {
+					"authorization": idToken ? `Bearer ${idToken}` : "",
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ status: selectedStatus }),
@@ -87,7 +91,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					name="status"
 					value={newStatus}
 					onChange={handleStatusChange}
-					className={`bg-zinc-900 line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]}`}
+					className={`bg-zinc-900 line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]} focus:outline-none`}
 				>
 					<option value="Open" className="text-zinc-200">
 						Open
