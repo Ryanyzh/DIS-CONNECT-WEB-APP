@@ -158,7 +158,7 @@ const columns: {
 ];
 
 export function OpenTicketsPage() {
-	const { tickets, triggerRefresh } = useTickets("/api/tickets");
+	const { tickets, triggerRefresh } = useTickets();
 
 	return (
 		<PageShell title="Open Tickets" description="View and manage open tickets.">

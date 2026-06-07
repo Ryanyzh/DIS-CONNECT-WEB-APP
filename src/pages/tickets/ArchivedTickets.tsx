@@ -3,7 +3,7 @@ import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 
 export function ArchivedTicketsPage() {
-	const { tickets, triggerRefresh } = useTickets("/api/tickets");
+	const { tickets, triggerRefresh } = useTickets();
 	const closedTickets: TicketProps[] = tickets.filter(
 		(ticket: TicketProps) => ticket.status == "Closed"
 	);

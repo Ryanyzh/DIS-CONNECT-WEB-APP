@@ -4,7 +4,7 @@ import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 
 export function AllTicketsPage() {
-	const { tickets, triggerRefresh } = useTickets("/api/tickets");
+	const { tickets, triggerRefresh } = useTickets();
 	const [statusFilter, setStatusFilter] = useState<string>("All");
 	const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
