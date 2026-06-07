@@ -1,18 +1,27 @@
 import { useEffect, useState, useCallback } from "react";
 import { type TicketProps } from "../components/TicketCard"
+import { getIdToken } from "../lib/authRepository";
 
-export function useTickets(endpointUrl: string = "/api/tickets") {
+export function useTickets(endpointUrl: string = "/api/v1/tickets") {
     const [tickets, setTickets] = useState<TicketProps[]>([]);
     const [refresh, setRefresh] = useState(0); // state to trigger refresh when status changes
 
     const fetchTickets = useCallback(async () => {
         try {
-            const response = await fetch(endpointUrl);
+            const idToken = await getIdToken();
+
+            const response = await fetch(endpointUrl, {
+                method: "GET",
+                headers: {
+                    "Authorization": idToken ? `Bearer ${idToken}` : "",
+                    "Content-Type": "application/json"
+                }
+            });
             if (!response.ok) {
                 throw new Error(`Error retrieving tickets: ${response.status}`)
             }
             const data = await response.json();
-            const formattedTickets: TicketProps[] = data.map((ticket: any) => {
+            const formattedTickets: TicketProps[] = data.tickets.map((ticket: any) => {
                 return {
                     ...ticket,
                     deadline: new Date(ticket.deadline),
