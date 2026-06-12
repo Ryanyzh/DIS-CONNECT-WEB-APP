@@ -23,12 +23,12 @@ export function AllTicketsPage() {
 		>
 			<div className="bg-wise-canvas h-full w-full flex flex-col">
 				{/* Ticket Board */}
-				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 p-xl">
+				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0">
 					<div className="flex flex-row justify-between items-center">
-						<div className="text-xl font-semibold mb-4">Ticket Board</div>
+						<div className="text-xl font-semibold m-4">Ticket Board</div>
 
 						{/* Ticket filters */}
-						<div className="flex flex-row gap-4 items-center mb-4">
+						<div className="flex flex-row gap-4 items-center m-4">
 							<select
 								name="statusFilter"
 								value={statusFilter}
@@ -57,7 +57,7 @@ export function AllTicketsPage() {
 							</select>
 						</div>
 					</div>
-					<div className="grid grid-cols-4 gap-4 justify-between h-full max-h-[90vh] min-h-0 overflow-y-auto">
+					<div className="flex flex-col gap-2 justify-between h-[57vh] min-h-0 overflow-y-auto">
 						{tickets.filter((ticket) => statusFilter == "All" || ticket.status == statusFilter)
 							.filter((ticket) => categoryFilter == "All" || ticket.tag == categoryFilter)
 							.map((ticket) => (
