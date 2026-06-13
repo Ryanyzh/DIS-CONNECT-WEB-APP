@@ -1,6 +1,9 @@
 import type { HrOfficer } from "../types/HrOfficer";
 import React, { useState } from "react";
 import { getIdToken } from "../lib/authRepository";
+import { useNavigate } from "react-router-dom";
+import type { TicketAttachment } from "../types/TicketAttachment";
+import type { Scholar } from "../types/Scholar";
 
 // ticket lifecycle
 export type TicketStatus = "Open" | "In Review" | "Waiting for Response" | "Resolved" | "Closed";
@@ -11,6 +14,7 @@ export type TicketTag = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "G
 // fields that a ticket will have when created
 export interface TicketProps {
 	id: string;
+	code: string;
 	title: string;
 	tag: TicketTag;
 	description: string; // description of the issue
@@ -18,7 +22,10 @@ export interface TicketProps {
 	status: TicketStatus;
 	deadline: Date; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
 	lastUpdated: Date;
+	createdAt: Date;
+	scholar?: Scholar;
 	officer?: HrOfficer; // the HR officer assigned to the ticket
+	attachments?: TicketAttachment[];
 }
 
 // props for TicketCard component, for things specific to the UI of the ticket card
@@ -27,36 +34,41 @@ export interface TicketCardProps {
 	onStatusChange: () => void; // function to call when status is changed to reload dashboard
 }
 
+export const tagStyles: Record<TicketTag, string> = {
+	Reimbursement: "bg-blue-600/15 text-blue-800",
+	Exchange: "bg-amber-600/15 text-amber-800",
+	Policy: "bg-emerald-600/15 text-emerald-800",
+	Finance: "bg-rose-600/15 text-rose-800",
+	"General Query": "bg-cyan-600/15 text-cyan-800",
+};
+
+export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = {
+	Open: { text: "text-pink-400", bg: "bg-pink-400/15" },
+	"In Review": { text: "text-blue-400", bg: "bg-blue-400/15" },
+	"Waiting for Response": { text: "text-amber-400", bg: "bg-amber-400/15" },
+	Resolved: { text: "text-emerald-400", bg: "bg-emerald-400/15" },
+	Closed: { text: "text-violet-500", bg: "bg-violet-500/15" },
+};
+
+export const priorityStyles: Record<number, string> = {
+	1: "text-green-400 bg-green-400/15",
+	2: "text-green-400 bg-green-400/15",
+	3: "text-green-400 bg-green-400/15",
+	4: "text-yellow-400 bg-yellow-400/15",
+	5: "text-yellow-400 bg-yellow-400/15",
+	6: "text-yellow-400 bg-yellow-400/15",
+	7: "text-yellow-400 bg-yellow-400/15",
+	8: "text-red-400 bg-red-400/15",
+	9: "text-red-400 bg-red-400/15",
+	10: "text-red-400 bg-red-400/15",
+};
+
 function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
-	const tagStyles: Record<TicketTag, string> = {
-		Reimbursement: "bg-blue-600/20 text-blue-800 border-blue-600/20",
-		Exchange: "bg-amber-600/20 text-amber-800 border-amber-600/20",
-		Policy: "bg-emerald-600/20 text-emerald-800 border-emerald-600/20",
-		Finance: "bg-rose-600/20 text-rose-800 border-rose-600/20",
-		"General Query": "bg-cyan-600/20 text-cyan-800 border-cyan-600/20",
+	const navigate = useNavigate();
+	const handleCardClick = () => {
+		navigate(`/tickets/${ticket.id}`);
 	};
-
-	const statusStyles: Record<TicketStatus, string> = {
-		Open: "text-pink-400",
-		"In Review": "text-blue-400",
-		"Waiting for Response": "text-amber-400",
-		Resolved: "text-emerald-400",
-		Closed: "text-violet-500",
-	};
-
-	const priorityStyles: Record<number, string> = {
-		1: "text-green-400",
-		2: "text-green-400",
-		3: "text-green-400",
-		4: "text-yellow-400",
-		5: "text-yellow-400",
-		6: "text-yellow-400",
-		7: "text-yellow-400",
-		8: "text-red-400",
-		9: "text-red-400",
-		10: "text-red-400",
-	}
-
+	
 	const [newStatus, setStatus] = useState<TicketStatus>(ticket.status);
 	const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedStatus = e.target.value as TicketStatus;
@@ -93,13 +105,14 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 		ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
 
 	return (
-		<div className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative">
+		<div onClick={handleCardClick} className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative cursor-pointer">
 			{/* Ticket ID and status dropdown */}
 			<div className="flex flex-row justify-between mb-2 items-center">
 				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-400">
-					{ticket.id}
+					{ticket.code}
 				</span>
-				{/* Dropdown button for changing ticket status */}
+
+				{/* Dropdown button for changing ticket status
 				<select
 					name="status"
 					value={newStatus}
@@ -121,11 +134,16 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					<option value="Closed" className="bg-zinc-900 text-zinc-100">
 						Closed
 					</option>
-				</select>
+				</select> */}
+
+
+				<span className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}>
+					{ticket.status}
+				</span>
 			</div>
 
 			{/* Ticket title */}
-			<div className="text-lg font-semibold leading-snug tracking-tight line-clamp-2 ">
+			<div className="text-lg font-semibold leading-snug tracking-tight line-clamp-2">
 				{ticket.title}
 			</div>
 
@@ -139,25 +157,21 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					)}
 
 					<span
-						className={`text-xs px-1.5 py-1 mr-1 rounded-md border font-semibold ${tagStyles[ticket.tag]}`}
+						className={`text-xs px-1.5 py-1 mr-1 rounded-md font-semibold ${tagStyles[ticket.tag]}`}
 					>
 						{ticket.tag}
 					</span>
-					<span>
-						Last updated: {ticket.lastUpdated.toLocaleString()}
-					</span>
-					<span
-						className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}
-					>
+					<span>Last updated: {ticket.lastUpdated.toLocaleString()}</span>
+					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
 						Due by: {ticket.deadline.toLocaleString()}
 					</span>
 				</div>
-				<span className={`text-right font-semibold ${priorityStyles[ticket.priority]}`}>
-					{ticket.priority <= 3 
-						? `Priority: Low ${ticket.priority}`
+				<span className={`px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}>
+					{ticket.priority <= 3
+						? `Low ${ticket.priority}`
 						: ticket.priority >= 8
-							? `Priority: High ${ticket.priority}`
-							: `Priority: Medium ${ticket.priority}`}
+							? `High ${ticket.priority}`
+							: `Medium ${ticket.priority}`}
 				</span>
 			</div>
 		</div>

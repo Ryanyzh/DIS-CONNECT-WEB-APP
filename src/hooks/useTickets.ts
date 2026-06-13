@@ -17,12 +17,13 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
                 }
             });
             if (!response.ok) {
-                throw new Error(`Error retrieving tickets: ${response.status}`)
+                throw new Error(`Error retrieving tickets: ${response.status}`);
             }
             const data = await response.json();
             const formattedTickets: TicketProps[] = data.tickets.map((ticket: any) => {
                 return {
-                    id: ticket.ticket_code,
+                    id: ticket.ticket_id,
+                    code: ticket.ticket_code,
                     title: ticket.subject,
                     tag: ticket.category.category_name,
                     description: ticket.description,
@@ -30,6 +31,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
                     status: ticket.status.status_name,
                     deadline: new Date(ticket.due_at),
                     lastUpdated: new Date(ticket.updated_at),
+                    createdAt: new Date(ticket.created_at),
                     officer: ticket.assigned_to
                 }
             });

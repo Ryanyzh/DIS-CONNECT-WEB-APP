@@ -8,6 +8,7 @@ import {
 	OpenTicketsPage,
 	SlaMonitoringPage,
 	ArchivedTicketsPage,
+	TicketDetailsPage,
 	ScholarDirectoryPage,
 	ScholarProfilesPage,
 	ScholarExchangePage,
@@ -56,6 +57,7 @@ function App() {
 						<Route path="/tickets/open" element={<OpenTicketsPage />} />
 						<Route path="/tickets/sla" element={<SlaMonitoringPage />} />
 						<Route path="/tickets/archived" element={<ArchivedTicketsPage />} />
+						<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
 						<Route path="/scholars/directory" element={<ScholarDirectoryPage />} />
 						<Route path="/scholars/profiles" element={<ScholarProfilesPage />} />
 						<Route path="/scholars/exchange" element={<ScholarExchangePage />} />

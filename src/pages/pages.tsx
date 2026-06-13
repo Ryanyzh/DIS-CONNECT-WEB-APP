@@ -8,6 +8,7 @@ import { UsersPage } from "./users/Users";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+import { TicketDetailsPage } from "./tickets/TicketDetails";
 import { signOut } from "../lib/authRepository";
 
 const createPage = (title: string, description: string) => {
@@ -24,6 +25,7 @@ export {
 	OpenTicketsPage,
 	AllTicketsPage,
 	ArchivedTicketsPage,
+	TicketDetailsPage,
 };
 
 export const AssignedTicketsPage = createPage(

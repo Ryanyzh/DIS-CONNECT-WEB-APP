@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PageShell from "../PageShell";
-import TicketCard, { type TicketProps } from "../../components/TicketCard";
+import TicketCard, { type TicketStatus, statusStyles } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 
 export function AllTicketsPage() {
@@ -16,24 +16,40 @@ export function AllTicketsPage() {
 		setCategoryFilter(e.target.value);
 	};
 
+	const stats = [
+		{ status: "Open" as TicketStatus, count: tickets.filter((ticket) => ticket.status == "Open").length },
+		{ status: "In Review" as TicketStatus, count: tickets.filter((ticket) => ticket.status == "In Review").length },
+		{ status: "Waiting for Response" as TicketStatus, count: tickets.filter((ticket) => ticket.status == "Waiting for Response").length },
+		{ status: "Resolved" as TicketStatus, count: tickets.filter((ticket) => ticket.status == "Resolved").length },
+		{ status: "Closed" as TicketStatus, count: tickets.filter((ticket) => ticket.status == "Closed").length }
+	];
+
 	return (
 		<PageShell
 			title="All Tickets"
 			description="View every ticket in the system and filter by status, category, or owner."
 		>
 			<div className="bg-wise-canvas h-full w-full flex flex-col">
-				{/* Ticket Board */}
-				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0">
+				{/* Summary Banner */}
+				<div className="bg-wise-canvas flex flex-row w-full border p-4 justify-between rounded-xl items-center divide-x">
+					{stats.map(({ status, count }) => (
+						<div key={status} className="flex flex-col px-4">
+							<span className={`text-sm ${statusStyles[status].text}`}>{status}</span>
+							<span className="text-lg font-semibold">{count}</span>
+						</div>
+					))}
+				</div>
+				
+				{/* Ticket List */}
+				<div className="bg-wise-canvas h-full min-h-0 w-full">
 					<div className="flex flex-row justify-between items-center">
-						<div className="text-xl font-semibold m-4">Ticket Board</div>
-
 						{/* Ticket filters */}
-						<div className="flex flex-row gap-4 items-center m-4">
+						<div className="flex flex-row w-full gap-4 items-center py-4">
 							<select
 								name="statusFilter"
 								value={statusFilter}
 								onChange={changeStatusFilter}
-								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
+								className="border p-2 rounded-xl line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
 							>
 								<option value="All" className="bg-zinc-900 text-zinc-100">Status: All</option>
 								<option value="Open" className="bg-zinc-900 text-zinc-100">Status: Open</option>
@@ -46,7 +62,7 @@ export function AllTicketsPage() {
 								name="categoryFilter"
 								value={categoryFilter}
 								onChange={changeCategoryFilter}
-								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
+								className="border p-2 rounded-xl line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
 							>
 								<option value="All" className="bg-zinc-900 text-zinc-100">Category: All</option>
 								<option value="Reimbursement" className="bg-zinc-900 text-zinc-100">Category: Reimbursement</option>
