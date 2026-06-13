@@ -174,12 +174,12 @@ export function OpenTicketsPage() {
 					<div className="text-xl font-semibold m-4">Ticket Board</div>
 					<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
 						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
-							const filteredTickets: TicketProps[] = tickets.filter(filterFunc);
+							const filteredTickets: TicketProps[] = tickets.filter(filterFunc).toSorted((a, b) => b.priority - a.priority);
 
 							return (
 								<div
 									key={title}
-									className={`${bgColor} flex flex-1 flex-col border border-zinc-700/40 rounded-xl h-full min-h-0 w-full min-w-[15rem]`}
+									className={`${bgColor} flex flex-1 flex-col border border-zinc-700/20 rounded-xl h-full min-h-0 w-full min-w-[15rem]`}
 								>
 									{/* Column Header */}
 									<div
@@ -189,7 +189,7 @@ export function OpenTicketsPage() {
 									</div>
 
 									{/* Ticket cards */}
-									<div className="flex flex-1 flex-col gap-y-4 overflow-y-auto">
+									<div className="flex flex-1 flex-col gap-y-3 overflow-y-auto">
 										{filteredTickets.map((filteredTicket) => (
 											<TicketCard
 												key={filteredTicket.id}

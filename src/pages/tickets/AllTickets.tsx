@@ -35,12 +35,12 @@ export function AllTicketsPage() {
 								onChange={changeStatusFilter}
 								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
 							>
-								<option value="All">Status: All</option>
-								<option value="Open">Status: Open</option>
-								<option value="In Review">Status: In Review</option>
-								<option value="Waiting for Response">Status: Waiting for Response</option>
-								<option value="Resolved">Status: Resolved</option>
-								<option value="Closed">Status: Closed</option>
+								<option value="All" className="bg-zinc-900 text-zinc-100">Status: All</option>
+								<option value="Open" className="bg-zinc-900 text-zinc-100">Status: Open</option>
+								<option value="In Review" className="bg-zinc-900 text-zinc-100">Status: In Review</option>
+								<option value="Waiting for Response" className="bg-zinc-900 text-zinc-100">Status: Waiting for Response</option>
+								<option value="Resolved" className="bg-zinc-900 text-zinc-100">Status: Resolved</option>
+								<option value="Closed" className="bg-zinc-900 text-zinc-100">Status: Closed</option>
 							</select>
 							<select
 								name="categoryFilter"
@@ -48,19 +48,21 @@ export function AllTicketsPage() {
 								onChange={changeCategoryFilter}
 								className="line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
 							>
-								<option value="All">Category: All</option>
-								<option value="Reimbursement">Category: Reimbursement</option>
-								<option value="Exchange">Category: Exchange</option>
-								<option value="Policy">Category: Policy</option>
-								<option value="Finance">Category: Finance</option>
-								<option value="General Query">Category: General Query</option>
+								<option value="All" className="bg-zinc-900 text-zinc-100">Category: All</option>
+								<option value="Reimbursement" className="bg-zinc-900 text-zinc-100">Category: Reimbursement</option>
+								<option value="Exchange" className="bg-zinc-900 text-zinc-100">Category: Exchange</option>
+								<option value="Policy" className="bg-zinc-900 text-zinc-100">Category: Policy</option>
+								<option value="Finance" className="bg-zinc-900 text-zinc-100">Category: Finance</option>
+								<option value="General Query" className="bg-zinc-900 text-zinc-100">Category: General Query</option>
 							</select>
 						</div>
 					</div>
-					<div className="flex flex-col gap-2 justify-between h-[57vh] min-h-0 overflow-y-auto">
-						{tickets.filter((ticket) => statusFilter == "All" || ticket.status == statusFilter)
+					<div className="flex flex-col gap-3 justify-between max-h-[57vh] min-h-0 overflow-y-auto">
+						{tickets
+                            .filter((ticket) => statusFilter == "All" || ticket.status == statusFilter)
 							.filter((ticket) => categoryFilter == "All" || ticket.tag == categoryFilter)
-							.map((ticket) => (
+							.toSorted((a, b) => b.priority - a.priority)
+                            .map((ticket) => (
 								<TicketCard key={ticket.id} ticket={ticket} onStatusChange={triggerRefresh} />
 							))}
 					</div>
