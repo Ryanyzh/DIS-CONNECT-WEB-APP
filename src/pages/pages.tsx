@@ -8,6 +8,8 @@ import { UsersPage } from "./users/Users";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+import { AllAnnouncementsPage } from "./announcements/AllAnnouncements";
+import { CreateAnnouncementPage } from "./announcements/CreateAnnouncement";
 import { signOut } from "../lib/authRepository";
 
 const createPage = (title: string, description: string) => {
@@ -55,14 +57,8 @@ export const ScholarActivityLogsPage = createPage(
 	"Audit scholar activities, attendance, and engagement events."
 );
 
-export const AllAnnouncementsPage = createPage(
-	"All Announcements",
-	"Manage announcements, view recent notices, and publish updates."
-);
-export const CreateAnnouncementPage = createPage(
-	"Create Announcement",
-	"Draft new announcements and share them with scholars or staff."
-);
+export { AllAnnouncementsPage, CreateAnnouncementPage };
+
 export const TaskTrackingPage = createPage(
 	"Task Tracking",
 	"Track announcement-related tasks and progress across initiatives."

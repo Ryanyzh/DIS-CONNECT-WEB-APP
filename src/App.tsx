@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./pages/Login";
+import { AnnouncementDetailPage } from "./pages/announcements/AnnouncementDetail";
+import { CreateAnnouncementPage as EditAnnouncementPage } from "./pages/announcements/CreateAnnouncement";
 import {
 	OverviewPage,
 	AllTicketsPage,
@@ -62,6 +64,8 @@ function App() {
 						<Route path="/scholars/activity" element={<ScholarActivityLogsPage />} />
 						<Route path="/announcements/all" element={<AllAnnouncementsPage />} />
 						<Route path="/announcements/create" element={<CreateAnnouncementPage />} />
+						<Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
+						<Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
 						<Route path="/announcements/tasks" element={<TaskTrackingPage />} />
 						<Route
 							path="/announcements/reminders"
@@ -76,10 +80,7 @@ function App() {
 							path="/knowledge-base/suggested"
 							element={<SuggestedArticlesPage />}
 						/>
-						<Route
-							path="/knowledge-base/analytics"
-							element={<SearchAnalyticsPage />}
-						/>
+						<Route path="/knowledge-base/analytics" element={<SearchAnalyticsPage />} />
 						<Route path="/analytics/tickets" element={<TicketAnalyticsPage />} />
 						<Route path="/analytics/sla" element={<SlaAnalyticsPage />} />
 						<Route path="/analytics/workload" element={<HrWorkloadPage />} />
@@ -90,7 +91,10 @@ function App() {
 						<Route path="/analytics/reports" element={<ReportsExportPage />} />
 						<Route path="/notifications/inbox" element={<InboxPage />} />
 						<Route path="/notifications/alerts" element={<AlertsPage />} />
-						<Route path="/notifications/settings" element={<NotificationSettingsPage />} />
+						<Route
+							path="/notifications/settings"
+							element={<NotificationSettingsPage />}
+						/>
 						<Route path="/users/users" element={<UsersPage />} />
 						<Route
 							path="/users/create-student"
@@ -109,10 +113,7 @@ function App() {
 						<Route path="/settings/priorities" element={<PrioritiesPage />} />
 						<Route path="/settings/sla" element={<SlaPoliciesPage />} />
 						<Route path="/settings/escalation" element={<EscalationRulesPage />} />
-						<Route
-							path="/settings/email-templates"
-							element={<EmailTemplatesPage />}
-						/>
+						<Route path="/settings/email-templates" element={<EmailTemplatesPage />} />
 						<Route path="/settings/general" element={<GeneralSettingsPage />} />
 						<Route path="/profile/account" element={<MyAccountPage />} />
 						<Route path="/profile/security" element={<SecurityPage />} />
