@@ -68,10 +68,9 @@ export const ReminderManagementPage = createPage(
 	"Manage reminder schedules and automated notification workflows."
 );
 
-export const FaqArticlesPage = createPage(
-	"FAQ Articles",
-	"Organize frequently asked questions and knowledge content."
-);
+export { AllFaqsPage as FaqArticlesPage } from "./faq/AllFaqs";
+export { CreateFaqPage } from "./faq/CreateFaq";
+
 export const KnowledgeCategoriesPage = createPage(
 	"Categories",
 	"Manage knowledge base categories and content taxonomy."

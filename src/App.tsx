@@ -19,6 +19,7 @@ import {
 	TaskTrackingPage,
 	ReminderManagementPage,
 	FaqArticlesPage,
+	CreateFaqPage,
 	KnowledgeCategoriesPage,
 	SuggestedArticlesPage,
 	SearchAnalyticsPage,
@@ -72,6 +73,8 @@ function App() {
 							element={<ReminderManagementPage />}
 						/>
 						<Route path="/knowledge-base/faqs" element={<FaqArticlesPage />} />
+						<Route path="/knowledge-base/faqs/create" element={<CreateFaqPage />} />
+						<Route path="/knowledge-base/faqs/:id/edit" element={<CreateFaqPage />} />
 						<Route
 							path="/knowledge-base/categories"
 							element={<KnowledgeCategoriesPage />}
