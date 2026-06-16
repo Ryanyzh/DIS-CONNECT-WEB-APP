@@ -182,7 +182,7 @@ export function TicketDetailsPage() {
 							count = 0; // placeholder
 						}
 						if (tab == "Attachments") {
-							count = ticket.attachments ? ticket.attachments.length : 0;
+							count = ticket.attachments.length;
 						}
 
 						return (
@@ -228,11 +228,11 @@ export function TicketDetailsPage() {
 
                 {activeTab == "Attachments" && (
                     <div className="h-full w-full flex flex-col gap-3">
-                        <div className="font-semibold">Files Uploaded ({ticket.attachments ? ticket.attachments.length : 0})</div>
-                        {(ticket.attachments && ticket.attachments.length > 0) ? (
+                        <div className="font-semibold">Files Uploaded ({ticket.attachments.length})</div>
+                        {(ticket.attachments.length > 0) ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {ticket.attachments.map((file: any) => (
-                                    <div key={file.attachment_id} className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm">
+                                    <div key={file.attachment_id} className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm select-none cursor-pointer">
                                         <span className="line-clamp-2">{file.file_name}</span>
                                         <span className="text-xs text-zinc-500">{(file.file_size / 1024).toFixed(2)} KB</span>
                                     </div>

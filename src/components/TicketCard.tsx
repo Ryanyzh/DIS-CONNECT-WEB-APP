@@ -25,7 +25,7 @@ export interface TicketProps {
 	createdAt: Date;
 	scholar?: Scholar;
 	officer?: HrOfficer; // the HR officer assigned to the ticket
-	attachments?: TicketAttachment[];
+	attachments: TicketAttachment[];
 }
 
 // props for TicketCard component, for things specific to the UI of the ticket card
