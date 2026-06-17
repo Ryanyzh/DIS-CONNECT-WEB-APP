@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { TicketDetailsPage } from "../TicketDetails";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -9,6 +9,27 @@ declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}
 	interface AsymmetricMatchersContaining extends jest.Matchers<void, any> {}
 }
+
+// mock firebase
+vi.mock("../../../lib/firebase", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("../../../lib/firebase")>();
+	return {
+		...actual,
+		storage: {},
+	};
+});
+
+vi.mock("firebase/storage", () => {
+	return {
+		getStorage: vi.fn(),
+		ref: vi.fn(() => ({})),
+		getDownloadURL: vi.fn(() =>
+			Promise.resolve(
+				"https://firebasestorage.googleapis.com/v0/b/orbital-dis-connect.firebasestorage.app/o/tickets%2F6ff67865-dfdf-486b-85ea-6e969ef5d705%2Fnew-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG?alt=media&token=54443b42-6bac-40e8-a113-b4dcc767b799"
+			)
+		),
+	};
+});
 
 describe("TicketDetailsPage Integration Test", () => {
 	const mockTicketDetails = {
@@ -89,8 +110,10 @@ describe("TicketDetailsPage Integration Test", () => {
 		vi.restoreAllMocks();
 	});
 
-	it("extracts ticket ID from route params, fetches ticket details, and displays ticket details and attachments", async () => {
-        render(
+	it("extracts ticket ID from route params, fetches ticket details, and displays ticket details and attachments, and opens attachment preview", async () => {
+		const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+
+		render(
 			<MemoryRouter initialEntries={["/tickets/6ff67865-dfdf-486b-85ea-6e969ef5d705"]}>
 				<Routes>
 					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
@@ -102,9 +125,9 @@ describe("TicketDetailsPage Integration Test", () => {
 		expect(ticketCode).toBeInTheDocument();
 
 		// Scholar name
-        expect(screen.getByText("Ryan Tan")).toBeInTheDocument();
-        
-        // Ticket description
+		expect(screen.getByText("Ryan Tan")).toBeInTheDocument();
+
+		// Ticket description
 		expect(
 			screen.getByText(
 				"Enquiry regarding the process and implications of changing major from Computer Science to Business Administration"
@@ -117,9 +140,25 @@ describe("TicketDetailsPage Integration Test", () => {
 
 		// attachments
 		const attachmentsTabButton = screen.getByRole("button", { name: /Attachments/ });
-        fireEvent.click(attachmentsTabButton);
-        
-        const attachment = await screen.findByText("new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG");
+		fireEvent.click(attachmentsTabButton);
+
+		// test attachment preview
+		const attachment = await screen.findByRole("button", {
+			name: /new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG/,
+		});
 		expect(attachment).toBeInTheDocument();
+		fireEvent.click(attachment);
+
+		await waitFor(() => {
+			expect(windowOpenSpy).toHaveBeenCalledOnce();
+		});
+
+		expect(windowOpenSpy).toHaveBeenCalledWith(
+			expect.stringContaining("new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG"),
+			"_blank",
+			"noopener,noreferrer"
+		);
+
+		windowOpenSpy.mockRestore();
 	});
 });

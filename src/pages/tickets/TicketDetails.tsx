@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import PageShell from "../PageShell";
 import { getIdToken } from "../../lib/authRepository";
 import {
 	type TicketProps,
@@ -9,8 +8,23 @@ import {
 } from "../../components/TicketCard";
 import { useState, useEffect } from "react";
 import type { Scholar } from "../../types/Scholar";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../../lib/firebase";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
+
+const handleAttachmentPreview = async (filePath: string) => {
+	try {
+		const fileRef = ref(storage, filePath);
+		const previewUrl = await getDownloadURL(fileRef);
+
+		// open preview of attachment in browser
+		window.open(previewUrl, "_blank", "noopener,noreferrer");
+	} catch (error) {
+		console.error("Error previewing attachment: ", error);
+		alert("Could not load attachment preview. Please try again.");
+	}
+};
 
 export function TicketDetailsPage() {
 	const { ticketId } = useParams<{ ticketId: string }>();
@@ -226,23 +240,33 @@ export function TicketDetailsPage() {
 					</div>
 				)}
 
-                {activeTab == "Attachments" && (
-                    <div className="h-full w-full flex flex-col gap-3">
-                        <div className="font-semibold">Files Uploaded ({ticket.attachments.length})</div>
-                        {(ticket.attachments.length > 0) ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {ticket.attachments.map((file: any) => (
-                                    <div key={file.attachment_id} className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm select-none cursor-pointer">
-                                        <span className="line-clamp-2">{file.file_name}</span>
-                                        <span className="text-xs text-zinc-500">{(file.file_size / 1024).toFixed(2)} KB</span>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-sm">No attachments found.</div>
-                        )}
-                    </div>
-                )}
+				{activeTab == "Attachments" && (
+					<div className="h-full w-full flex flex-col gap-3">
+						<div className="font-semibold">
+							Files Uploaded ({ticket.attachments.length})
+						</div>
+						{ticket.attachments.length > 0 ? (
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								{ticket.attachments.map((file: any) => (
+									<div
+										key={file.attachment_id}
+										onClick={() => handleAttachmentPreview(file.file_path)}
+										data-testid="attachment-preview"
+										className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm select-none cursor-pointer hover:bg-zinc-100 transition-all"
+										role="button"
+									>
+										<span className="line-clamp-2">{file.file_name}</span>
+										<span className="text-xs text-zinc-500">
+											{(file.file_size / 1024).toFixed(2)} KB
+										</span>
+									</div>
+								))}
+							</div>
+						) : (
+							<div className="text-sm">No attachments found.</div>
+						)}
+					</div>
+				)}
 			</div>
 		</div>
 	);
