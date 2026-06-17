@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { FormEventHandler } from "react";
 import PageShell from "../PageShell";
+import { apiFetch } from "../../lib/apiFetch";
 
 export function CreateHrOfficerAccountPage() {
 	const [fullName, setFullName] = useState("");
@@ -11,16 +11,70 @@ export function CreateHrOfficerAccountPage() {
 	const [employeeId, setEmployeeId] = useState("");
 	const [departmentId, setDepartmentId] = useState("");
 	const [designation, setDesignation] = useState("");
-	const [message, setMessage] = useState<string | null>(null);
+	const [submitting, setSubmitting] = useState(false);
+	const [notification, setNotification] = useState<{
+		type: "success" | "error";
+		text: string;
+	} | null>(null);
 
 	const generatePassword = () => {
 		const code = Math.floor(Math.random() * 90000000) + 10000000;
 		setPassword(code.toString());
 	};
 
-	const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+	const showNotification = (type: "success" | "error", text: string) => {
+		setNotification({ type, text });
+		window.setTimeout(() => setNotification(null), 4000);
+	};
+
+	const resetForm = () => {
+		setFullName("");
+		setEmail("");
+		setPassword("");
+		setPhone("");
+		setEmployeeId("");
+		setDepartmentId("");
+		setDesignation("");
+		setShowPassword(false);
+	};
+
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		setMessage(`HR officer account for ${fullName} has been queued for creation.`);
+		setSubmitting(true);
+
+		const payload = {
+			full_name: fullName,
+			email,
+			password,
+			phone,
+			employee_id: employeeId,
+			department_id: departmentId,
+			designation,
+		};
+
+		try {
+			const res = await apiFetch("/api/v1/auth/register-hr-officer", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			if (!res.ok) {
+				const errorText = await res.text();
+				throw new Error(errorText || "Failed to create HR officer account.");
+			}
+
+			showNotification("success", `HR officer account for ${fullName} has been created.`);
+			resetForm();
+		} catch (error) {
+			console.error(error);
+			showNotification(
+				"error",
+				"Failed to create account. Please check the details and try again."
+			);
+		} finally {
+			setSubmitting(false);
+		}
 	};
 
 	return (
@@ -166,19 +220,28 @@ export function CreateHrOfficerAccountPage() {
 						</p>
 						<button
 							type="submit"
-							className="inline-flex items-center justify-center rounded-wisePill bg-wise-green px-6 py-3 text-body-md font-semibold text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral"
+							disabled={submitting}
+							className="inline-flex items-center justify-center rounded-wisePill bg-wise-green px-6 py-3 text-body-md font-semibold text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							Create HR officer account
+							{submitting ? "Creating..." : "Create HR officer account"}
 						</button>
 					</div>
-
-					{message && (
-						<p className="rounded-wiseMd bg-wise-canvasSoft px-4 py-3 text-body-md text-wise-ink dark:bg-[#1b2612] dark:text-wise-canvas">
-							{message}
-						</p>
-					)}
 				</form>
 			</div>
+
+			{notification && (
+				<div
+					role="status"
+					aria-live="polite"
+					className={`fixed top-6 right-6 z-[999] w-[min(100%,24rem)] rounded-wiseMd border px-4 py-3 text-body-md shadow-xl shadow-black/10 ${
+						notification.type === "success"
+							? "border-[#badbcc] bg-[#e6f8ec] text-[#0f5132]"
+							: "border-[#f5c2c7] bg-[#f8d7da] text-[#842029]"
+					} dark:border-[#264e38] dark:bg-[#122117] dark:text-[#c3f7cc]`}
+				>
+					{notification.text}
+				</div>
+			)}
 		</PageShell>
 	);
 }

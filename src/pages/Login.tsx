@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { signInAndGetToken } from "../lib/authRepository";
+import { signInAsHr, AccessDeniedError } from "../lib/authRepository";
 
 function friendlyError(code: string): string {
 	switch (code) {
@@ -30,10 +30,12 @@ export function LoginPage() {
 		setError(null);
 		setIsLoading(true);
 		try {
-			await signInAndGetToken(email, password);
+			await signInAsHr(email, password);
 			navigate("/");
 		} catch (err) {
-			if (err instanceof FirebaseError) {
+			if (err instanceof AccessDeniedError) {
+				setError("Access denied. This dashboard is for HR officers only.");
+			} else if (err instanceof FirebaseError) {
 				setError(friendlyError(err.code));
 			} else {
 				setError("An unexpected error occurred.");
@@ -50,7 +52,9 @@ export function LoginPage() {
 				<p className="text-zinc-400 text-sm mb-6">HR Dashboard</p>
 				<form onSubmit={handleSubmit} className="flex flex-col gap-4">
 					<div>
-						<label className="block text-xs font-medium text-zinc-400 mb-1">Email</label>
+						<label className="block text-xs font-medium text-zinc-400 mb-1">
+							Email
+						</label>
 						<input
 							type="email"
 							value={email}
