@@ -143,11 +143,9 @@ describe("AllTicketsPage Integration Test", () => {
 	};
 
 	beforeEach(() => {
-		vi.spyOn(globalThis, "fetch").mockResolvedValue({
-			ok: true,
-			status: 200,
-			json: async () => mockTickets,
-		} as Response);
+		vi.spyOn(globalThis, "fetch").mockResolvedValue(
+			Response.json(mockTickets, { status: 200 })
+		);
 	});
 
 	afterEach(() => {

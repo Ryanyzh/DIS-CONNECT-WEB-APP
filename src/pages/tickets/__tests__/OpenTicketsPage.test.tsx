@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { AllTicketsPage } from "../AllTickets";
+import { OpenTicketsPage } from "../OpenTickets";
 import { MemoryRouter } from "react-router-dom";
 
 import "@testing-library/jest-dom/vitest";
@@ -31,10 +31,10 @@ describe("AllTicketsPage Integration Test", () => {
 				ticket_code: "TKT-2026-500E17",
 				resolved_at: null,
 				status: {
-					status_id: "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
-					status_name: "In Review",
-					status_type: "active",
-					is_closed: false,
+					status_id: "ece14a06-c6fd-55e6-8017-1cad1c82d0ce",
+					status_name: "Closed", // CLOSED TICKET
+					status_type: "terminal",
+					is_closed: true,
 				},
 				priority: {
 					priority_id: "f1b9f4e8-4723-50b5-92ae-ddd8d5b929db",
@@ -141,4 +141,38 @@ describe("AllTicketsPage Integration Test", () => {
 			},
 		],
 	};
+
+    beforeEach(() => {
+        vi.spyOn(globalThis, "fetch").mockResolvedValue(
+            Response.json(mockTickets, { status: 200 })
+        );
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it("renders active open tickets and excludes closed tickets", async () => {
+        render(
+            <MemoryRouter>
+                <OpenTicketsPage />
+            </MemoryRouter>
+        )
+
+        // open tickets should appear
+        const openTicket1 = await screen.findAllByText("TKT-2026-31791D");
+        expect(openTicket1[0]).toBeInTheDocument();
+        expect(screen.getAllByText("Hostel Reimbursement Resubmission")[0]).toBeInTheDocument();
+
+        const openTicket2 = await screen.findAllByText("TKT-2026-B0E7C1");
+        expect(openTicket2[0]).toBeInTheDocument();
+        expect(screen.getAllByText("Reimbursement claim for overseas exchange flight ticket")[0]).toBeInTheDocument();
+
+        // closed tickets should not appear
+        const closedTicket = screen.queryByText("TKT-2026-500E17");
+        const closedTicketSubject = screen.queryByText("Enquiry regarding major change");
+
+        expect(closedTicket).not.toBeInTheDocument();
+        expect(closedTicketSubject).not.toBeInTheDocument();
+    })
 });
