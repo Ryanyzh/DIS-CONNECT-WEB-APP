@@ -112,7 +112,7 @@ function StatCard({ label, value, sub }: { label: string; value: number; sub?: s
 	);
 }
 
-export function UsersPage() {
+export function AllAccountsPage() {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<"students" | "hr-officers">("students");
 	const [search, setSearch] = useState("");

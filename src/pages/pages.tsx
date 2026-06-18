@@ -4,7 +4,7 @@ import PageShell from "./PageShell";
 import OverviewPage from "./Overview";
 import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
 import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
-import { UsersPage } from "./users/Users";
+import { AllAccountsPage } from "./users/AllAccounts";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
@@ -22,7 +22,7 @@ export {
 	OverviewPage,
 	CreateStudentAccountPage,
 	CreateHrOfficerAccountPage,
-	UsersPage,
+	AllAccountsPage,
 	OpenTicketsPage,
 	AllTicketsPage,
 	ArchivedTicketsPage,

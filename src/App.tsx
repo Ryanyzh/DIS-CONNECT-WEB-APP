@@ -31,7 +31,7 @@ import {
 	InboxPage,
 	AlertsPage,
 	NotificationSettingsPage,
-	UsersPage,
+	AllAccountsPage,
 	HrOfficersPage,
 	RolesAndPermissionsPage,
 	CreateStudentAccountPage,
@@ -98,7 +98,7 @@ function App() {
 							path="/notifications/settings"
 							element={<NotificationSettingsPage />}
 						/>
-						<Route path="/users/users" element={<UsersPage />} />
+						<Route path="/users/users" element={<AllAccountsPage />} />
 						<Route
 							path="/users/create-student"
 							element={<CreateStudentAccountPage />}
