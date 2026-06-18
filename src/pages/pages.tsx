@@ -122,10 +122,8 @@ export const HrOfficersPage = createPage(
 	"HR Officers",
 	"View and manage HR officer profiles and assignments."
 );
-export const RolesAndPermissionsPage = createPage(
-	"Roles & Permissions",
-	"Create and assign roles across the dashboard"
-);
+
+export { RolesAndPermissionsPage } from "./users/RolesAndPermissions";
 
 export const TicketCategoriesPage = createPage(
 	"Ticket Categories",
