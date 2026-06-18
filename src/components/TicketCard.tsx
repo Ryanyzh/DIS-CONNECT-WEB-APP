@@ -6,17 +6,23 @@ import type { TicketAttachment } from "../types/TicketAttachment";
 import type { Scholar } from "../types/Scholar";
 
 // ticket lifecycle
-export type TicketStatus = "Open" | "In Review" | "Waiting for Response" | "Resolved" | "Closed";
+export type TicketStatus =
+	| "Open"
+	| "In Review"
+	| "Waiting for Response"
+	| "Resolved"
+	| "Closed"
+	| "Escalated";
 
-// ticket tags
-export type TicketTag = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
+// ticket categorys
+export type TicketCategory = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
 
 // fields that a ticket will have when created
 export interface TicketProps {
 	id: string;
 	code: string;
 	title: string;
-	tag: TicketTag;
+	category: TicketCategory;
 	description: string; // description of the issue
 	priority: number; // priority of the ticket, higher number means higher priority (e.g. 1-5, 1 = very low priority, 5 = very high priority)
 	status: TicketStatus;
@@ -34,7 +40,7 @@ export interface TicketCardProps {
 	onStatusChange: () => void; // function to call when status is changed to reload dashboard
 }
 
-export const tagStyles: Record<TicketTag, string> = {
+export const categoryStyles: Record<TicketCategory, string> = {
 	Reimbursement: "bg-blue-600/15 text-blue-800",
 	Exchange: "bg-amber-600/15 text-amber-800",
 	Policy: "bg-emerald-600/15 text-emerald-800",
@@ -48,6 +54,20 @@ export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = 
 	"Waiting for Response": { text: "text-amber-400", bg: "bg-amber-400/15" },
 	Resolved: { text: "text-emerald-400", bg: "bg-emerald-400/15" },
 	Closed: { text: "text-violet-500", bg: "bg-violet-500/15" },
+	Escalated: { text: "text-rose-500", bg: "bg-rose-500/15" },
+};
+
+export const priorityLabels: Record<number, string> = {
+    1: "Low Priority 1",
+    2: "Low Priority 2",
+    3: "Low Priority 3",
+    4: "Medium Priority 4",
+    5: "Medium Priority 5",
+    6: "Medium Priority 6",
+    7: "Medium Priority 7",
+    8: "High Priority 8",
+    9: "High Priority 9",
+    10: "High Priority 10",
 };
 
 export const priorityStyles: Record<number, string> = {
@@ -68,7 +88,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 	const handleCardClick = () => {
 		navigate(`/tickets/${ticket.id}`);
 	};
-	
+
 	const [newStatus, setStatus] = useState<TicketStatus>(ticket.status);
 	const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedStatus = e.target.value as TicketStatus;
@@ -105,7 +125,10 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 		ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
 
 	return (
-		<div onClick={handleCardClick} className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative cursor-pointer">
+		<div
+			onClick={handleCardClick}
+			className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative cursor-pointer"
+		>
 			{/* Ticket ID and status dropdown */}
 			<div className="flex flex-row justify-between mb-2 items-center">
 				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-400">
@@ -136,8 +159,9 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					</option>
 				</select> */}
 
-
-				<span className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}>
+				<span
+					className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}
+				>
 					{ticket.status}
 				</span>
 			</div>
@@ -157,21 +181,19 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					)}
 
 					<span
-						className={`text-xs px-1.5 py-1 mr-1 rounded-md font-semibold ${tagStyles[ticket.tag]}`}
+						className={`text-xs px-1.5 py-1 mr-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
 					>
-						{ticket.tag}
+						{ticket.category}
 					</span>
-					<span>Last updated: {ticket.lastUpdated.toLocaleString()}</span>
+					<span>Last updated: {ticket.lastUpdated.toLocaleString("en-SG")}</span>
 					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
-						Due by: {ticket.deadline.toLocaleString()}
+						Due by: {ticket.deadline.toLocaleString("en-SG")}
 					</span>
 				</div>
-				<span className={`px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}>
-					{ticket.priority <= 3
-						? `Low ${ticket.priority}`
-						: ticket.priority >= 8
-							? `High ${ticket.priority}`
-							: `Medium ${ticket.priority}`}
+				<span
+					className={`px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
+				>
+					{priorityLabels[ticket.priority]}
 				</span>
 			</div>
 		</div>

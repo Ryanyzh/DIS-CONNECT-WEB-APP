@@ -1,0 +1,79 @@
+import type { TicketStatus } from "./TicketCard";
+
+interface ActionsPanelProps {
+	currentStatus: TicketStatus;
+	onAction: (nextStatus: TicketStatus, metadata?: Record<string, any>) => Promise<void>;
+}
+
+export function ActionsPanel({ currentStatus, onAction }: ActionsPanelProps) {
+	return (
+		<div className="w-full border-t rounded-lg rounded-t-none p-4 bg-wise-canvas flex flex-col gap-4 shadow-sm">
+			<span className="font-semibold">Actions</span>
+
+			{currentStatus == "Open" && (
+				<button
+					onClick={() => onAction("In Review")}
+					className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
+				>
+					Assign Ticket
+				</button>
+			)}
+
+			{currentStatus == "In Review" && (
+				<div className="flex flex-col gap-4">
+					<button
+						onClick={() => onAction("Waiting for Response")}
+						className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all"
+					>
+						Request Info
+					</button>
+					<button
+						onClick={() => onAction("Resolved")}
+						className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-all"
+					>
+						Resolve Ticket
+					</button>
+					<button
+						onClick={() => onAction("Escalated")}
+						className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
+					>
+						Escalate Ticket
+					</button>
+				</div>
+			)}
+
+			{currentStatus == "Waiting for Response" && (
+				<button
+					onClick={() => onAction("In Review")}
+					className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
+				>
+					Resume Review
+				</button>
+			)}
+
+			{currentStatus == "Resolved" && (
+				<button
+					onClick={() => onAction("Closed")}
+					className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
+				>
+					Close Ticket
+				</button>
+			)}
+
+			{currentStatus == "Closed" && (
+				<p className="text-sm text-gray-400 italic text-center py-2 border border-dashed rounded-lg">
+					This ticket has been closed. No actions available.
+				</p>
+			)}
+
+			{currentStatus == "Escalated" && (
+				<button
+					onClick={() => onAction("In Review")}
+					className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
+				>
+					Resolve Escalation
+				</button>
+			)}
+		</div>
+	);
+}

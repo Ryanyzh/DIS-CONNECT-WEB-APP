@@ -131,7 +131,8 @@ const columns: {
 	{
 		title: "Unassigned",
 		titleColor: "text-pink-400",
-		filterFunc: (ticket: TicketProps) => ticket.officer == undefined && ticket.status != "Closed",
+		filterFunc: (ticket: TicketProps) =>
+			ticket.officer == undefined && ticket.status != "Closed",
 		bgColor: "bg-pink-400/1",
 	},
 	{
@@ -164,7 +165,19 @@ const columns: {
 ];
 
 export function OpenTicketsPage() {
-	const { tickets, triggerRefresh } = useTickets();
+	const { tickets, triggerRefresh, loading } = useTickets();
+
+	if (loading) {
+		return (
+			<PageShell title="Open Tickets" description="View and manage open tickets.">
+				<div className="bg-wise-canvas h-full w-full flex flex-col items-center justify-center">
+					<div className="flex flex-col items-center gap-3">
+						<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
+					</div>
+				</div>
+			</PageShell>
+		);
+	}
 
 	return (
 		<PageShell title="Open Tickets" description="View and manage open tickets.">
@@ -174,7 +187,9 @@ export function OpenTicketsPage() {
 					<div className="text-xl font-semibold m-4">Ticket Board</div>
 					<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
 						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
-							const filteredTickets: TicketProps[] = tickets.filter(filterFunc).toSorted((a, b) => b.priority - a.priority);
+							const filteredTickets: TicketProps[] = tickets
+								.filter(filterFunc)
+								.toSorted((a, b) => b.priority - a.priority);
 
 							return (
 								<div

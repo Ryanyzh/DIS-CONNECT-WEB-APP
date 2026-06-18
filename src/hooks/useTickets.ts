@@ -5,9 +5,11 @@ import { getIdToken } from "../lib/authRepository";
 export function useTickets(endpointUrl: string = "/api/v1/tickets") {
     const [tickets, setTickets] = useState<TicketProps[]>([]);
     const [refresh, setRefresh] = useState(0); // state to trigger refresh when status changes
+    const [loading, setLoading] = useState<boolean>(true);
 
     const fetchTickets = useCallback(async () => {
         try {
+            setLoading(true);
             const idToken = await getIdToken();
 
             const response = await fetch(endpointUrl, {
@@ -38,6 +40,8 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
             setTickets(formattedTickets);
         } catch (err) {
             console.error("Error retrieving tickets: ", err);
+        } finally {
+            setLoading(false);
         }
     }, [endpointUrl]);
 
@@ -50,5 +54,5 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
         setRefresh((prev) => prev + 1);
     }
 
-    return { tickets, triggerRefresh };
+    return { tickets, triggerRefresh, loading };
 }
