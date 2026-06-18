@@ -185,6 +185,72 @@ export function UsersPage() {
 				</div>
 			</div>
 
+			{/* Stats */}
+			<div className="grid grid-cols-3 gap-4">
+				<StatCard
+					label="Total Accounts"
+					value={mockStudents.length + mockHrOfficers.length}
+					sub="across all roles"
+				/>
+				<StatCard label="Students" value={mockStudents.length} sub="scholar accounts" />
+				<StatCard label="HR Officers" value={mockHrOfficers.length} sub="staff accounts" />
+			</div>
+
+			{/* Search + Tabs */}
+			<div className="flex items-center justify-between gap-4">
+				<div className="relative flex-1 max-w-sm">
+					<svg
+						className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
+					</svg>
+					<input
+						type="text"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Search by name, email, or ID…"
+						className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+					/>
+				</div>
+
+				<div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+					<button
+						onClick={() => setActiveTab("students")}
+						className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+							activeTab === "students"
+								? "bg-white dark:bg-zinc-900 text-wise-ink dark:text-zinc-100 shadow-sm"
+								: "text-zinc-500 dark:text-zinc-400 hover:text-wise-ink dark:hover:text-zinc-200"
+						}`}
+					>
+						Students
+						<span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
+							{mockStudents.length}
+						</span>
+					</button>
+					<button
+						onClick={() => setActiveTab("hr-officers")}
+						className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+							activeTab === "hr-officers"
+								? "bg-white dark:bg-zinc-900 text-wise-ink dark:text-zinc-100 shadow-sm"
+								: "text-zinc-500 dark:text-zinc-400 hover:text-wise-ink dark:hover:text-zinc-200"
+						}`}
+					>
+						HR Officers
+						<span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
+							{mockHrOfficers.length}
+						</span>
+					</button>
+				</div>
+			</div>
+
 			{/* Tables */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
 				{activeTab === "students" && (
