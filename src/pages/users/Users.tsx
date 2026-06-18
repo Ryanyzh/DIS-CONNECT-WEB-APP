@@ -269,6 +269,81 @@ export function UsersPage() {
 						)}
 					</>
 				)}
+
+				{activeTab === "hr-officers" && (
+					<>
+						{filteredOfficers.length === 0 ? (
+							<div className="text-center py-16 text-zinc-400 text-sm">
+								No HR officers match your search.
+							</div>
+						) : (
+							<table className="w-full text-sm">
+								<thead>
+									<tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50">
+										<th className="text-left px-5 py-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+											Officer
+										</th>
+										<th className="text-left px-5 py-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+											Employee ID
+										</th>
+										<th className="text-left px-5 py-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+											Department & Designation
+										</th>
+										<th className="text-left px-5 py-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+											Phone
+										</th>
+										<th className="text-left px-5 py-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+											Joined
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+									{filteredOfficers.map((officer) => (
+										<tr
+											key={officer.id}
+											className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+										>
+											<td className="px-5 py-3.5">
+												<div className="flex items-center gap-3">
+													<div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+														{getInitials(officer.fullName)}
+													</div>
+													<div className="min-w-0">
+														<p className="font-semibold text-wise-ink dark:text-zinc-100 truncate">
+															{officer.fullName}
+														</p>
+														<p className="text-xs text-zinc-400 truncate">
+															{officer.email}
+														</p>
+													</div>
+												</div>
+											</td>
+											<td className="px-5 py-3.5">
+												<span className="inline-block text-xs font-mono font-medium px-2 py-0.5 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 rounded">
+													{officer.employeeId}
+												</span>
+											</td>
+											<td className="px-5 py-3.5">
+												<p className="text-wise-ink dark:text-zinc-100 font-medium">
+													{officer.designation}
+												</p>
+												<p className="text-xs text-zinc-400">
+													{officer.department}
+												</p>
+											</td>
+											<td className="px-5 py-3.5 text-wise-body dark:text-zinc-400">
+												{officer.phone}
+											</td>
+											<td className="px-5 py-3.5 text-wise-body dark:text-zinc-400 whitespace-nowrap">
+												{formatDate(officer.createdAt)}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						)}
+					</>
+				)}
 			</div>
 		</div>
 	);
