@@ -9,6 +9,13 @@ interface RoleMeta {
 	userCount: number;
 }
 
+interface PermissionRow {
+	area: string;
+	action: string;
+	hr_admin: boolean;
+	hr_officer: boolean;
+}
+
 const ROLES: RoleMeta[] = [
 	{
 		key: "hr_admin",
@@ -27,6 +34,47 @@ const ROLES: RoleMeta[] = [
 		userCount: 2,
 	},
 ];
+
+const PERMISSIONS: PermissionRow[] = [
+	// Tickets
+	{ area: "Tickets", action: "View all tickets", hr_admin: true, hr_officer: true },
+	{ area: "Tickets", action: "Assign tickets to officers", hr_admin: true, hr_officer: true },
+	{ area: "Tickets", action: "Close & archive tickets", hr_admin: true, hr_officer: true },
+	// Announcements
+	{ area: "Announcements", action: "View announcements", hr_admin: true, hr_officer: true },
+	{ area: "Announcements", action: "Create & publish", hr_admin: true, hr_officer: true },
+	{ area: "Announcements", action: "Edit & delete", hr_admin: true, hr_officer: true },
+	// Knowledge Base
+	{ area: "Knowledge Base", action: "View FAQ articles", hr_admin: true, hr_officer: true },
+	{ area: "Knowledge Base", action: "Create & edit FAQs", hr_admin: true, hr_officer: true },
+	{ area: "Knowledge Base", action: "Delete FAQs", hr_admin: true, hr_officer: false },
+	// Scholars
+	{ area: "Scholars", action: "View scholar profiles", hr_admin: true, hr_officer: true },
+	{ area: "Scholars", action: "Create student accounts", hr_admin: true, hr_officer: true },
+	{ area: "Scholars", action: "Edit scholar records", hr_admin: true, hr_officer: true },
+	// Analytics
+	{ area: "Analytics", action: "View analytics & reports", hr_admin: true, hr_officer: true },
+	{ area: "Analytics", action: "Export reports", hr_admin: true, hr_officer: false },
+	// User Management
+	{ area: "User Management", action: "View all accounts", hr_admin: true, hr_officer: true },
+	{
+		area: "User Management",
+		action: "Create HR officer accounts",
+		hr_admin: true,
+		hr_officer: false,
+	},
+	{
+		area: "User Management",
+		action: "Manage roles & permissions",
+		hr_admin: true,
+		hr_officer: false,
+	},
+	// Settings
+	{ area: "Settings", action: "View system settings", hr_admin: true, hr_officer: true },
+	{ area: "Settings", action: "Edit system settings", hr_admin: true, hr_officer: false },
+];
+
+const AREAS = Array.from(new Set(PERMISSIONS.map((p) => p.area)));
 
 function Check({ granted }: { granted: boolean }) {
 	if (granted) {
