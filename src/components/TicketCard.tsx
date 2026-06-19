@@ -160,7 +160,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 				</select> */}
 
 				<span
-					className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}
+					className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}
 				>
 					{ticket.status}
 				</span>

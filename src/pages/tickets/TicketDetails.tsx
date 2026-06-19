@@ -1,18 +1,21 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { getIdToken } from "../../lib/authRepository";
+import { getCurrentUser, getIdToken } from "../../lib/authRepository";
 import {
 	type TicketProps,
 	statusStyles,
 	categoryStyles,
 	priorityStyles,
 	priorityLabels,
+	type TicketStatus,
 } from "../../components/TicketCard";
 import { useState, useEffect } from "react";
 import type { Scholar } from "../../types/Scholar";
 import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "../../lib/firebase";
+import { STATUS_IDS, storage } from "../../lib/firebase";
 import { ActionsPanel } from "../../components/ActionsPanel";
 import { TicketInfoPanel } from "../../components/TicketInfoPanel";
+import { useRole } from "../../hooks/useRole";
+import { ActivityTab } from "../../components/ActivityTab";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
@@ -30,11 +33,13 @@ const handleAttachmentPreview = async (filePath: string) => {
 };
 
 export function TicketDetailsPage() {
+	const { role, roleLoading } = useRole(getCurrentUser()?.uid);
 	const { ticketId } = useParams<{ ticketId: string }>();
 	const navigate = useNavigate();
 
 	const [ticket, setTicket] = useState<TicketProps>();
 	const [loading, setLoading] = useState<boolean>(true);
+	const [refresh, setRefresh] = useState<number>(0);
 
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
 
@@ -104,9 +109,44 @@ export function TicketDetailsPage() {
 
 	useEffect(() => {
 		getTicketData();
-	}, [ticketId]);
+	}, [ticketId, refresh]);
 
-	if (loading) {
+	async function handleExecuteAction(nextStatus: TicketStatus, metadata?: Record<string, any>) {
+		if (!ticketId) return;
+
+		const nextStatusId = STATUS_IDS[nextStatus];
+		if (!nextStatusId) {
+			console.error(`No status ID found for ${nextStatus}`);
+			return;
+		}
+
+		try {
+			const idToken = await getIdToken();
+
+			const response = await fetch(`/api/v1/tickets/${ticketId}/status`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					authorization: idToken ? `Bearer ${idToken}` : "",
+				},
+				body: JSON.stringify({
+					status_id: nextStatusId,
+					...metadata,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error(`Error executing action: ${response.status}`);
+			}
+
+			setRefresh((prev) => prev + 1);
+			console.log("Successfully executed action");
+		} catch (error) {
+			console.error("Failed to execute action: ", error);
+		}
+	}
+
+	if (loading || roleLoading) {
 		return (
 			<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-col items-center justify-center">
 				<div className="flex flex-col items-center gap-3">
@@ -146,7 +186,7 @@ export function TicketDetailsPage() {
 				<div className="flex flex-row items-center text-xl font-semibold line-clamp-2 justify-between">
 					<span>{ticket.title}</span>
 					<span
-						className={`line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-sm leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-2.5 py-1.5 rounded-md`}
+						className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-sm leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-2.5 py-1.5 rounded-md`}
 					>
 						{ticket.status}
 					</span>
@@ -173,7 +213,9 @@ export function TicketDetailsPage() {
 						<div className="text-sm text-zinc-400">Scholar</div>
 					</div>
 					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{ticket.createdAt.toLocaleString("en-SG")}</div>
+						<div className="text-lg mb-1">
+							{ticket.createdAt.toLocaleString("en-SG")}
+						</div>
 						<div className="text-sm text-zinc-400">Created</div>
 					</div>
 					<div className="flex-1 flex-col">
@@ -267,13 +309,17 @@ export function TicketDetailsPage() {
 							)}
 						</div>
 					)}
+
+					{activeTab == "Activity" && (<ActivityTab ticketId={ticketId} refresh={refresh} />)}
 				</div>
 			</div>
 
-			{/* Ticket information and actions panel */}
+			{/* Ticket information and actions panel (temporarily allow scholars to see action panel for testing) */}
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} />
-				<ActionsPanel currentStatus={ticket.status} />
+				{role == "scholar" && (
+					<ActionsPanel currentStatus={ticket.status} onAction={handleExecuteAction} />
+				)}
 			</div>
 		</div>
 	);

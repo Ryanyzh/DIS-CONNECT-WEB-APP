@@ -1,3 +1,4 @@
+import { getCurrentUser } from "../lib/authRepository";
 import type { TicketStatus } from "./TicketCard";
 
 interface ActionsPanelProps {
@@ -11,12 +12,23 @@ export function ActionsPanel({ currentStatus, onAction }: ActionsPanelProps) {
 			<span className="font-semibold">Actions</span>
 
 			{currentStatus == "Open" && (
-				<button
-					onClick={() => onAction("In Review")}
-					className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
-				>
-					Assign Ticket
-				</button>
+				<div className="flex flex-col gap-4">
+					<button
+						onClick={() =>
+							onAction("In Review", { assigned_to: getCurrentUser()?.uid })
+						}
+						className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
+					>
+						Claim Ticket
+					</button>
+
+					<button
+						onClick={() => onAction("In Review")}
+						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
+					>
+						Assign Ticket
+					</button>
+				</div>
 			)}
 
 			{currentStatus == "In Review" && (
@@ -52,12 +64,20 @@ export function ActionsPanel({ currentStatus, onAction }: ActionsPanelProps) {
 			)}
 
 			{currentStatus == "Resolved" && (
-				<button
-					onClick={() => onAction("Closed")}
-					className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
-				>
-					Close Ticket
-				</button>
+				<div className="flex flex-col gap-4">
+					<button
+						onClick={() => onAction("Closed")}
+						className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
+					>
+						Close Ticket
+					</button>
+					<button
+						onClick={() => onAction("In Review")}
+						className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
+					>
+						Resume Review
+					</button>
+				</div>
 			)}
 
 			{currentStatus == "Closed" && (
