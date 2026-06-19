@@ -87,7 +87,7 @@ export function ActivityTab({
 			<div className="px-10 py-4 rounded-lg h-[22vw] w-full flex flex-col gap-4 overflow-y-auto">
 				{history.map((log) => (
 					<div key={log.action_id}>
-						<div className={`flex flex-col border ${log.action_type == "Escalated" ? "border-rose-200 hover:border-rose-300 text-rose-500" : "border-slate-200 hover:border-slate-300 text-slate-800"} rounded-2xl rounded-tl-none p-3 shadow-sm transition-all`}>
+						<div className={`flex flex-col border ${log.action_type == "Escalated" ? "border-rose-200 hover:border-rose-300 text-rose-500" : "border-slate-200 hover:border-slate-300 text-slate-800"} rounded-2xl rounded-tl-none p-3 shadow-sm transition-all self-start`}>
 							<p className="text-sm">{log.message}</p>
 						</div>
 

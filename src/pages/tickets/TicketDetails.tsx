@@ -16,6 +16,8 @@ import { ActionsPanel } from "../../components/ActionsPanel";
 import { TicketInfoPanel } from "../../components/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
 import { ActivityTab } from "../../components/ActivityTab";
+import type { HrOfficer } from "../../types/HrOfficer";
+import { ConversationTab } from "../../components/ConversationTab";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
@@ -73,6 +75,23 @@ export function TicketDetailsPage() {
 				email: scholarData.email,
 			};
 
+			let formattedOfficer: HrOfficer | undefined = undefined;
+			
+			if (data.assigned_to != null) {
+				const officerResponse = await fetch(`/api/v1/users/${data.assigned_to}`);
+
+				if (!officerResponse.ok) {
+					throw new Error(`Error retrieving officer: ${officerResponse.status}`);
+				}
+
+				const officerData = await officerResponse.json();
+				formattedOfficer = {
+					id: officerData.user_id,
+					name: officerData.full_name,
+					email: officerData.email,
+				};
+			}
+
 			const formattedTicket: TicketProps = {
 				id: data.ticket_id,
 				code: data.ticket_code,
@@ -85,7 +104,7 @@ export function TicketDetailsPage() {
 				lastUpdated: new Date(data.updated_at),
 				createdAt: new Date(data.created_at),
 				scholar: formattedScholar,
-				officer: data.assigned_to,
+				officer: formattedOfficer,
 				attachments: data.attachments
 					? data.attachments.map((attachment: any) => {
 							return {
@@ -234,9 +253,6 @@ export function TicketDetailsPage() {
 
 							// counts for conversation and attachments
 							let count: number | undefined;
-							if (tab == "Conversation") {
-								count = 0; // placeholder
-							}
 							if (tab == "Attachments") {
 								count = ticket.attachments.length;
 							}
@@ -261,7 +277,7 @@ export function TicketDetailsPage() {
 					)}
 				</div>
 
-				{/* Body of information (only details and attachments so far) */}
+				{/* Body of information (only details and attachments and activity so far) */}
 				<div className="h-full w-full flex flex-col gap-3">
 					{activeTab == "Details" && (
 						<div className="h-full w-full flex flex-col gap-3">
@@ -280,6 +296,10 @@ export function TicketDetailsPage() {
 								</div>
 							</div>
 						</div>
+					)}
+
+					{activeTab == "Conversation" && (
+						<ConversationTab ticketId={ticketId} />
 					)}
 
 					{activeTab == "Attachments" && (
@@ -310,13 +330,15 @@ export function TicketDetailsPage() {
 						</div>
 					)}
 
-					{activeTab == "Activity" && (<ActivityTab ticketId={ticketId} refresh={refresh} />)}
+					{activeTab == "Activity" && (
+						<ActivityTab ticketId={ticketId} refresh={refresh} />
+					)}
 				</div>
 			</div>
 
 			{/* Ticket information and actions panel (temporarily allow scholars to see action panel for testing) */}
 			<div className="h-full w-full flex flex-col border rounded-lg">
-				<TicketInfoPanel ticket={ticket} />
+				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 				{role == "scholar" && (
 					<ActionsPanel currentStatus={ticket.status} onAction={handleExecuteAction} />
 				)}

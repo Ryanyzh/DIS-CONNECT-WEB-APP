@@ -58,16 +58,16 @@ export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = 
 };
 
 export const priorityLabels: Record<number, string> = {
-    1: "Low Priority 1",
-    2: "Low Priority 2",
-    3: "Low Priority 3",
-    4: "Medium Priority 4",
-    5: "Medium Priority 5",
-    6: "Medium Priority 6",
-    7: "Medium Priority 7",
-    8: "High Priority 8",
-    9: "High Priority 9",
-    10: "High Priority 10",
+	1: "Low Priority 1",
+	2: "Low Priority 2",
+	3: "Low Priority 3",
+	4: "Medium Priority 4",
+	5: "Medium Priority 5",
+	6: "Medium Priority 6",
+	7: "Medium Priority 7",
+	8: "High Priority 8",
+	9: "High Priority 9",
+	10: "High Priority 10",
 };
 
 export const priorityStyles: Record<number, string> = {
@@ -175,9 +175,9 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 			<div className="flex flex-wrap justify-between items-center pt-3 text-sm text-zinc-400 gap-4">
 				<div className="flex flex-wrap items-center gap-4">
 					{ticket.officer ? (
-						<span className="font-medium text-zinc-300">{ticket.officer.name}</span>
+						<span>Assigned to: {ticket.officer.name}</span>
 					) : (
-						<span className="font-medium text-pink-400">Unassigned</span>
+						<span className="text-pink-400">Unassigned</span>
 					)}
 
 					<span
