@@ -115,26 +115,21 @@ export function AnnouncementDetailPage() {
 				{/* Author row */}
 				<div className="flex items-center gap-3 mb-5">
 					<div
-						className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${cfg.text} bg-current`}
-						style={{ color: undefined }}
+						className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+						style={{
+							background:
+								announcement.category === "Event"
+									? "#3b82f6"
+									: announcement.category === "Deadline"
+										? "#f43f5e"
+										: announcement.category === "Result"
+											? "#10b981"
+											: announcement.category === "Maintenance"
+												? "#71717a"
+												: "#8b5cf6",
+						}}
 					>
-						<div
-							className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}
-							style={{
-								background:
-									announcement.category === "Event"
-										? "#3b82f6"
-										: announcement.category === "Deadline"
-											? "#f43f5e"
-											: announcement.category === "Result"
-												? "#10b981"
-												: announcement.category === "Maintenance"
-													? "#71717a"
-													: "#8b5cf6",
-							}}
-						>
-							{initials}
-						</div>
+						{initials}
 					</div>
 					<div className="min-w-0">
 						<p className="text-sm font-semibold text-wise-ink dark:text-zinc-100 leading-none">
