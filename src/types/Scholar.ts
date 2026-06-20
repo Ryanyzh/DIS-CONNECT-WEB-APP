@@ -1,4 +1,10 @@
-import type { TicketStatus, TicketTag } from "../components/TicketCard";
+import type { TicketStatus, TicketCategory } from "../components/TicketCard";
+
+export interface BasicScholar {
+	id: string;
+	name: string;
+	email: string;
+}
 
 export type ScholarStatus = "Active" | "On Leave" | "Graduated" | "Inactive";
 
@@ -13,7 +19,7 @@ export interface ScholarExchange {
 export interface ScholarTicket {
 	id: string;
 	title: string;
-	tag: TicketTag;
+	category: TicketCategory;
 	status: TicketStatus;
 	priority: number;
 	createdAt: string;
@@ -72,9 +78,12 @@ export const ticketStatusConfig: Record<TicketStatus, { badge: string }> = {
 	Closed: {
 		badge: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
 	},
+	Escalated: {
+		badge: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800",
+	},
 };
 
-export const ticketTagConfig: Record<TicketTag, string> = {
+export const ticketCategoryConfig: Record<TicketCategory, string> = {
 	Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
 	Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
 	Policy: "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
@@ -124,7 +133,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "EXC-2024-001",
 				title: "Exchange housing reimbursement claim",
-				tag: "Reimbursement",
+				category: "Reimbursement",
 				status: "Resolved",
 				priority: 3,
 				createdAt: "2024-03-10",
@@ -133,7 +142,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "POL-2024-007",
 				title: "Clarification on bond obligation terms",
-				tag: "Policy",
+				category: "Policy",
 				status: "Closed",
 				priority: 2,
 				createdAt: "2024-05-15",
@@ -158,7 +167,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-003",
 				title: "Allowance disbursement delay — May 2024",
-				tag: "Finance",
+				category: "Finance",
 				status: "In Review",
 				priority: 4,
 				createdAt: "2024-05-20",
@@ -198,7 +207,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "GEN-2024-012",
 				title: "Leave of absence documentation request",
-				tag: "General Query",
+				category: "General Query",
 				status: "Waiting for Response",
 				priority: 3,
 				createdAt: "2024-06-01",
@@ -207,7 +216,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-009",
 				title: "Stipend suspension during leave period",
-				tag: "Finance",
+				category: "Finance",
 				status: "Open",
 				priority: 5,
 				createdAt: "2024-06-10",
@@ -232,7 +241,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "POL-2023-044",
 				title: "Post-graduation bond service query",
-				tag: "Policy",
+				category: "Policy",
 				status: "Resolved",
 				priority: 2,
 				createdAt: "2023-11-10",

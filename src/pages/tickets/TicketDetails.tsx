@@ -71,8 +71,18 @@ export function TicketDetailsPage() {
 			const scholarData = await scholarResponse.json();
 			const formattedScholar: Scholar = {
 				id: scholarData.user_id,
-				name: scholarData.full_name,
+				fullName: scholarData.full_name,
 				email: scholarData.email,
+				studentId: scholarData.student_id ?? "",
+				faculty: scholarData.faculty ?? "",
+				program: scholarData.program ?? "",
+				yearOfStudy: scholarData.year_of_study ?? "",
+				phone: scholarData.phone ?? "",
+				preferredContact: scholarData.preferred_contact ?? "Email",
+				scholarshipType: scholarData.scholarship_type ?? "",
+				status: scholarData.status ?? "Active",
+				createdAt: scholarData.created_at ?? "",
+				tickets: [],
 			};
 
 			let formattedOfficer: HrOfficer | undefined = undefined;
@@ -228,7 +238,7 @@ export function TicketDetailsPage() {
 				{/* Scholar, created at, assigned officer */}
 				<div className="flex flex-row w-full text-center items-center justify-between divide-x">
 					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{ticket.scholar.name}</div>
+						<div className="text-lg mb-1">{ticket.scholar.fullName}</div>
 						<div className="text-sm text-zinc-400">Scholar</div>
 					</div>
 					<div className="flex-1 flex-col">

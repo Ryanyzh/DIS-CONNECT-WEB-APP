@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
 	scholarStatusConfig,
 	ticketStatusConfig,
-	ticketTagConfig,
+	ticketCategoryConfig,
 	getInitials,
 	formatDate,
 	MOCK_SCHOLARS,
@@ -241,7 +241,7 @@ export function ScholarDetailPage() {
 							<div className="divide-y divide-zinc-100 dark:divide-zinc-800">
 								{[...openTickets, ...closedTickets].map((ticket) => {
 									const statusCfg = ticketStatusConfig[ticket.status];
-									const tagCfg = ticketTagConfig[ticket.tag];
+									const tagCfg = ticketCategoryConfig[ticket.category];
 									const priority = PRIORITY_LABEL[ticket.priority];
 									return (
 										<div
@@ -257,7 +257,7 @@ export function ScholarDetailPage() {
 														<span
 															className={`text-xs font-medium px-1.5 py-0.5 rounded border ${tagCfg}`}
 														>
-															{ticket.tag}
+															{ticket.category}
 														</span>
 													</div>
 													<p className="text-sm font-semibold text-wise-ink dark:text-zinc-100 leading-snug">
