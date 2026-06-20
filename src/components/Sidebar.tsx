@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import DisconnectLogo from "../assets/disconnect-logo.svg";
-import DisconnectName from "../assets/disconnect-name.svg";
+import DisconnectName from "../assets/disconnect_word_logo_cropped.svg";
 
 const expandableSections = [
 	{
