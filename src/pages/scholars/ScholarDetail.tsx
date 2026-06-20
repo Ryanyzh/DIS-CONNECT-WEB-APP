@@ -1,5 +1,31 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { scholarStatusConfig, getInitials, formatDate, MOCK_SCHOLARS } from "../../types/Scholar";
+import {
+	scholarStatusConfig,
+	ticketStatusConfig,
+	ticketTagConfig,
+	getInitials,
+	formatDate,
+	MOCK_SCHOLARS,
+} from "../../types/Scholar";
+
+const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
+	1: { label: "Very Low", color: "text-zinc-400" },
+	2: { label: "Low", color: "text-blue-500" },
+	3: { label: "Medium", color: "text-amber-500" },
+	4: { label: "High", color: "text-orange-500" },
+	5: { label: "Critical", color: "text-rose-500" },
+};
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+	return (
+		<div className="flex items-start justify-between gap-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800 last:border-0">
+			<span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 flex-shrink-0 w-36">
+				{label}
+			</span>
+			<span className="text-sm text-wise-ink dark:text-zinc-200 text-right">{value}</span>
+		</div>
+	);
+}
 
 export function ScholarDetailPage() {
 	const { id } = useParams<{ id: string }>();
@@ -134,6 +160,131 @@ export function ScholarDetailPage() {
 							</p>
 							<p className="text-xs text-zinc-400 mt-0.5">Open</p>
 						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Two-column body */}
+			<div className="grid grid-cols-3 gap-6">
+				{/* Left: Details */}
+				<div className="col-span-1 space-y-4">
+					{/* Academic info */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-5 shadow-sm">
+						<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
+							Academic
+						</h2>
+						<InfoRow label="Faculty" value={scholar.faculty} />
+						<InfoRow label="Programme" value={scholar.program} />
+						<InfoRow label="Year of Study" value={`Year ${scholar.yearOfStudy}`} />
+						<InfoRow label="Scholarship" value={scholar.scholarshipType} />
+					</div>
+
+					{/* Contact info */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-5 shadow-sm">
+						<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
+							Contact
+						</h2>
+						<InfoRow label="Email" value={scholar.email} />
+						<InfoRow label="Phone" value={scholar.phone} />
+						<InfoRow label="Preferred" value={scholar.preferredContact} />
+					</div>
+
+					{/* Exchange */}
+					{scholar.exchange && (
+						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-5 shadow-sm">
+							<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3">
+								Exchange / Internship
+							</h2>
+							<InfoRow label="University" value={scholar.exchange.university} />
+							<InfoRow label="Country" value={scholar.exchange.country} />
+							<InfoRow
+								label="Period"
+								value={`${formatDate(scholar.exchange.startDate)} – ${formatDate(scholar.exchange.endDate)}`}
+							/>
+							<div className="flex items-start justify-between gap-4 py-2.5">
+								<span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 flex-shrink-0 w-36">
+									Status
+								</span>
+								<span
+									className={`text-xs font-medium px-2 py-0.5 rounded border ${
+										scholar.exchange.status === "Completed"
+											? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800"
+											: scholar.exchange.status === "Ongoing"
+												? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+												: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800"
+									}`}
+								>
+									{scholar.exchange.status}
+								</span>
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* Right: Tickets */}
+				<div className="col-span-2 space-y-4">
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
+						<div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+							<h2 className="text-sm font-semibold text-wise-ink dark:text-zinc-100">
+								Ticket History
+							</h2>
+							<p className="text-xs text-zinc-400 mt-0.5">
+								All support requests submitted by this scholar.
+							</p>
+						</div>
+
+						{scholar.tickets.length === 0 ? (
+							<div className="text-center py-12 text-zinc-400 text-sm">
+								No tickets submitted yet.
+							</div>
+						) : (
+							<div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+								{[...openTickets, ...closedTickets].map((ticket) => {
+									const statusCfg = ticketStatusConfig[ticket.status];
+									const tagCfg = ticketTagConfig[ticket.tag];
+									const priority = PRIORITY_LABEL[ticket.priority];
+									return (
+										<div
+											key={ticket.id}
+											className="px-5 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+										>
+											<div className="flex items-start justify-between gap-3">
+												<div className="flex-1 min-w-0">
+													<div className="flex items-center gap-2 mb-1.5 flex-wrap">
+														<span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+															{ticket.id}
+														</span>
+														<span
+															className={`text-xs font-medium px-1.5 py-0.5 rounded border ${tagCfg}`}
+														>
+															{ticket.tag}
+														</span>
+													</div>
+													<p className="text-sm font-semibold text-wise-ink dark:text-zinc-100 leading-snug">
+														{ticket.title}
+													</p>
+													<div className="flex items-center gap-3 mt-2 text-xs text-zinc-400">
+														<span>
+															Updated {formatDate(ticket.lastUpdated)}
+														</span>
+														<span
+															className={`font-medium ${priority.color}`}
+														>
+															{priority.label} priority
+														</span>
+													</div>
+												</div>
+												<span
+													className={`inline-block text-xs font-medium px-2.5 py-0.5 rounded border whitespace-nowrap flex-shrink-0 ${statusCfg.badge}`}
+												>
+													{ticket.status}
+												</span>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
