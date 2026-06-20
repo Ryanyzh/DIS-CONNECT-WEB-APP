@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./pages/Login";
+import { AnnouncementDetailPage } from "./pages/announcements/AnnouncementDetail";
+import { CreateAnnouncementPage as EditAnnouncementPage } from "./pages/announcements/CreateAnnouncement";
 import {
 	OverviewPage,
 	AllTicketsPage,
@@ -10,6 +12,7 @@ import {
 	ArchivedTicketsPage,
 	ScholarDirectoryPage,
 	ScholarProfilesPage,
+	ScholarDetailPage,
 	ScholarExchangePage,
 	ScholarActivityLogsPage,
 	AllAnnouncementsPage,
@@ -17,6 +20,7 @@ import {
 	TaskTrackingPage,
 	ReminderManagementPage,
 	FaqArticlesPage,
+	CreateFaqPage,
 	KnowledgeCategoriesPage,
 	SuggestedArticlesPage,
 	SearchAnalyticsPage,
@@ -28,7 +32,7 @@ import {
 	InboxPage,
 	AlertsPage,
 	NotificationSettingsPage,
-	UsersPage,
+	AllAccountsPage,
 	HrOfficersPage,
 	RolesAndPermissionsPage,
 	CreateStudentAccountPage,
@@ -58,16 +62,21 @@ function App() {
 						<Route path="/tickets/archived" element={<ArchivedTicketsPage />} />
 						<Route path="/scholars/directory" element={<ScholarDirectoryPage />} />
 						<Route path="/scholars/profiles" element={<ScholarProfilesPage />} />
+						<Route path="/scholars/profiles/:id" element={<ScholarDetailPage />} />
 						<Route path="/scholars/exchange" element={<ScholarExchangePage />} />
 						<Route path="/scholars/activity" element={<ScholarActivityLogsPage />} />
 						<Route path="/announcements/all" element={<AllAnnouncementsPage />} />
 						<Route path="/announcements/create" element={<CreateAnnouncementPage />} />
+						<Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
+						<Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
 						<Route path="/announcements/tasks" element={<TaskTrackingPage />} />
 						<Route
 							path="/announcements/reminders"
 							element={<ReminderManagementPage />}
 						/>
 						<Route path="/knowledge-base/faqs" element={<FaqArticlesPage />} />
+						<Route path="/knowledge-base/faqs/create" element={<CreateFaqPage />} />
+						<Route path="/knowledge-base/faqs/:id/edit" element={<CreateFaqPage />} />
 						<Route
 							path="/knowledge-base/categories"
 							element={<KnowledgeCategoriesPage />}
@@ -76,10 +85,7 @@ function App() {
 							path="/knowledge-base/suggested"
 							element={<SuggestedArticlesPage />}
 						/>
-						<Route
-							path="/knowledge-base/analytics"
-							element={<SearchAnalyticsPage />}
-						/>
+						<Route path="/knowledge-base/analytics" element={<SearchAnalyticsPage />} />
 						<Route path="/analytics/tickets" element={<TicketAnalyticsPage />} />
 						<Route path="/analytics/sla" element={<SlaAnalyticsPage />} />
 						<Route path="/analytics/workload" element={<HrWorkloadPage />} />
@@ -90,8 +96,11 @@ function App() {
 						<Route path="/analytics/reports" element={<ReportsExportPage />} />
 						<Route path="/notifications/inbox" element={<InboxPage />} />
 						<Route path="/notifications/alerts" element={<AlertsPage />} />
-						<Route path="/notifications/settings" element={<NotificationSettingsPage />} />
-						<Route path="/users/users" element={<UsersPage />} />
+						<Route
+							path="/notifications/settings"
+							element={<NotificationSettingsPage />}
+						/>
+						<Route path="/users/users" element={<AllAccountsPage />} />
 						<Route
 							path="/users/create-student"
 							element={<CreateStudentAccountPage />}
@@ -109,10 +118,7 @@ function App() {
 						<Route path="/settings/priorities" element={<PrioritiesPage />} />
 						<Route path="/settings/sla" element={<SlaPoliciesPage />} />
 						<Route path="/settings/escalation" element={<EscalationRulesPage />} />
-						<Route
-							path="/settings/email-templates"
-							element={<EmailTemplatesPage />}
-						/>
+						<Route path="/settings/email-templates" element={<EmailTemplatesPage />} />
 						<Route path="/settings/general" element={<GeneralSettingsPage />} />
 						<Route path="/profile/account" element={<MyAccountPage />} />
 						<Route path="/profile/security" element={<SecurityPage />} />

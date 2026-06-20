@@ -29,23 +29,19 @@ const expandableSections = [
 	},
 	{
 		label: "Knowledge Base",
-		items: [
-			{ label: "FAQ Articles", path: "/knowledge-base/faqs" },
-			{ label: "Categories", path: "/knowledge-base/categories" },
-		],
+		items: [{ label: "FAQ Articles", path: "/knowledge-base/faqs" }],
 	},
 	{
 		label: "Analytics",
 		items: [
 			{ label: "Ticket Analytics", path: "/analytics/tickets" },
 			{ label: "SLA Analytics", path: "/analytics/sla" },
-			{ label: "HR Workload", path: "/analytics/workload" },
 		],
 	},
 	{
 		label: "Users & Roles",
 		items: [
-			{ label: "Users", path: "/users/users" },
+			{ label: "All Accounts", path: "/users/users" },
 			{ label: "Create Student Account", path: "/users/create-student" },
 			{ label: "Create HR Officer Account", path: "/users/create-hr-officer" },
 			{ label: "Roles & Permissions", path: "/users/roles-and-permissions" },

@@ -4,10 +4,12 @@ import PageShell from "./PageShell";
 import OverviewPage from "./Overview";
 import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
 import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
-import { UsersPage } from "./users/Users";
+import { AllAccountsPage } from "./users/AllAccounts";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+import { AllAnnouncementsPage } from "./announcements/AllAnnouncements";
+import { CreateAnnouncementPage } from "./announcements/CreateAnnouncement";
 import { signOut } from "../lib/authRepository";
 
 const createPage = (title: string, description: string) => {
@@ -20,7 +22,7 @@ export {
 	OverviewPage,
 	CreateStudentAccountPage,
 	CreateHrOfficerAccountPage,
-	UsersPage,
+	AllAccountsPage,
 	OpenTicketsPage,
 	AllTicketsPage,
 	ArchivedTicketsPage,
@@ -42,10 +44,10 @@ export const ScholarDirectoryPage = createPage(
 	"Scholar Directory",
 	"Search and browse scholar records in the directory."
 );
-export const ScholarProfilesPage = createPage(
-	"Scholar Profiles",
-	"View detailed scholar profiles and background information."
-);
+
+export { ScholarProfilesPage } from "./scholars/ScholarProfiles";
+export { ScholarDetailPage } from "./scholars/ScholarDetail";
+
 export const ScholarExchangePage = createPage(
 	"Exchange / Internship Tracking",
 	"Track scholar exchange placements and internship status."
@@ -55,14 +57,8 @@ export const ScholarActivityLogsPage = createPage(
 	"Audit scholar activities, attendance, and engagement events."
 );
 
-export const AllAnnouncementsPage = createPage(
-	"All Announcements",
-	"Manage announcements, view recent notices, and publish updates."
-);
-export const CreateAnnouncementPage = createPage(
-	"Create Announcement",
-	"Draft new announcements and share them with scholars or staff."
-);
+export { AllAnnouncementsPage, CreateAnnouncementPage };
+
 export const TaskTrackingPage = createPage(
 	"Task Tracking",
 	"Track announcement-related tasks and progress across initiatives."
@@ -72,10 +68,9 @@ export const ReminderManagementPage = createPage(
 	"Manage reminder schedules and automated notification workflows."
 );
 
-export const FaqArticlesPage = createPage(
-	"FAQ Articles",
-	"Organize frequently asked questions and knowledge content."
-);
+export { AllFaqsPage as FaqArticlesPage } from "./faq/AllFaqs";
+export { CreateFaqPage } from "./faq/CreateFaq";
+
 export const KnowledgeCategoriesPage = createPage(
 	"Categories",
 	"Manage knowledge base categories and content taxonomy."
@@ -127,10 +122,8 @@ export const HrOfficersPage = createPage(
 	"HR Officers",
 	"View and manage HR officer profiles and assignments."
 );
-export const RolesAndPermissionsPage = createPage(
-	"Roles & Permissions",
-	"Create and assign roles across the dashboard"
-);
+
+export { RolesAndPermissionsPage } from "./users/RolesAndPermissions";
 
 export const TicketCategoriesPage = createPage(
 	"Ticket Categories",
