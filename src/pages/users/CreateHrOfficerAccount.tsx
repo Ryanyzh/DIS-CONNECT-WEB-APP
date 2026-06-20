@@ -53,25 +53,29 @@ export function CreateHrOfficerAccountPage() {
 		};
 
 		try {
-			const res = await apiFetch("/api/v1/auth/register-hr-officer", {
+			const res = await apiFetch("/api/v1/auth/register-hr", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
 			});
 
 			if (!res.ok) {
-				const errorText = await res.text();
-				throw new Error(errorText || "Failed to create HR officer account.");
+				let detail = `Request failed with status ${res.status}`;
+				try {
+					const body = await res.json();
+					detail = body.detail ?? JSON.stringify(body);
+				} catch {
+					detail = await res.text() || detail;
+				}
+				showNotification("error", detail);
+				return;
 			}
 
 			showNotification("success", `HR officer account for ${fullName} has been created.`);
 			resetForm();
 		} catch (error) {
 			console.error(error);
-			showNotification(
-				"error",
-				"Failed to create account. Please check the details and try again."
-			);
+			showNotification("error", String(error));
 		} finally {
 			setSubmitting(false);
 		}
