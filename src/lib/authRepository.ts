@@ -1,14 +1,20 @@
-import {
-	signInWithEmailAndPassword,
-	signOut as firebaseSignOut,
-	type User,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, signOut as firebaseSignOut, type User } from "firebase/auth";
 import { auth } from "./firebase";
 
-export async function signInAndGetToken(email: string, password: string): Promise<string> {
+export class AccessDeniedError extends Error {
+	constructor() {
+		super("access-denied");
+		this.name = "AccessDeniedError";
+	}
+}
+
+export async function signInAsHr(email: string, password: string): Promise<void> {
 	const credential = await signInWithEmailAndPassword(auth, email, password);
-	const idToken = await credential.user.getIdToken();
-	return idToken;
+	const tokenResult = await credential.user.getIdTokenResult();
+	if (tokenResult.claims["role"] !== "hr") {
+		await firebaseSignOut(auth);
+		throw new AccessDeniedError();
+	}
 }
 
 export async function getIdToken(forceRefresh = false): Promise<string | null> {
