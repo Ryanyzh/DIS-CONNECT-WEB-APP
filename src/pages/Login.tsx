@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { signInAsHr, AccessDeniedError } from "../lib/authRepository";
 
@@ -20,6 +20,8 @@ function friendlyError(code: string): string {
 
 export function LoginPage() {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/tickets/all";
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export function LoginPage() {
 		setIsLoading(true);
 		try {
 			await signInAsHr(email, password);
-			navigate("/");
+			navigate(from, { replace: true });
 		} catch (err) {
 			if (err instanceof AccessDeniedError) {
 				setError("Access denied. This dashboard is for HR officers only.");
