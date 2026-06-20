@@ -67,17 +67,9 @@ export default function Sidebar() {
 			{/* Logo Section */}
 			<div className="border-b border-wise-ink/10 p-4 flex items-center gap-2.5">
 				<div className="flex h-10 w-10 items-center justify-center rounded-wiseXl bg-wise-green text-wise-ink flex-shrink-0">
-					<img
-						src={DisconnectLogo}
-						alt="Disconnect Logo"
-						className="h-8 w-8 text-wise-ink"
-					/>
+					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-8 w-8" />
 				</div>
-				<img
-					src={DisconnectName}
-					alt="Disconnect Name"
-					className="h-24 ml-1 text-wise-ink"
-				/>
+				<img src={DisconnectName} alt="Disconnect Name" className="h-5 ml-1" />
 			</div>
 
 			<div className="flex-1 space-y-6 p-4">
