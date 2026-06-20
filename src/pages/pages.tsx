@@ -44,10 +44,10 @@ export const ScholarDirectoryPage = createPage(
 	"Scholar Directory",
 	"Search and browse scholar records in the directory."
 );
-export const ScholarProfilesPage = createPage(
-	"Scholar Profiles",
-	"View detailed scholar profiles and background information."
-);
+
+export { ScholarProfilesPage } from "./scholars/ScholarProfiles";
+export { ScholarDetailPage } from "./scholars/ScholarDetail";
+
 export const ScholarExchangePage = createPage(
 	"Exchange / Internship Tracking",
 	"Track scholar exchange placements and internship status."

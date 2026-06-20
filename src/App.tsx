@@ -12,6 +12,7 @@ import {
 	ArchivedTicketsPage,
 	ScholarDirectoryPage,
 	ScholarProfilesPage,
+	ScholarDetailPage,
 	ScholarExchangePage,
 	ScholarActivityLogsPage,
 	AllAnnouncementsPage,
@@ -61,6 +62,7 @@ function App() {
 						<Route path="/tickets/archived" element={<ArchivedTicketsPage />} />
 						<Route path="/scholars/directory" element={<ScholarDirectoryPage />} />
 						<Route path="/scholars/profiles" element={<ScholarProfilesPage />} />
+						<Route path="/scholars/profiles/:id" element={<ScholarDetailPage />} />
 						<Route path="/scholars/exchange" element={<ScholarExchangePage />} />
 						<Route path="/scholars/activity" element={<ScholarActivityLogsPage />} />
 						<Route path="/announcements/all" element={<AllAnnouncementsPage />} />
