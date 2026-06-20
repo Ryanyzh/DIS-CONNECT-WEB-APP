@@ -8,6 +8,7 @@ import { AllAccountsPage } from "./users/AllAccounts";
 import { OpenTicketsPage } from "./tickets/OpenTickets";
 import { AllTicketsPage } from "./tickets/AllTickets";
 import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+import { TicketDetailsPage } from "./tickets/TicketDetails";
 import { AllAnnouncementsPage } from "./announcements/AllAnnouncements";
 import { CreateAnnouncementPage } from "./announcements/CreateAnnouncement";
 import { signOut } from "../lib/authRepository";
@@ -26,6 +27,7 @@ export {
 	OpenTicketsPage,
 	AllTicketsPage,
 	ArchivedTicketsPage,
+	TicketDetailsPage,
 };
 
 export const AssignedTicketsPage = createPage(

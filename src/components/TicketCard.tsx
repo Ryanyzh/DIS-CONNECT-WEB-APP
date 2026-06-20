@@ -1,23 +1,37 @@
 import type { HrOfficer } from "../types/HrOfficer";
 import React, { useState } from "react";
+import { getIdToken } from "../lib/authRepository";
+import { useNavigate } from "react-router-dom";
+import type { TicketAttachment } from "../types/TicketAttachment";
+import type { Scholar } from "../types/Scholar";
 
 // ticket lifecycle
-export type TicketStatus = "Open" | "In Review" | "Waiting for Response" | "Resolved" | "Closed";
+export type TicketStatus =
+	| "Open"
+	| "In Review"
+	| "Waiting for Response"
+	| "Resolved"
+	| "Closed"
+	| "Escalated";
 
-// ticket tags
-export type TicketTag = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
+// ticket categorys
+export type TicketCategory = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
 
 // fields that a ticket will have when created
 export interface TicketProps {
-	id: string; // ticket id in the form of {Tag}-{year of deadline}-{numerical id (number of tickets created in that year with that tag)}
+	id: string;
+	code: string;
 	title: string;
-	tag: TicketTag;
+	category: TicketCategory;
 	description: string; // description of the issue
 	priority: number; // priority of the ticket, higher number means higher priority (e.g. 1-5, 1 = very low priority, 5 = very high priority)
 	status: TicketStatus;
 	deadline: Date; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
 	lastUpdated: Date;
+	createdAt: Date;
+	scholar?: Scholar;
 	officer?: HrOfficer; // the HR officer assigned to the ticket
+	attachments: TicketAttachment[];
 }
 
 // props for TicketCard component, for things specific to the UI of the ticket card
@@ -26,21 +40,53 @@ export interface TicketCardProps {
 	onStatusChange: () => void; // function to call when status is changed to reload dashboard
 }
 
-function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
-	const tagStyles: Record<TicketTag, string> = {
-		Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
-		Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
-		Policy: "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
-		Finance: "bg-rose-950/40 text-rose-300 border-rose-900/40",
-		"General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40",
-	};
+export const categoryStyles: Record<TicketCategory, string> = {
+	Reimbursement: "bg-blue-600/15 text-blue-800",
+	Exchange: "bg-amber-600/15 text-amber-800",
+	Policy: "bg-emerald-600/15 text-emerald-800",
+	Finance: "bg-rose-600/15 text-rose-800",
+	"General Query": "bg-cyan-600/15 text-cyan-800",
+};
 
-	const statusStyles: Record<TicketStatus, string> = {
-		Open: "text-pink-400",
-		"In Review": "text-blue-400",
-		"Waiting for Response": "text-amber-400",
-		Resolved: "text-emerald-400",
-		Closed: "text-violet-500",
+export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = {
+	Open: { text: "text-pink-400", bg: "bg-pink-400/15" },
+	"In Review": { text: "text-blue-400", bg: "bg-blue-400/15" },
+	"Waiting for Response": { text: "text-amber-400", bg: "bg-amber-400/15" },
+	Resolved: { text: "text-emerald-400", bg: "bg-emerald-400/15" },
+	Closed: { text: "text-violet-500", bg: "bg-violet-500/15" },
+	Escalated: { text: "text-rose-500", bg: "bg-rose-500/15" },
+};
+
+export const priorityLabels: Record<number, string> = {
+	1: "Low Priority 1",
+	2: "Low Priority 2",
+	3: "Low Priority 3",
+	4: "Medium Priority 4",
+	5: "Medium Priority 5",
+	6: "Medium Priority 6",
+	7: "Medium Priority 7",
+	8: "High Priority 8",
+	9: "High Priority 9",
+	10: "High Priority 10",
+};
+
+export const priorityStyles: Record<number, string> = {
+	1: "text-green-400 bg-green-400/15",
+	2: "text-green-400 bg-green-400/15",
+	3: "text-green-400 bg-green-400/15",
+	4: "text-yellow-400 bg-yellow-400/15",
+	5: "text-yellow-400 bg-yellow-400/15",
+	6: "text-yellow-400 bg-yellow-400/15",
+	7: "text-yellow-400 bg-yellow-400/15",
+	8: "text-red-400 bg-red-400/15",
+	9: "text-red-400 bg-red-400/15",
+	10: "text-red-400 bg-red-400/15",
+};
+
+function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
+	const navigate = useNavigate();
+	const handleCardClick = () => {
+		navigate(`/tickets/${ticket.id}`);
 	};
 
 	const [newStatus, setStatus] = useState<TicketStatus>(ticket.status);
@@ -52,10 +98,13 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 		}
 
 		try {
+			const idToken = await getIdToken();
+
 			// send HTTP PATCH request to backend to update ticket status
-			const response = await fetch(`/api/tickets/${ticket.id}/status`, {
+			const response = await fetch(`/api/v1/tickets/${ticket.id}/status`, {
 				method: "PATCH",
 				headers: {
+					authorization: idToken ? `Bearer ${idToken}` : "",
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ status: selectedStatus }),
@@ -76,69 +125,75 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 		ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
 
 	return (
-		<div className="bg-zinc-900 p-4 rounded-xl border border-zinc-700/40 shadow-md hover:border-zinc-100/40 transition-all w-full text-zinc-100 flex flex-col justify-between relative">
+		<div
+			onClick={handleCardClick}
+			className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative cursor-pointer"
+		>
 			{/* Ticket ID and status dropdown */}
 			<div className="flex flex-row justify-between mb-2 items-center">
-				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-500">
-					{ticket.id}
+				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-400">
+					{ticket.code}
 				</span>
-				{/* Dropdown button for changing ticket status */}
+
+				{/* Dropdown button for changing ticket status
 				<select
 					name="status"
 					value={newStatus}
 					onChange={handleStatusChange}
-					className={`bg-zinc-900 line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]}`}
+					className={`bg-wise-canvas line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]} focus:outline-none`}
 				>
-					<option value="Open" className="text-zinc-200">
+					<option value="Open" className="bg-zinc-900 text-zinc-100">
 						Open
 					</option>
-					<option value="In Review" className="text-zinc-200">
+					<option value="In Review" className="bg-zinc-900 text-zinc-100">
 						In Review
 					</option>
-					<option value="Waiting for Response" className="text-zinc-200">
+					<option value="Waiting for Response" className="bg-zinc-900 text-zinc-100">
 						Waiting for Response
 					</option>
-					<option value="Resolved" className="text-zinc-200">
+					<option value="Resolved" className="bg-zinc-900 text-zinc-100">
 						Resolved
 					</option>
-					<option value="Closed" className="text-zinc-200">
+					<option value="Closed" className="bg-zinc-900 text-zinc-100">
 						Closed
 					</option>
-				</select>
+				</select> */}
+
+				<span
+					className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}
+				>
+					{ticket.status}
+				</span>
 			</div>
 
 			{/* Ticket title */}
-			<div className="text-lg font-semibold leading-snug tracking-tight text-zinc-200 mb-4 line-clamp-2 ">
+			<div className="text-lg font-semibold leading-snug tracking-tight line-clamp-2">
 				{ticket.title}
 			</div>
 
-			{/* Ticket tag and deadline */}
-			<div className="mb-5 flex justify-between items-center">
-				<span
-					className={`text-xs px-1.5 py-1 mr-1 rounded-md border font-medium ${tagStyles[ticket.tag]}`}
-				>
-					{ticket.tag}
-				</span>
-				<span
-					className={`text-right text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}
-				>
-					by: {ticket.deadline.toLocaleString()}
-				</span>
-			</div>
-
-			{/* Assigned Officer and last updated */}
-			<div className="flex justify-between items-center pt-3 border-t border-zinc-800/60 text-sm text-zinc-400">
-				<div>
+			{/* Assigned Officer, ticket category, last updated, deadline */}
+			<div className="flex flex-wrap justify-between items-center pt-3 text-sm text-zinc-400 gap-4">
+				<div className="flex flex-wrap items-center gap-4">
 					{ticket.officer ? (
-						<span className="font-medium text-zinc-300 mr-1">
-							{ticket.officer.name}
-						</span>
+						<span>Assigned to: {ticket.officer.name}</span>
 					) : (
-						<span className="font-medium text-pink-400 mr-1">Unassigned</span>
+						<span className="text-pink-400">Unassigned</span>
 					)}
+
+					<span
+						className={`text-xs px-1.5 py-1 mr-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
+					>
+						{ticket.category}
+					</span>
+					<span>Last updated: {ticket.lastUpdated.toLocaleString("en-SG")}</span>
+					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
+						Due by: {ticket.deadline.toLocaleString("en-SG")}
+					</span>
 				</div>
-				<span className="text-right">
-					last updated: {ticket.lastUpdated.toLocaleString()}
+				<span
+					className={`px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
+				>
+					{priorityLabels[ticket.priority]}
 				</span>
 			</div>
 		</div>

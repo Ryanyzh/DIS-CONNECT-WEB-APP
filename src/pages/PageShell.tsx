@@ -8,7 +8,7 @@ interface PageShellProps {
 
 export default function PageShell({ title, description, children }: PageShellProps) {
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 w-full md:w-[75vw]">
       <div className="border-b border-wise-ink/10 pb-6 dark:border-wise-canvasSoft/20">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
