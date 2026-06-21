@@ -88,7 +88,6 @@ export function ScholarExchangeFormPage() {
 		(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
 			setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-	
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
@@ -105,9 +104,7 @@ export function ScholarExchangeFormPage() {
 
 		try {
 			const res = await apiFetch(
-				isEditing
-					? `/api/v1/scholars/exchange/${id}`
-					: "/api/v1/scholars/exchange",
+				isEditing ? `/api/v1/scholars/exchange/${id}` : "/api/v1/scholars/exchange",
 				{
 					method: isEditing ? "PATCH" : "POST",
 					headers: { "Content-Type": "application/json" },
@@ -135,7 +132,6 @@ export function ScholarExchangeFormPage() {
 			</div>
 		);
 	}
-	
 
 	return (
 		<div className="max-w-2xl mx-auto">
@@ -275,6 +271,56 @@ export function ScholarExchangeFormPage() {
 								className={inputClass}
 							/>
 						</div>
+					</div>
+
+					{/* Type-specific fields */}
+					{form.type === "Exchange" ? (
+						<div>
+							<label className={labelClass}>Academic Credits</label>
+							<input
+								type="number"
+								min={0}
+								value={form.academicCredits}
+								onChange={set("academicCredits")}
+								placeholder="e.g. 20"
+								className={inputClass}
+							/>
+						</div>
+					) : (
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<label className={labelClass}>Department</label>
+								<input
+									type="text"
+									value={form.department}
+									onChange={set("department")}
+									placeholder="e.g. Cloud Infrastructure"
+									className={inputClass}
+								/>
+							</div>
+							<div>
+								<label className={labelClass}>Supervisor Name</label>
+								<input
+									type="text"
+									value={form.supervisorName}
+									onChange={set("supervisorName")}
+									placeholder="e.g. Ms. Priya Menon"
+									className={inputClass}
+								/>
+							</div>
+						</div>
+					)}
+
+					{/* Notes */}
+					<div>
+						<label className={labelClass}>Notes (optional)</label>
+						<textarea
+							value={form.notes}
+							onChange={set("notes")}
+							rows={3}
+							placeholder="Any remarks or follow-up actions…"
+							className={`${inputClass} resize-none`}
+						/>
 					</div>
 
 					{error && <p className="text-rose-500 text-xs">{error}</p>}
