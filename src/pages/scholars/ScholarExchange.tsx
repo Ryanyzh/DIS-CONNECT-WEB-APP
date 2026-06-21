@@ -9,6 +9,7 @@ import {
 	placementTypeConfig,
 	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
+import { getInitials, formatDate } from "../../types/Scholar";
 
 type TypeFilter = PlacementType | "All";
 type StatusFilter = PlacementStatus | "All";

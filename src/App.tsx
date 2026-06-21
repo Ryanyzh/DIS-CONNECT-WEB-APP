@@ -15,6 +15,7 @@ import {
 	ScholarProfilesPage,
 	ScholarDetailPage,
 	ScholarExchangePage,
+	ScholarExchangeFormPage,
 	ScholarActivityLogsPage,
 	AllAnnouncementsPage,
 	CreateAnnouncementPage,
@@ -66,6 +67,14 @@ function App() {
 						<Route path="/scholars/profiles" element={<ScholarProfilesPage />} />
 						<Route path="/scholars/profiles/:id" element={<ScholarDetailPage />} />
 						<Route path="/scholars/exchange" element={<ScholarExchangePage />} />
+						<Route
+							path="/scholars/exchange/create"
+							element={<ScholarExchangeFormPage />}
+						/>
+						<Route
+							path="/scholars/exchange/:id/edit"
+							element={<ScholarExchangeFormPage />}
+						/>
 						<Route path="/scholars/activity" element={<ScholarActivityLogsPage />} />
 						<Route path="/announcements/all" element={<AllAnnouncementsPage />} />
 						<Route path="/announcements/create" element={<CreateAnnouncementPage />} />

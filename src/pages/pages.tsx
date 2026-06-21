@@ -49,11 +49,9 @@ export const ScholarDirectoryPage = createPage(
 
 export { ScholarProfilesPage } from "./scholars/ScholarProfiles";
 export { ScholarDetailPage } from "./scholars/ScholarDetail";
+export { ScholarExchangePage } from "./scholars/ScholarExchange";
+export { ScholarExchangeFormPage } from "./scholars/ScholarExchangeForm";
 
-export const ScholarExchangePage = createPage(
-	"Exchange / Internship Tracking",
-	"Track scholar exchange placements and internship status."
-);
 export const ScholarActivityLogsPage = createPage(
 	"Scholar Activity Logs",
 	"Audit scholar activities, attendance, and engagement events."
