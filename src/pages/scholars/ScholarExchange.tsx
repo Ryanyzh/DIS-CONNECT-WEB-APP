@@ -5,6 +5,8 @@ import {
 	type ExchangePlacement,
 	type PlacementType,
 	type PlacementStatus,
+	placementStatusConfig,
+	placementTypeConfig,
 	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
 
@@ -19,6 +21,140 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 			</p>
 			<p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
 		</div>
+	);
+}
+
+function PlacementRow({
+	placement,
+	onEdit,
+	onDelete,
+}: {
+	placement: ExchangePlacement;
+	onEdit: () => void;
+	onDelete: () => void;
+}) {
+	const statusCfg = placementStatusConfig[placement.status];
+	const typeCfg = placementTypeConfig[placement.type];
+
+	const duration = (() => {
+		const start = new Date(placement.startDate);
+		const end = new Date(placement.endDate);
+		const months = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30));
+		return `${months} mo`;
+	})();
+
+	return (
+		<tr className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+			{/* Scholar */}
+			<td className="px-5 py-3.5">
+				<div className="flex items-center gap-3">
+					<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+						{getInitials(placement.scholarName)}
+					</div>
+					<div className="min-w-0">
+						<p className="font-semibold text-wise-ink dark:text-zinc-100 text-sm truncate">
+							{placement.scholarName}
+						</p>
+						<p className="text-xs text-zinc-400 truncate">{placement.studentId}</p>
+					</div>
+				</div>
+			</td>
+			{/* Type */}
+			<td className="px-5 py-3.5">
+				<span className={`text-xs font-medium px-2 py-0.5 rounded border ${typeCfg.badge}`}>
+					{placement.type}
+				</span>
+			</td>
+			{/* Host institution */}
+			<td className="px-5 py-3.5">
+				<p className="text-sm font-medium text-wise-ink dark:text-zinc-100 truncate max-w-[180px]">
+					{placement.hostInstitution}
+				</p>
+				<p className="text-xs text-zinc-400">
+					{placement.city}, {placement.country}
+				</p>
+			</td>
+			{/* Dates */}
+			<td className="px-5 py-3.5 whitespace-nowrap">
+				<p className="text-sm text-wise-ink dark:text-zinc-200">
+					{formatDate(placement.startDate)}
+				</p>
+				<p className="text-xs text-zinc-400">
+					→ {formatDate(placement.endDate)} &middot; {duration}
+				</p>
+			</td>
+			{/* Extra info */}
+			<td className="px-5 py-3.5">
+				{placement.type === "Exchange" && placement.academicCredits != null ? (
+					<p className="text-xs text-zinc-500 dark:text-zinc-400">
+						{placement.academicCredits} credits
+					</p>
+				) : placement.type === "Internship" && placement.supervisorName ? (
+					<p className="text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-[140px]">
+						{placement.supervisorName}
+					</p>
+				) : (
+					<span className="text-zinc-300 dark:text-zinc-600 text-xs">—</span>
+				)}
+				{placement.type === "Internship" && placement.department && (
+					<p className="text-xs text-zinc-400 truncate max-w-[140px]">
+						{placement.department}
+					</p>
+				)}
+			</td>
+			{/* Status */}
+			<td className="px-5 py-3.5">
+				<span
+					className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded border ${statusCfg.badge}`}
+				>
+					<span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
+					{placement.status}
+				</span>
+			</td>
+			{/* Actions */}
+			<td className="px-5 py-3.5">
+				<div className="flex items-center gap-3">
+					<button
+						onClick={onEdit}
+						className="text-xs text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 flex items-center gap-1 transition-colors"
+					>
+						<svg
+							className="w-3.5 h-3.5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+							/>
+						</svg>
+						Edit
+					</button>
+					<button
+						onClick={onDelete}
+						className="text-xs text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-colors"
+					>
+						<svg
+							className="w-3.5 h-3.5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+							/>
+						</svg>
+						Delete
+					</button>
+				</div>
+			</td>
+		</tr>
 	);
 }
 
