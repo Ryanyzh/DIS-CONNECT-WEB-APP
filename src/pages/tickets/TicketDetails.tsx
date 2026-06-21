@@ -349,7 +349,7 @@ export function TicketDetailsPage() {
 			{/* Ticket information and actions panel (temporarily allow scholars to see action panel for testing) */}
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
-				{role == "scholar" && (
+				{role == "hr" && (
 					<ActionsPanel currentStatus={ticket.status} onAction={handleExecuteAction} />
 				)}
 			</div>

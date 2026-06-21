@@ -1,125 +1,8 @@
 import PageShell from "../PageShell";
 import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
+import { getCurrentUser } from "../../lib/authRepository";
 
-// const testTickets: TicketProps[] = [
-// 	// In Review
-// 	{
-// 		id: "REB-2024-0012",
-// 		title: "Hostel Reimbursement Year 1 Semester 1",
-// 		tag: "Reimbursement",
-// 		description: "Requesting reimbursement for hostel fees for Year 1 Semester 1",
-// 		priority: 3,
-// 		status: "In Review",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
-// 		officer: {
-// 			id: "0",
-// 			name: "Eileen T.",
-// 			email: "eileen.t@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	{
-// 		id: "REB-2024-0013",
-// 		title: "Hostel Reimbursement Year 1 Semester 2",
-// 		tag: "Reimbursement",
-// 		description: "Requesting reimbursement for hostel fees for Year 1 Semester 2",
-// 		priority: 3,
-// 		status: "In Review",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
-// 		officer: {
-// 			id: "0",
-// 			name: "Eileen T.",
-// 			email: "eileen.t@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	{
-// 		id: "REB-2024-0014",
-// 		title: "Hostel Reimbursement Year 2 Semester 1",
-// 		tag: "Reimbursement",
-// 		description: "Requesting reimbursement for hostel fees for Year 2 Semester 1",
-// 		priority: 3,
-// 		status: "In Review",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
-// 		officer: {
-// 			id: "0",
-// 			name: "Eileen T.",
-// 			email: "eileen.t@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	{
-// 		id: "REB-2024-0015",
-// 		title: "Hostel Reimbursement Year 2 Semester 2",
-// 		tag: "Reimbursement",
-// 		description: "Requesting reimbursement for hostel fees for Year 2 Semester 2",
-// 		priority: 3,
-// 		status: "In Review",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 2 * 60000), // 2 minutes ago
-// 		officer: {
-// 			id: "0",
-// 			name: "Eileen T.",
-// 			email: "eileen.t@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	// Waiting for Response
-// 	{
-// 		id: "EXCH-2024-0051",
-// 		title: "NOC overseas extension",
-// 		tag: "Exchange",
-// 		description: "Requesting extension for overseas exchange",
-// 		priority: 4,
-// 		status: "Waiting for Response",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 5 * 60000), // 5 minutes ago
-// 		officer: {
-// 			id: "1",
-// 			name: "Marcus W.",
-// 			email: "marcus.w@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	// Resolved
-// 	{
-// 		id: "POL-2024-0030",
-// 		title: "Bond deferral - postgrad",
-// 		tag: "Policy",
-// 		description: "Requesting bond deferral for further studies",
-// 		priority: 1,
-// 		status: "Resolved",
-// 		deadline: new Date(new Date().getTime() + 10 * 60000), // 10 minutes later
-// 		lastUpdated: new Date(new Date().getTime() - 5 * 60000), // 5 minutes ago
-// 		officer: {
-// 			id: "1",
-// 			name: "Marcus W.",
-// 			email: "marcus.w@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// 	// Overdue
-// 	{
-// 		id: "EXCH-2024-0040",
-// 		title: "NOC request - urgent",
-// 		tag: "Exchange",
-// 		description: "Requesting permission for overseas exchange",
-// 		priority: 5,
-// 		status: "Waiting for Response",
-// 		deadline: new Date(new Date().getTime() - 10 * 60000), // 10 minutes ago
-// 		lastUpdated: new Date(new Date().getTime() - 20 * 60000), // 20 minutes ago
-// 		officer: {
-// 			id: "0",
-// 			name: "Eileen T.",
-// 			email: "eileen.t@example.com",
-// 			department: "HR",
-// 		},
-// 	},
-// ];
 
 // each column of tickets will have a filter to get the relevant tickets
 const columns: {
@@ -180,7 +63,7 @@ export function OpenTicketsPage() {
 	}
 
 	return (
-		<PageShell title="Open Tickets" description="View and manage open tickets.">
+		<PageShell title="Open Tickets" description="View and manage your open tickets.">
 			<div className="bg-wise-canvas h-full w-full flex flex-col">
 				{/* Ticket Board */}
 				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 w-full">
@@ -188,6 +71,7 @@ export function OpenTicketsPage() {
 					<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
 						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
 							const filteredTickets: TicketProps[] = tickets
+								.filter((ticket) => ticket.officer?.id == getCurrentUser()?.uid || !ticket.officer)
 								.filter(filterFunc)
 								.toSorted((a, b) => b.priority - a.priority);
 

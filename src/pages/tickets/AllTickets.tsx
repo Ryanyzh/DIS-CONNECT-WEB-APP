@@ -37,6 +37,10 @@ export function AllTicketsPage() {
 			status: "Closed" as TicketStatus,
 			count: tickets.filter((ticket) => ticket.status == "Closed").length,
 		},
+        {
+            status: "Escalated" as TicketStatus,
+            count: tickets.filter((ticket) => ticket.status == "Escalated").length,
+        },
 	];
 
 	if (loading) {
