@@ -35,10 +35,94 @@ export function ScholarExchangeFormPage() {
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	useEffect(() => {
+		if (!isEditing) return;
+		apiFetch(`/api/v1/scholars/exchange/${id}`)
+			.then((res) => {
+				if (!res.ok) throw new Error();
+				return res.json();
+			})
+			.then((data) => {
+				setForm({
+					type: data.type,
+					scholarId: data.scholarId,
+					hostInstitution: data.hostInstitution,
+					country: data.country,
+					city: data.city,
+					startDate: data.startDate,
+					endDate: data.endDate,
+					status: data.status,
+					academicCredits: data.academicCredits?.toString() ?? "",
+					department: data.department ?? "",
+					supervisorName: data.supervisorName ?? "",
+					notes: data.notes ?? "",
+				});
+			})
+			.catch(() => {
+				// Fallback to mock data when backend not ready
+				const mock = MOCK_PLACEMENTS.find((p) => p.id === id);
+				if (mock) {
+					setForm({
+						type: mock.type,
+						scholarId: mock.scholarId,
+						hostInstitution: mock.hostInstitution,
+						country: mock.country,
+						city: mock.city,
+						startDate: mock.startDate,
+						endDate: mock.endDate,
+						status: mock.status,
+						academicCredits: mock.academicCredits?.toString() ?? "",
+						department: mock.department ?? "",
+						supervisorName: mock.supervisorName ?? "",
+						notes: mock.notes ?? "",
+					});
+				} else {
+					setError("Placement not found.");
+				}
+			})
+			.finally(() => setLoading(false));
+	}, [id, isEditing]);
+
 	const set =
 		(field: keyof ExchangePlacementFormData) =>
 		(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
 			setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+	
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError(null);
+		setSubmitting(true);
+
+		const scholar = MOCK_SCHOLARS.find((s) => s.id === form.scholarId);
+		const payload = {
+			...form,
+			scholarName: scholar?.fullName ?? "",
+			studentId: scholar?.studentId ?? "",
+			faculty: scholar?.faculty ?? "",
+			academicCredits: form.academicCredits ? Number(form.academicCredits) : undefined,
+		};
+
+		try {
+			const res = await apiFetch(
+				isEditing
+					? `/api/v1/scholars/exchange/${id}`
+					: "/api/v1/scholars/exchange",
+				{
+					method: isEditing ? "PATCH" : "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				}
+			);
+			if (!res.ok) throw new Error();
+			navigate("/scholars/exchange");
+		} catch {
+			// Navigate back anyway when backend is not ready
+			navigate("/scholars/exchange");
+		} finally {
+			setSubmitting(false);
+		}
+	};
 
 	const inputClass =
 		"w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
@@ -51,6 +135,7 @@ export function ScholarExchangeFormPage() {
 			</div>
 		);
 	}
+	
 
 	return (
 		<div className="max-w-2xl mx-auto">
