@@ -259,6 +259,98 @@ export function ScholarExchangePage() {
 				</button>
 			</div>
 
+			{/* Stats */}
+			<div className="grid grid-cols-5 gap-4">
+				<StatCard
+					label="Total"
+					value={stats.total}
+					color="text-wise-ink dark:text-zinc-100"
+				/>
+				<StatCard
+					label="Ongoing"
+					value={stats.ongoing}
+					color="text-emerald-600 dark:text-emerald-400"
+				/>
+				<StatCard
+					label="Upcoming"
+					value={stats.upcoming}
+					color="text-amber-600 dark:text-amber-400"
+				/>
+				<StatCard
+					label="Exchanges"
+					value={stats.exchange}
+					color="text-violet-600 dark:text-violet-400"
+				/>
+				<StatCard
+					label="Internships"
+					value={stats.internship}
+					color="text-cyan-600 dark:text-cyan-400"
+				/>
+			</div>
+
+			{/* Filters */}
+			<div className="flex items-center gap-3 flex-wrap">
+				{/* Search */}
+				<div className="relative flex-1 min-w-[220px] max-w-sm">
+					<svg
+						className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
+					</svg>
+					<input
+						type="text"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Search scholar, institution, country…"
+						className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+					/>
+				</div>
+
+				{/* Type pills */}
+				<div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+					{(["All", "Exchange", "Internship"] as TypeFilter[]).map((t) => (
+						<button
+							key={t}
+							onClick={() => setTypeFilter(t)}
+							className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+								typeFilter === t
+									? "bg-white dark:bg-zinc-900 text-wise-ink dark:text-zinc-100 shadow-sm"
+									: "text-zinc-500 dark:text-zinc-400 hover:text-wise-ink dark:hover:text-zinc-200"
+							}`}
+						>
+							{t}
+						</button>
+					))}
+				</div>
+
+				{/* Status pills */}
+				<div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+					{(
+						["All", "Upcoming", "Ongoing", "Completed", "Cancelled"] as StatusFilter[]
+					).map((s) => (
+						<button
+							key={s}
+							onClick={() => setStatusFilter(s)}
+							className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+								statusFilter === s
+									? "bg-white dark:bg-zinc-900 text-wise-ink dark:text-zinc-100 shadow-sm"
+									: "text-zinc-500 dark:text-zinc-400 hover:text-wise-ink dark:hover:text-zinc-200"
+							}`}
+						>
+							{s}
+						</button>
+					))}
+				</div>
+			</div>
+
 			{/* Table */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
 				{loading ? (
