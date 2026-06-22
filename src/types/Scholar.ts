@@ -28,7 +28,7 @@ export interface ScholarTicket {
 
 export interface Scholar {
 	id: string;
-	fullName: string;
+	name: string;
 	email: string;
 	studentId: string;
 	faculty: string;
