@@ -1,169 +1,156 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "./PageShell";
-import OverviewPage from "./Overview";
-import { CreateStudentAccountPage } from "./users/CreateStudentAccount";
-import { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
-import { AllAccountsPage } from "./users/AllAccounts";
-import { OpenTicketsPage } from "./tickets/OpenTickets";
-import { AllTicketsPage } from "./tickets/AllTickets";
-import { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
-import { TicketDetailsPage } from "./tickets/TicketDetails";
-import { AllAnnouncementsPage } from "./announcements/AllAnnouncements";
-import { CreateAnnouncementPage } from "./announcements/CreateAnnouncement";
 import { signOut } from "../lib/authRepository";
 
 const createPage = (title: string, description: string) => {
-	return function Page() {
-		return <PageShell title={title} description={description} />;
-	};
+    return function Page() {
+        return <PageShell title={title} description={description} />;
+    };
 };
 
-export {
-	OverviewPage,
-	CreateStudentAccountPage,
-	CreateHrOfficerAccountPage,
-	AllAccountsPage,
-	OpenTicketsPage,
-	AllTicketsPage,
-	ArchivedTicketsPage,
-	TicketDetailsPage,
-};
+export function LogoutPage() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        signOut().finally(() => navigate("/login", { replace: true }));
+    }, [navigate]);
+    return (
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <span className="text-zinc-400 text-sm">Signing out...</span>
+        </div>
+    );
+}
 
-export const AssignedTicketsPage = createPage(
-	"Assigned to Me",
-	"Review all tickets currently assigned to your account."
-);
-export const EscalatedTicketsPage = createPage(
-	"Escalated Tickets",
-	"Monitor tickets that have been escalated for priority handling."
-);
+// Overview
+export { default as OverviewPage } from "./Overview";
+
+// Tickets
+export { AllTicketsPage } from "./tickets/AllTickets";
+export { OpenTicketsPage } from "./tickets/OpenTickets";
+export { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
+export { TicketDetailsPage } from "./tickets/TicketDetails";
 export const SlaMonitoringPage = createPage(
-	"SLA Monitoring",
-	"Keep SLA compliance visible and catch upcoming or breached deadlines."
-);
-export const ScholarDirectoryPage = createPage(
-	"Scholar Directory",
-	"Search and browse scholar records in the directory."
+    "SLA Monitoring",
+    "Keep SLA compliance visible and catch upcoming or breached deadlines."
 );
 
+// Scholars
+export const ScholarDirectoryPage = createPage(
+    "Scholar Directory",
+    "Search and browse scholar records in the directory."
+);
 export { ScholarProfilesPage } from "./scholars/ScholarProfiles";
 export { ScholarDetailPage } from "./scholars/ScholarDetail";
 export { ScholarExchangePage } from "./scholars/ScholarExchange";
 export { ScholarExchangeFormPage } from "./scholars/ScholarExchangeForm";
 export { ScholarActivityLogsPage } from "./scholars/ScholarActivityLogs";
 
-export { AllAnnouncementsPage, CreateAnnouncementPage };
-
+// Announcements
+export { AllAnnouncementsPage } from "./announcements/AllAnnouncements";
+export { CreateAnnouncementPage } from "./announcements/CreateAnnouncement";
 export const TaskTrackingPage = createPage(
-	"Task Tracking",
-	"Track announcement-related tasks and progress across initiatives."
+    "Task Tracking",
+    "Track announcement-related tasks and progress across initiatives."
 );
 export const ReminderManagementPage = createPage(
-	"Reminder Management",
-	"Manage reminder schedules and automated notification workflows."
+    "Reminder Management",
+    "Set and manage reminders tied to announcements and deadlines."
 );
 
+// Knowledge Base
 export { AllFaqsPage as FaqArticlesPage } from "./faq/AllFaqs";
 export { CreateFaqPage } from "./faq/CreateFaq";
-
 export const KnowledgeCategoriesPage = createPage(
-	"Categories",
-	"Manage knowledge base categories and content taxonomy."
+    "Categories",
+    "Manage knowledge base categories and content taxonomy."
 );
 export const SuggestedArticlesPage = createPage(
-	"Suggested Articles",
-	"Review suggested knowledge articles for scholar support."
+    "Suggested Articles",
+    "Review and curate articles suggested by the system."
 );
 export const SearchAnalyticsPage = createPage(
-	"Search Analytics",
-	"Analyze knowledge base search behavior and trending topics."
+    "Search Analytics",
+    "Analyse knowledge base search queries and gaps."
 );
 
+// Analytics
 export const TicketAnalyticsPage = createPage(
-	"Ticket Analytics",
-	"Explore ticket volume, resolution patterns, and team performance."
+    "Ticket Analytics",
+    "Explore ticket volume, resolution patterns, and team performance."
 );
 export const SlaAnalyticsPage = createPage(
-	"SLA Analytics",
-	"Review SLA metrics for service performance and compliance."
+    "SLA Analytics",
+    "Review SLA metrics for service performance and compliance."
 );
 export const HrWorkloadPage = createPage(
-	"HR Workload",
-	"Monitor HR workload distribution and capacity planning."
+    "HR Workload",
+    "Monitor HR officer workload and ticket distribution."
 );
 export const ResponseTimeMetricsPage = createPage(
-	"Response Time Metrics",
-	"Track average response times and service speed."
+    "Response Time Metrics",
+    "Track average response and resolution times across the team."
 );
 export const ReportsExportPage = createPage(
-	"Reports & Export",
-	"Export analytics and operational reports for stakeholder review."
+    "Reports & Export",
+    "Generate and export reports for stakeholders."
 );
 
+// Notifications
 export const InboxPage = createPage(
-	"Inbox",
-	"Review system notifications, messages, and recent updates."
+    "Inbox",
+    "View all incoming notifications and messages."
 );
 export const AlertsPage = createPage(
-	"Alerts",
-	"View active alerts and incident notices in one place."
+    "Alerts",
+    "Manage system alerts and escalation notifications."
 );
 export const NotificationSettingsPage = createPage(
-	"Notification Settings",
-	"Configure notification preferences and delivery channels."
+    "Notification Settings",
+    "Configure notification preferences and delivery channels."
 );
 
+// Users
+export { AllAccountsPage } from "./users/AllAccounts";
+export { CreateStudentAccountPage } from "./users/CreateStudentAccount";
+export { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
 export const HrOfficersPage = createPage(
-	"HR Officers",
-	"View and manage HR officer profiles and assignments."
+    "HR Officers",
+    "View and manage HR officer profiles and assignments."
 );
-
 export { RolesAndPermissionsPage } from "./users/RolesAndPermissions";
 
+// Settings
 export const TicketCategoriesPage = createPage(
-	"Ticket Categories",
-	"Manage ticket categories used by the system."
+    "Ticket Categories",
+    "Manage ticket categories used by the system."
 );
 export const PrioritiesPage = createPage(
-	"Priorities",
-	"Define priority levels for incoming tickets."
+    "Priorities",
+    "Configure ticket priority levels and thresholds."
 );
 export const SlaPoliciesPage = createPage(
-	"SLA Policies",
-	"Configure SLA policies and escalation triggers."
+    "SLA Policies",
+    "Define SLA response and resolution time policies."
 );
 export const EscalationRulesPage = createPage(
-	"Escalation Rules",
-	"Define how tickets escalate through support workflows."
+    "Escalation Rules",
+    "Set up rules for automatic ticket escalation."
 );
 export const EmailTemplatesPage = createPage(
-	"Email Templates",
-	"Manage email templates used for automated messages."
+    "Email Templates",
+    "Manage email templates for automated notifications."
 );
 export const GeneralSettingsPage = createPage(
-	"General Settings",
-	"Configure global dashboard and system settings."
+    "General Settings",
+    "Configure global dashboard and system settings."
 );
 
+// Profile
 export const MyAccountPage = createPage(
-	"My Account",
-	"Update your profile, contact information, and preferences."
+    "My Account",
+    "Update your profile, contact information, and preferences."
 );
 export const SecurityPage = createPage(
-	"Security",
-	"Manage login security, passwords, and session controls."
+    "Security",
+    "Manage your password and account security settings."
 );
-export function LogoutPage() {
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		signOut().finally(() => navigate("/login", { replace: true }));
-	}, [navigate]);
-
-	return (
-		<div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-			<span className="text-zinc-400 text-sm">Signing out...</span>
-		</div>
-	);
-}
