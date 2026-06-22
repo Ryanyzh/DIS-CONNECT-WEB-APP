@@ -8,6 +8,7 @@ import {
 	MOCK_ACTIVITY_LOGS,
 } from "../../types/ActivityLog";
 import { getInitials } from "../../types/Scholar";
+import { MOCK_SCHOLARS } from "../../types/Scholar";
 
 // ── Main component ──────────────────────────────────────────────────────────
 
@@ -15,6 +16,11 @@ export function ScholarActivityLogsPage() {
 	const [logs, setLogs] = useState<ActivityLog[]>([]);
 	const [loading, setLoading] = useState(true);
 
+	const [search, setSearch] = useState("");
+	const [scholarFilter, setScholarFilter] = useState("All");
+	const [typeFilter, setTypeFilter] = useState<ActivityEventType | "All">("All");
+	const [dateFrom, setDateFrom] = useState("");
+	const [dateTo, setDateTo] = useState("");
 	const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
 	const fetchLogs = useCallback(() => {
@@ -33,6 +39,43 @@ export function ScholarActivityLogsPage() {
 		fetchLogs();
 	}, [fetchLogs]);
 
+	const toggleExpand = (id: string) =>
+		setExpanded((prev) => {
+			const next = new Set(prev);
+			next.has(id) ? next.delete(id) : next.add(id);
+			return next;
+		});
+
+	const sorted = [...logs].sort(
+		(a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+	);
+
+	const filtered = sorted.filter((l) => {
+		const matchSearch =
+			l.scholarName.toLowerCase().includes(search.toLowerCase()) ||
+			l.description.toLowerCase().includes(search.toLowerCase()) ||
+			l.studentId.toLowerCase().includes(search.toLowerCase()) ||
+			l.performedBy.toLowerCase().includes(search.toLowerCase());
+		const matchScholar = scholarFilter === "All" || l.scholarId === scholarFilter;
+		const matchType = typeFilter === "All" || l.eventType === typeFilter;
+		const ts = new Date(l.timestamp);
+		const matchFrom = !dateFrom || ts >= new Date(dateFrom);
+		const matchTo = !dateTo || ts <= new Date(dateTo + "T23:59:59Z");
+		return matchSearch && matchScholar && matchType && matchFrom && matchTo;
+	});
+
+	const grouped = groupByDate(filtered);
+
+	const clearFilters = () => {
+		setSearch("");
+		setScholarFilter("All");
+		setTypeFilter("All");
+		setDateFrom("");
+		setDateTo("");
+	};
+	const isFiltered =
+		search || scholarFilter !== "All" || typeFilter !== "All" || dateFrom || dateTo;
+
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -43,6 +86,104 @@ export function ScholarActivityLogsPage() {
 				<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
 					Chronological audit trail of all scholar-related events across the system.
 				</p>
+			</div>
+
+			{/* Filters */}
+			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-4 shadow-sm space-y-3">
+				<div className="flex items-center gap-3 flex-wrap">
+					{/* Search */}
+					<div className="relative flex-1 min-w-[200px]">
+						<svg
+							className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+							/>
+						</svg>
+						<input
+							type="text"
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+							placeholder="Search by scholar, description, or officer…"
+							className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+						/>
+					</div>
+
+					{/* Scholar dropdown */}
+					<select
+						value={scholarFilter}
+						onChange={(e) => setScholarFilter(e.target.value)}
+						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+					>
+						<option value="All">All Scholars</option>
+						{MOCK_SCHOLARS.map((s) => (
+							<option key={s.id} value={s.id}>
+								{s.fullName}
+							</option>
+						))}
+					</select>
+
+					{/* Date range */}
+					<input
+						type="date"
+						value={dateFrom}
+						onChange={(e) => setDateFrom(e.target.value)}
+						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+					/>
+					<span className="text-zinc-400 text-sm">to</span>
+					<input
+						type="date"
+						value={dateTo}
+						onChange={(e) => setDateTo(e.target.value)}
+						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+					/>
+
+					{isFiltered && (
+						<button
+							onClick={clearFilters}
+							className="text-xs text-zinc-400 hover:text-rose-500 transition-colors whitespace-nowrap"
+						>
+							Clear filters
+						</button>
+					)}
+				</div>
+
+				{/* Event type pills */}
+				<div className="flex flex-wrap gap-1.5">
+					<button
+						onClick={() => setTypeFilter("All")}
+						className={`text-xs font-medium px-2.5 py-1 rounded-lg border transition-colors ${
+							typeFilter === "All"
+								? "bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 border-wise-ink dark:border-zinc-100"
+								: "bg-white dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400"
+						}`}
+					>
+						All Events
+					</button>
+					{EVENT_TYPES.map((t) => {
+						const cfg = eventConfig[t];
+						const active = typeFilter === t;
+						return (
+							<button
+								key={t}
+								onClick={() => setTypeFilter(t)}
+								className={`text-xs font-medium px-2.5 py-1 rounded-lg border transition-colors ${
+									active
+										? "bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 border-wise-ink dark:border-zinc-100"
+										: `${cfg.badge} hover:opacity-80`
+								}`}
+							>
+								{cfg.label}
+							</button>
+						);
+					})}
+				</div>
 			</div>
 
 			{/* Feed */}
