@@ -111,7 +111,7 @@ export function formatDate(iso: string) {
 export const MOCK_SCHOLARS: Scholar[] = [
 	{
 		id: "1",
-		fullName: "Alice Johnson",
+		name: "Alice Johnson",
 		email: "alice@u.nus.edu",
 		studentId: "A0234567B",
 		faculty: "School of Computing",
@@ -152,7 +152,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 	},
 	{
 		id: "2",
-		fullName: "Bob Smith",
+		name: "Bob Smith",
 		email: "bob@u.nus.edu",
 		studentId: "A0234568C",
 		faculty: "NUS Business School",
@@ -177,7 +177,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 	},
 	{
 		id: "3",
-		fullName: "Carol White",
+		name: "Carol White",
 		email: "carol@u.nus.edu",
 		studentId: "A0234569D",
 		faculty: "College of Humanities & Sciences",
@@ -192,7 +192,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 	},
 	{
 		id: "4",
-		fullName: "David Tan",
+		name: "David Tan",
 		email: "david@u.nus.edu",
 		studentId: "A0211234E",
 		faculty: "College of Design & Engineering",
@@ -226,7 +226,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 	},
 	{
 		id: "5",
-		fullName: "Emily Chen",
+		name: "Emily Chen",
 		email: "emily@u.nus.edu",
 		studentId: "A0198765F",
 		faculty: "Yong Loo Lin School of Medicine",
