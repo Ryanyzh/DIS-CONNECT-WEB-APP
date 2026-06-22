@@ -8,7 +8,7 @@ import {
 	priorityLabels,
 	type TicketStatus,
 } from "../../components/TicketCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
 import { STATUS_IDS, storage } from "../../lib/firebase";
 import { ActionsPanel } from "../../components/ActionsPanel";
@@ -43,7 +43,7 @@ export function TicketDetailsPage() {
 
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
 
-	const getTicketData = async () => {
+	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
 			const idToken = await getIdToken();
@@ -98,11 +98,11 @@ export function TicketDetailsPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		getTicketData();
-	}, [ticketId, refresh]);
+	}, [ticketId, refresh, getTicketData]);
 
 	async function handleExecuteAction(nextStatus: TicketStatus, metadata?: Record<string, any>) {
 		if (!ticketId) return;
@@ -251,7 +251,7 @@ export function TicketDetailsPage() {
 					)}
 				</div>
 
-				{/* Body of information (only details and attachments and activity so far) */}
+				{/* Body of information */}
 				<div className="h-full w-full flex flex-col gap-3">
 					{activeTab == "Details" && (
 						<div className="h-full w-full flex flex-col gap-3">
@@ -310,7 +310,7 @@ export function TicketDetailsPage() {
 				</div>
 			</div>
 
-			{/* Ticket information and actions panel (temporarily allow scholars to see action panel for testing) */}
+			{/* Ticket information and actions panel */}
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 				{role == "hr" && (
