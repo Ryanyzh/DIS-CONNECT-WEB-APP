@@ -10,6 +10,49 @@ import {
 import { getInitials } from "../../types/Scholar";
 import { MOCK_SCHOLARS } from "../../types/Scholar";
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatTimestamp(iso: string): { date: string; time: string; relative: string } {
+	const d = new Date(iso);
+	const now = new Date();
+	const diff = now.getTime() - d.getTime();
+	const mins = Math.floor(diff / 60000);
+	const hours = Math.floor(diff / 3600000);
+	const days = Math.floor(diff / 86400000);
+
+	const relative =
+		mins < 1
+			? "Just now"
+			: mins < 60
+				? `${mins}m ago`
+				: hours < 24
+					? `${hours}h ago`
+					: days < 7
+						? `${days}d ago`
+						: d.toLocaleDateString("en-SG", { day: "numeric", month: "short" });
+
+	return {
+		date: d.toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" }),
+		time: d.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
+		relative,
+	};
+}
+
+function groupByDate(logs: ActivityLog[]): [string, ActivityLog[]][] {
+	const map = new Map<string, ActivityLog[]>();
+	for (const log of logs) {
+		const key = new Date(log.timestamp).toLocaleDateString("en-SG", {
+			weekday: "long",
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+		});
+		if (!map.has(key)) map.set(key, []);
+		map.get(key)!.push(log);
+	}
+	return Array.from(map.entries());
+}
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function ScholarActivityLogsPage() {
@@ -66,6 +109,17 @@ export function ScholarActivityLogsPage() {
 
 	const grouped = groupByDate(filtered);
 
+	const stats = {
+		total: logs.length,
+		today: logs.filter(
+			(l) => new Date(l.timestamp).toDateString() === new Date().toDateString()
+		).length,
+		thisWeek: logs.filter(
+			(l) => new Date().getTime() - new Date(l.timestamp).getTime() < 7 * 86400000
+		).length,
+		scholars: new Set(logs.map((l) => l.scholarId)).size,
+	};
+
 	const clearFilters = () => {
 		setSearch("");
 		setScholarFilter("All");
@@ -86,6 +140,42 @@ export function ScholarActivityLogsPage() {
 				<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
 					Chronological audit trail of all scholar-related events across the system.
 				</p>
+			</div>
+
+			{/* Stats */}
+			<div className="grid grid-cols-4 gap-4">
+				{[
+					{
+						label: "Total Events",
+						value: stats.total,
+						color: "text-wise-ink dark:text-zinc-100",
+					},
+					{
+						label: "Today",
+						value: stats.today,
+						color: "text-violet-600 dark:text-violet-400",
+					},
+					{
+						label: "This Week",
+						value: stats.thisWeek,
+						color: "text-blue-600 dark:text-blue-400",
+					},
+					{
+						label: "Scholars Tracked",
+						value: stats.scholars,
+						color: "text-emerald-600 dark:text-emerald-400",
+					},
+				].map(({ label, value, color }) => (
+					<div
+						key={label}
+						className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-5 py-4 shadow-sm"
+					>
+						<p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+							{label}
+						</p>
+						<p className={`mt-1 text-2xl font-bold ${color}`}>{value}</p>
+					</div>
+				))}
 			</div>
 
 			{/* Filters */}
