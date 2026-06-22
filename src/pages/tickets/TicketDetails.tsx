@@ -16,7 +16,6 @@ import { ActionsPanel } from "../../components/ActionsPanel";
 import { TicketInfoPanel } from "../../components/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
 import { ActivityTab } from "../../components/ActivityTab";
-import type { HrOfficer } from "../../types/HrOfficer";
 import { ConversationTab } from "../../components/ConversationTab";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
@@ -85,23 +84,6 @@ export function TicketDetailsPage() {
 				tickets: [],
 			};
 
-			let formattedOfficer: HrOfficer | undefined = undefined;
-			
-			if (data.assigned_to != null) {
-				const officerResponse = await fetch(`/api/v1/users/${data.assigned_to}`);
-
-				if (!officerResponse.ok) {
-					throw new Error(`Error retrieving officer: ${officerResponse.status}`);
-				}
-
-				const officerData = await officerResponse.json();
-				formattedOfficer = {
-					id: officerData.user_id,
-					name: officerData.full_name,
-					email: officerData.email,
-				};
-			}
-
 			const formattedTicket: TicketProps = {
 				id: data.ticket_id,
 				code: data.ticket_code,
@@ -114,7 +96,7 @@ export function TicketDetailsPage() {
 				lastUpdated: new Date(data.updated_at),
 				createdAt: new Date(data.created_at),
 				scholar: formattedScholar,
-				officer: formattedOfficer,
+				officer: data.assigned_to,
 				attachments: data.attachments
 					? data.attachments.map((attachment: any) => {
 							return {

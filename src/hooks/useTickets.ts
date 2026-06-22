@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { type TicketProps } from "../components/TicketCard";
 import { getIdToken } from "../lib/authRepository";
-import type { HrOfficer } from "../types/HrOfficer";
 
 export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 	const [tickets, setTickets] = useState<TicketProps[]>([]);
@@ -23,24 +22,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
 			}
 			const data = await response.json();
-			const formattedTicketPromises: TicketProps[] = data.tickets.map(async (ticket: any) => {
-				let formattedOfficer: HrOfficer | undefined = undefined;
-
-				if (ticket.assigned_to != null) {
-					const officerResponse = await fetch(`/api/v1/users/${ticket.assigned_to}`);
-
-					if (!officerResponse.ok) {
-						throw new Error(`Error retrieving officer: ${officerResponse.status}`);
-					}
-
-					const officerData = await officerResponse.json();
-					formattedOfficer = {
-						id: officerData.user_id,
-						name: officerData.full_name,
-						email: officerData.email,
-					};
-				}
-
+			const formattedTickets: TicketProps[] = data.tickets.map((ticket: any) => {
 				return {
 					id: ticket.ticket_id,
 					code: ticket.ticket_code,
@@ -52,10 +34,10 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					deadline: new Date(ticket.due_at),
 					lastUpdated: new Date(ticket.updated_at),
 					createdAt: new Date(ticket.created_at),
-					officer: formattedOfficer,
+					officer: ticket.assigned_to,
 				};
 			});
-			const formattedTickets: TicketProps[] = await Promise.all(formattedTicketPromises);
+			
             setTickets(formattedTickets);
 		} catch (err) {
 			console.error("Error retrieving tickets: ", err);
