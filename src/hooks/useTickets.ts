@@ -27,18 +27,37 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					id: ticket.ticket_id,
 					code: ticket.ticket_code,
 					title: ticket.subject,
-					tag: ticket.category.category_name,
+					category: ticket.category.category_name,
 					description: ticket.description,
 					priority: ticket.priority.level,
 					status: ticket.status.status_name,
 					deadline: new Date(ticket.due_at),
 					lastUpdated: new Date(ticket.updated_at),
 					createdAt: new Date(ticket.created_at),
+					scholar: {
+						...ticket.scholar,
+						studentId: ticket.scholar.student_id ?? "",
+						faculty: ticket.scholar.faculty ?? "",
+						program: ticket.scholar.program ?? "",
+						yearOfStudy: ticket.scholar.year_of_study ?? "",
+						preferredContact: ticket.scholar.preferred_contact ?? "Email",
+						scholarshipType: ticket.scholar.scholarship_type ?? "",
+						status: ticket.scholar.status ?? "Active",
+						tickets: [],
+					},
 					officer: ticket.assigned_to,
+					attachments: data.attachments
+						? data.attachments.map((attachment: any) => {
+								return {
+									...attachment,
+									uploaded_at: new Date(attachment.uploaded_at),
+								};
+							})
+						: [],
 				};
 			});
-			
-            setTickets(formattedTickets);
+
+			setTickets(formattedTickets);
 		} catch (err) {
 			console.error("Error retrieving tickets: ", err);
 		} finally {

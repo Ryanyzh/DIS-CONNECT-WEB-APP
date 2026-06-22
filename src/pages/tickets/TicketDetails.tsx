@@ -9,7 +9,6 @@ import {
 	type TicketStatus,
 } from "../../components/TicketCard";
 import { useState, useEffect } from "react";
-import type { Scholar } from "../../types/Scholar";
 import { ref, getDownloadURL } from "firebase/storage";
 import { STATUS_IDS, storage } from "../../lib/firebase";
 import { ActionsPanel } from "../../components/ActionsPanel";
@@ -61,29 +60,6 @@ export function TicketDetailsPage() {
 			}
 			const data = await response.json();
 
-			const scholarResponse = await fetch(`/api/v1/users/${data.scholar_id}`);
-
-			if (!scholarResponse.ok) {
-				throw new Error(`Error retrieving scholar: ${scholarResponse.status}`);
-			}
-
-			const scholarData = await scholarResponse.json();
-			const formattedScholar: Scholar = {
-				id: scholarData.user_id,
-				name: scholarData.full_name,
-				email: scholarData.email,
-				studentId: scholarData.student_id ?? "",
-				faculty: scholarData.faculty ?? "",
-				program: scholarData.program ?? "",
-				yearOfStudy: scholarData.year_of_study ?? "",
-				phone: scholarData.phone ?? "",
-				preferredContact: scholarData.preferred_contact ?? "Email",
-				scholarshipType: scholarData.scholarship_type ?? "",
-				status: scholarData.status ?? "Active",
-				createdAt: scholarData.created_at ?? "",
-				tickets: [],
-			};
-
 			const formattedTicket: TicketProps = {
 				id: data.ticket_id,
 				code: data.ticket_code,
@@ -95,16 +71,22 @@ export function TicketDetailsPage() {
 				deadline: new Date(data.due_at),
 				lastUpdated: new Date(data.updated_at),
 				createdAt: new Date(data.created_at),
-				scholar: formattedScholar,
+				scholar: {
+						...data.scholar,
+						studentId: data.scholar.student_id ?? "",
+						faculty: data.scholar.faculty ?? "",
+						program: data.scholar.program ?? "",
+						yearOfStudy: data.scholar.year_of_study ?? "",
+						preferredContact: data.scholar.preferred_contact ?? "Email",
+						scholarshipType: data.scholar.scholarship_type ?? "",
+						status: data.scholar.status ?? "Active",
+						tickets: [],
+					},
 				officer: data.assigned_to,
 				attachments: data.attachments
 					? data.attachments.map((attachment: any) => {
 							return {
-								attachment_id: attachment.attachment_id,
-								file_name: attachment.file_name,
-								file_path: attachment.file_path,
-								file_type: attachment.file_type,
-								file_size: attachment.file_size,
+								...attachment,
 								uploaded_at: new Date(attachment.uploaded_at),
 							};
 						})
