@@ -19,7 +19,6 @@ export function useRole(uid: string | undefined) {
             }
 
             const user = await response.json();
-            console.log(user.role); // debugging
             setRole(user.role);
         } catch (error) {
             console.error("Error fetching user data from Firestore: ", error);

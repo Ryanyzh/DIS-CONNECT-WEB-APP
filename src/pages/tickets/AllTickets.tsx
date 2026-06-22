@@ -134,7 +134,7 @@ export function AllTicketsPage() {
 							</select>
 						</div>
 					</div>
-					<div className="flex flex-col gap-3 justify-between max-h-[57vh] min-h-0 overflow-y-auto">
+					<div className="flex flex-col gap-3 justify-between h-full max-h-[100vh] min-h-0 overflow-y-auto">
 						{tickets
 							.filter(
 								(ticket) => statusFilter == "All" || ticket.status == statusFilter
