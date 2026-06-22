@@ -51,11 +51,7 @@ export { ScholarProfilesPage } from "./scholars/ScholarProfiles";
 export { ScholarDetailPage } from "./scholars/ScholarDetail";
 export { ScholarExchangePage } from "./scholars/ScholarExchange";
 export { ScholarExchangeFormPage } from "./scholars/ScholarExchangeForm";
-
-export const ScholarActivityLogsPage = createPage(
-	"Scholar Activity Logs",
-	"Audit scholar activities, attendance, and engagement events."
-);
+export { ScholarActivityLogsPage } from "./scholars/ScholarActivityLogs";
 
 export { AllAnnouncementsPage, CreateAnnouncementPage };
 
