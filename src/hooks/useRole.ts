@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiFetch } from "../lib/apiFetch";
 
 export function useRole(uid: string | undefined) {
     const [role, setRole] = useState<string>();
@@ -12,7 +13,7 @@ export function useRole(uid: string | undefined) {
                 throw new Error("No UID provided");
             }
 
-            const response = await fetch(`/api/v1/users/${uid}`);
+            const response = await apiFetch(`/api/v1/users/${uid}`);
 
             if (!response.ok) {
                 throw new Error(`Error retrieving user: ${response.status}`);

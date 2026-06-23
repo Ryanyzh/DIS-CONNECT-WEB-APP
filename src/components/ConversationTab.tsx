@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getIdToken } from "../lib/authRepository";
 import type { TicketAttachment } from "../types/TicketAttachment";
+import { apiFetch } from "../lib/apiFetch";
 
 interface Message {
 	message_id: string;
@@ -27,14 +28,7 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 
 	async function fetchMessages() {
 		try {
-			const idToken = await getIdToken();
-
-			const response = await fetch(`/api/v1/tickets/${ticketId}/messages`, {
-				method: "GET",
-				headers: {
-					authorization: idToken ? `Bearer ${idToken}` : "",
-				},
-			});
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`)
 
 			if (!response.ok) {
 				throw new Error(`Error fetching conversation history: ${response.status}`);
@@ -64,13 +58,11 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 
 		try {
 			setSending(true);
-			const idToken = await getIdToken();
 
-			const response = await fetch(`/api/v1/tickets/${ticketId}/messages`, {
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					authorization: idToken ? `Bearer ${idToken}` : "",
 				},
 				body: JSON.stringify({ message_text: newMessage }),
 			});

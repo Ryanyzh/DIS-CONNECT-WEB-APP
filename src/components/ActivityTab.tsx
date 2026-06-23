@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getIdToken } from "../lib/authRepository";
+import { apiFetch } from "../lib/apiFetch";
 
 interface HistoryLog {
 	action_id: string;
@@ -31,14 +32,8 @@ export function ActivityTab({
 	async function fetchHistory() {
 		try {
 			setActivityLoading(true);
-			const idToken = await getIdToken();
 
-			const response = await fetch(`/api/v1/tickets/${ticketId}/history`, {
-				method: "GET",
-				headers: {
-					authorization: idToken ? `Bearer ${idToken}` : "",
-				},
-			});
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}/history`)
 
 			if (!response.ok) {
 				throw new Error(`Error fetching ticket history: ${response.status}`);

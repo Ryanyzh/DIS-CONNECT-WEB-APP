@@ -37,7 +37,6 @@ export interface TicketProps {
 // props for TicketCard component, for things specific to the UI of the ticket card
 export interface TicketCardProps {
 	ticket: TicketProps;
-	onStatusChange: () => void; // function to call when status is changed to reload dashboard
 }
 
 export const categoryStyles: Record<TicketCategory, string> = {
@@ -83,42 +82,10 @@ export const priorityStyles: Record<number, string> = {
 	10: "text-red-400 bg-red-400/15",
 };
 
-function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
+function TicketCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
 	const handleCardClick = () => {
 		navigate(`/tickets/${ticket.id}`);
-	};
-
-	const [newStatus, setStatus] = useState<TicketStatus>(ticket.status);
-	const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-		const selectedStatus = e.target.value as TicketStatus;
-		setStatus(selectedStatus);
-		if (selectedStatus == ticket.status) {
-			return; // don't need to do anything, status unchanged
-		}
-
-		try {
-			const idToken = await getIdToken();
-
-			// send HTTP PATCH request to backend to update ticket status
-			const response = await fetch(`/api/v1/tickets/${ticket.id}/status`, {
-				method: "PATCH",
-				headers: {
-					authorization: idToken ? `Bearer ${idToken}` : "",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ status: selectedStatus }),
-			});
-
-			if (response.ok) {
-				// ticket status successfully updated, refresh the dashboard to show updated status
-				onStatusChange();
-			}
-		} catch (error) {
-			console.error("Error updating ticket status: ", error);
-			// revert status change in UI
-			setStatus(ticket.status);
-		}
 	};
 
 	const isOverdue =
@@ -134,30 +101,6 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-400">
 					{ticket.code}
 				</span>
-
-				{/* Dropdown button for changing ticket status
-				<select
-					name="status"
-					value={newStatus}
-					onChange={handleStatusChange}
-					className={`bg-wise-canvas line-clamp-2 flex font-semibold text-right w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[newStatus]} focus:outline-none`}
-				>
-					<option value="Open" className="bg-zinc-900 text-zinc-100">
-						Open
-					</option>
-					<option value="In Review" className="bg-zinc-900 text-zinc-100">
-						In Review
-					</option>
-					<option value="Waiting for Response" className="bg-zinc-900 text-zinc-100">
-						Waiting for Response
-					</option>
-					<option value="Resolved" className="bg-zinc-900 text-zinc-100">
-						Resolved
-					</option>
-					<option value="Closed" className="bg-zinc-900 text-zinc-100">
-						Closed
-					</option>
-				</select> */}
 
 				<span
 					className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}

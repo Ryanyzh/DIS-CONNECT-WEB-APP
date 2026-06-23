@@ -148,7 +148,6 @@ export function AllTicketsPage() {
 								<TicketCard
 									key={ticket.id}
 									ticket={ticket}
-									onStatusChange={triggerRefresh}
 								/>
 							))}
 					</div>

@@ -36,7 +36,6 @@ export function ArchivedTicketsPage() {
 							<TicketCard
 								key={closedTicket.id}
 								ticket={closedTicket}
-								onStatusChange={triggerRefresh}
 							/>
 						))}
 					</div>

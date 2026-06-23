@@ -40,7 +40,7 @@ const columns: {
 		title: "Overdue",
 		titleColor: "text-rose-500",
 		filterFunc: (ticket: TicketProps) =>
-			ticket.deadline < new Date() &&
+			new Date(ticket.deadline) < new Date() &&
 			ticket.status != "Resolved" &&
 			ticket.status != "Closed",
 		bgColor: "bg-rose-500/1",
@@ -93,7 +93,6 @@ export function OpenTicketsPage() {
 											<TicketCard
 												key={filteredTicket.id}
 												ticket={filteredTicket}
-												onStatusChange={triggerRefresh}
 											/>
 										))}
 									</div>

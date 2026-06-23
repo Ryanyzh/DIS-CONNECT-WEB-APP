@@ -17,6 +17,7 @@ import { useRole } from "../../hooks/useRole";
 import { ActivityTab } from "../../components/ActivityTab";
 import { ConversationTab } from "../../components/ConversationTab";
 import { formatDate } from "../../types/Scholar";
+import { apiFetch } from "../../lib/apiFetch";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
@@ -47,14 +48,8 @@ export function TicketDetailsPage() {
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
-			const idToken = await getIdToken();
-
-			const response = await fetch(`/api/v1/tickets/${ticketId}`, {
-				method: "GET",
-				headers: {
-					authorization: idToken ? `Bearer ${idToken}` : "",
-				},
-			});
+			
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}`)
 
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);

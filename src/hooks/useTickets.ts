@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { type TicketProps } from "../components/TicketCard";
-import { getIdToken } from "../lib/authRepository";
+import { apiFetch } from "../lib/apiFetch";
 
 export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 	const [tickets, setTickets] = useState<TicketProps[]>([]);
@@ -10,14 +10,8 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 	const fetchTickets = useCallback(async () => {
 		try {
 			setLoading(true);
-			const idToken = await getIdToken();
 
-			const response = await fetch(endpointUrl, {
-				method: "GET",
-				headers: {
-					authorization: idToken ? `Bearer ${idToken}` : "",
-				},
-			});
+			const response = await apiFetch(endpointUrl)
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
 			}
