@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { getIdToken } from "../lib/authRepository";
 import { useNavigate } from "react-router-dom";
 import type { TicketAttachment } from "../types/TicketAttachment";
-import type { Scholar } from "../types/Scholar";
+import { formatDate, type Scholar } from "../types/Scholar";
 
 // ticket lifecycle
 export type TicketStatus =
@@ -26,9 +26,9 @@ export interface TicketProps {
 	description: string; // description of the issue
 	priority: number; // priority of the ticket, higher number means higher priority (e.g. 1-5, 1 = very low priority, 5 = very high priority)
 	status: TicketStatus;
-	deadline: Date; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
-	lastUpdated: Date;
-	createdAt: Date;
+	deadline: string; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
+	lastUpdated: string;
+	createdAt: string;
 	scholar?: Scholar;
 	officer?: HrOfficer; // the HR officer assigned to the ticket
 	attachments: TicketAttachment[];
@@ -122,7 +122,7 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 	};
 
 	const isOverdue =
-		ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
+		new Date(ticket.deadline) < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
 
 	return (
 		<div
@@ -185,9 +185,9 @@ function TicketCard({ ticket, onStatusChange }: TicketCardProps) {
 					>
 						{ticket.category}
 					</span>
-					<span>Last updated: {ticket.lastUpdated.toLocaleString("en-SG")}</span>
+					<span>Last updated: {formatDate(ticket.lastUpdated)}</span>
 					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
-						Due by: {ticket.deadline.toLocaleString("en-SG")}
+						Due by: {formatDate(ticket.deadline)}
 					</span>
 				</div>
 				<span

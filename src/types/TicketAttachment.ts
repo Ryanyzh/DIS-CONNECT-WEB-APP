@@ -4,5 +4,5 @@ export interface TicketAttachment {
     file_path: string;
     file_type: string;
     file_size: number;
-    uploaded_at: Date;
+    uploaded_at: string;
 }

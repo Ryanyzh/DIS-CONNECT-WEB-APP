@@ -1,4 +1,5 @@
 import type { HrOfficer } from "../types/HrOfficer";
+import { formatDate } from "../types/Scholar";
 import { categoryStyles, priorityLabels, priorityStyles, statusStyles, type TicketCategory, type TicketStatus } from "./TicketCard";
 
 
@@ -7,8 +8,8 @@ interface TicketInfo {
     status: TicketStatus;
     priority: number;
     category: TicketCategory;
-    deadline: Date;
-    lastUpdated: Date;
+    deadline: string;
+    lastUpdated: string;
 }
 
 interface TicketInfoPanelProps {
@@ -18,7 +19,7 @@ interface TicketInfoPanelProps {
 
 export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
 	const isOverdue =
-		ticket.deadline < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
+		new Date(ticket.deadline) < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
     
     return (
 		<div className="flex flex-col p-4 gap-4">
@@ -38,10 +39,10 @@ export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
                 <div className={`w-fit px-1.5 py-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}>{ticket.category}</div>
 
                 <div>Due By</div>
-                <div className={`${isOverdue ? "text-rose-500" : "text-green-500"}`}>{ticket.deadline.toLocaleString("en-SG")}</div>
+                <div className={`${isOverdue ? "text-rose-500" : "text-green-500"}`}>{formatDate(ticket.deadline)}</div>
 
                 <div>Last Updated</div>
-                <div>{ticket.lastUpdated.toLocaleString("en-SG")}</div>
+                <div>{formatDate(ticket.lastUpdated)}</div>
 
                 <div>Assigned Officer</div>
                 <div className={`${officer ? "text-black" : "text-pink-400"}`}>{officer ? officer.name : "Unassigned"}</div>

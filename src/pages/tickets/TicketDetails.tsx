@@ -16,6 +16,7 @@ import { TicketInfoPanel } from "../../components/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
 import { ActivityTab } from "../../components/ActivityTab";
 import { ConversationTab } from "../../components/ConversationTab";
+import { formatDate } from "../../types/Scholar";
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
@@ -68,9 +69,9 @@ export function TicketDetailsPage() {
 				description: data.description,
 				priority: data.priority.level,
 				status: data.status.status_name,
-				deadline: new Date(data.due_at),
-				lastUpdated: new Date(data.updated_at),
-				createdAt: new Date(data.created_at),
+				deadline: data.due_at,
+				lastUpdated: data.updated_at,
+				createdAt: data.created_at,
 				scholar: {
 						...data.scholar,
 						studentId: data.scholar.student_id ?? "",
@@ -83,14 +84,7 @@ export function TicketDetailsPage() {
 						tickets: [],
 					},
 				officer: data.assigned_to,
-				attachments: data.attachments
-					? data.attachments.map((attachment: any) => {
-							return {
-								...attachment,
-								uploaded_at: new Date(attachment.uploaded_at),
-							};
-						})
-					: [],
+				attachments: data.attachments ?? [],
 			};
 			setTicket(formattedTicket);
 		} catch (err) {
@@ -207,7 +201,7 @@ export function TicketDetailsPage() {
 					</div>
 					<div className="flex-1 flex-col">
 						<div className="text-lg mb-1">
-							{ticket.createdAt.toLocaleString("en-SG")}
+							{formatDate(ticket.createdAt)}
 						</div>
 						<div className="text-sm text-zinc-400">Created</div>
 					</div>
@@ -266,7 +260,7 @@ export function TicketDetailsPage() {
 
 								<div className="flex flex-col gap-3">
 									<div className="font-semibold">Due Date</div>
-									<div>{ticket.deadline.toLocaleString("en-SG")}</div>
+									<div>{formatDate(ticket.deadline)}</div>
 								</div>
 							</div>
 						</div>
