@@ -5,8 +5,8 @@ import {
 	ticketCategoryConfig,
 	getInitials,
 	formatDate,
-	MOCK_SCHOLARS,
 } from "../../types/Scholar";
+import { MOCK_SCHOLARS } from "../../data/mockScholars";
 
 const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
 	1: { label: "Very Low", color: "text-zinc-400" },
@@ -77,12 +77,12 @@ export function ScholarDetailPage() {
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-sm">
 				<div className="flex items-start gap-5">
 					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-						{getInitials(scholar.fullName)}
+						{getInitials(scholar.name)}
 					</div>
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-3 flex-wrap">
 							<h1 className="text-xl font-bold text-wise-ink dark:text-zinc-100">
-								{scholar.fullName}
+								{scholar.name}
 							</h1>
 							<span
 								className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded border ${statusCfg.badge}`}

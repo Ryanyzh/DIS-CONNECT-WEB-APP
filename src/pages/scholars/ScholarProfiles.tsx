@@ -6,8 +6,8 @@ import {
 	scholarStatusConfig,
 	getInitials,
 	formatDate,
-	MOCK_SCHOLARS,
 } from "../../types/Scholar";
+import { MOCK_SCHOLARS } from "../../data/mockScholars";
 
 const STATUSES: (ScholarStatus | "All")[] = ["All", "Active", "On Leave", "Graduated", "Inactive"];
 
@@ -25,11 +25,11 @@ function ScholarRow({ scholar, onClick }: { scholar: Scholar; onClick: () => voi
 			<td className="px-5 py-3.5">
 				<div className="flex items-center gap-3">
 					<div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-						{getInitials(scholar.fullName)}
+						{getInitials(scholar.name)}
 					</div>
 					<div className="min-w-0">
 						<p className="font-semibold text-wise-ink dark:text-zinc-100 truncate">
-							{scholar.fullName}
+							{scholar.name}
 						</p>
 						<p className="text-xs text-zinc-400 truncate">{scholar.email}</p>
 					</div>
@@ -102,7 +102,7 @@ export function ScholarProfilesPage() {
 
 	const filtered = MOCK_SCHOLARS.filter((s) => {
 		const matchesSearch =
-			s.fullName.toLowerCase().includes(search.toLowerCase()) ||
+			s.name.toLowerCase().includes(search.toLowerCase()) ||
 			s.email.toLowerCase().includes(search.toLowerCase()) ||
 			s.studentId.toLowerCase().includes(search.toLowerCase()) ||
 			s.program.toLowerCase().includes(search.toLowerCase());
