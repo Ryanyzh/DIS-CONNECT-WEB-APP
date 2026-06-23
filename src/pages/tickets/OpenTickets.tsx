@@ -68,48 +68,45 @@ export function OpenTicketsPage() {
 	}
 
 	return (
-		<PageShell title="Open Tickets" description="View and manage open tickets that are assigned to you, unassigned, or escalated.">
-			<div className="bg-wise-canvas h-full w-full flex flex-col">
-				{/* Ticket Board */}
-				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 w-full">
-					<div className="text-xl font-semibold m-4">Ticket Board</div>
-					<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
-						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
-							const filteredTickets: TicketProps[] = tickets
-								.filter(
-									(ticket) =>
-										ticket.officer?.id == getCurrentUser()?.uid ||
-										!ticket.officer ||
-										ticket.status == "Escalated"
-								)
-								.filter(filterFunc)
-								.toSorted((a, b) => b.priority - a.priority);
+		<PageShell
+			title="Open Tickets"
+			description="View and manage open tickets that are assigned to you, unassigned, or escalated."
+		>
+			<div className="bg-wise-canvas h-full max-h-[85vh] min-h-0 w-full flex flex-col">
+				<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
+					{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
+						const filteredTickets: TicketProps[] = tickets
+							.filter(
+								(ticket) =>
+									ticket.officer?.id == getCurrentUser()?.uid ||
+									!ticket.officer ||
+									ticket.status == "Escalated"
+							)
+							.filter(filterFunc)
+							.toSorted((a, b) => b.priority - a.priority);
 
-							return (
-								<div
-									key={title}
-									className={`${bgColor} flex flex-1 flex-col border border-zinc-700/20 rounded-xl h-full min-h-0 w-full min-w-[15rem]`}
-								>
-									{/* Column Header */}
-									<div
-										className={`${titleColor} p-3 font-semibold text-lg w-full`}
-									>
-										{title} ({filteredTickets.length})
-									</div>
-
-									{/* Ticket cards */}
-									<div className="flex flex-1 flex-col gap-y-3 overflow-y-auto">
-										{filteredTickets.map((filteredTicket) => (
-											<TicketCard
-												key={filteredTicket.id}
-												ticket={filteredTicket}
-											/>
-										))}
-									</div>
+						return (
+							<div
+								key={title}
+								className={`${bgColor} flex flex-1 flex-col border border-zinc-700/20 rounded-xl h-full min-h-0 w-full min-w-[15rem]`}
+							>
+								{/* Column Header */}
+								<div className={`${titleColor} p-3 font-semibold text-lg w-full`}>
+									{title} ({filteredTickets.length})
 								</div>
-							);
-						})}
-					</div>
+
+								{/* Ticket cards */}
+								<div className="flex flex-1 flex-col gap-y-3 overflow-y-auto">
+									{filteredTickets.map((filteredTicket) => (
+										<TicketCard
+											key={filteredTicket.id}
+											ticket={filteredTicket}
+										/>
+									))}
+								</div>
+							</div>
+						);
+					})}
 				</div>
 			</div>
 		</PageShell>
