@@ -153,7 +153,10 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 									<div className="flex items-center gap-3 mb-1">
 										<div
 											className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-											style={{ backgroundColor: bgColor.bg, color: bgColor.text }}
+											style={{
+												backgroundColor: bgColor.bg,
+												color: bgColor.text,
+											}}
 										>
 											{initials}
 										</div>
@@ -168,22 +171,6 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 									</div>
 								</div>
 								<div className="space-y-1 p-2">
-									<button className="flex w-full items-center gap-3 rounded-wiseXl px-3 py-2 text-body-md text-wise-ink transition hover:bg-wise-canvasSoft dark:text-wise-canvas dark:hover:bg-[#1a1f14]">
-										<svg
-											className="h-4 w-4"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-											/>
-										</svg>
-										Edit profile
-									</button>
 									<button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
 										<svg
 											className="h-4 w-4"
@@ -205,22 +192,6 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 											/>
 										</svg>
 										Account settings
-									</button>
-									<button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
-										<svg
-											className="h-4 w-4"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
-										Support
 									</button>
 								</div>
 								<div className="border-t border-slate-200/80 p-2 dark:border-slate-700/80">
