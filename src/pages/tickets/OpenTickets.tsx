@@ -3,7 +3,6 @@ import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 import { getCurrentUser } from "../../lib/authRepository";
 
-
 // each column of tickets will have a filter to get the relevant tickets
 const columns: {
 	title: string;
@@ -45,6 +44,12 @@ const columns: {
 			ticket.status != "Closed",
 		bgColor: "bg-rose-500/1",
 	},
+	{
+		title: "Escalated",
+		titleColor: "text-rose-500",
+		filterFunc: (ticket: TicketProps) => ticket.status == "Escalated",
+		bgColor: "bg-rose-500/1",
+	},
 ];
 
 export function OpenTicketsPage() {
@@ -63,7 +68,7 @@ export function OpenTicketsPage() {
 	}
 
 	return (
-		<PageShell title="Open Tickets" description="View and manage your open tickets.">
+		<PageShell title="Open Tickets" description="View and manage open tickets that are assigned to you, unassigned, or escalated.">
 			<div className="bg-wise-canvas h-full w-full flex flex-col">
 				{/* Ticket Board */}
 				<div className="bg-wise-canvas border border-zinc-700/20 rounded-xl h-full min-h-0 w-full">
@@ -71,7 +76,12 @@ export function OpenTicketsPage() {
 					<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
 						{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
 							const filteredTickets: TicketProps[] = tickets
-								.filter((ticket) => ticket.officer?.id == getCurrentUser()?.uid || !ticket.officer)
+								.filter(
+									(ticket) =>
+										ticket.officer?.id == getCurrentUser()?.uid ||
+										!ticket.officer ||
+										ticket.status == "Escalated"
+								)
 								.filter(filterFunc)
 								.toSorted((a, b) => b.priority - a.priority);
 

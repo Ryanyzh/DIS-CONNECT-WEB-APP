@@ -106,6 +106,9 @@ export function AllTicketsPage() {
 								<option value="Closed" className="bg-zinc-900 text-zinc-100">
 									Status: Closed
 								</option>
+								<option value="Escalated" className="bg-zinc-900 text-zinc-100">
+									Status: Escalated
+								</option>
 							</select>
 							<select
 								name="categoryFilter"
