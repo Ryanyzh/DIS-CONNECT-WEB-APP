@@ -1,0 +1,183 @@
+export type PlacementType = "Exchange" | "Internship";
+export type PlacementStatus = "Upcoming" | "Ongoing" | "Completed" | "Cancelled";
+
+export interface ExchangePlacement {
+	id: string;
+	type: PlacementType;
+	// Scholar
+	scholarId: string;
+	scholarName: string;
+	studentId: string;
+	faculty: string;
+	// Placement
+	hostInstitution: string;
+	country: string;
+	city: string;
+	startDate: string; // ISO date
+	endDate: string; // ISO date
+	status: PlacementStatus;
+	// Exchange-specific
+	academicCredits?: number;
+	// Internship-specific
+	department?: string;
+	supervisorName?: string;
+	// Common
+	notes?: string;
+	createdAt: string;
+}
+
+export interface ExchangePlacementFormData {
+	type: PlacementType;
+	scholarId: string;
+	hostInstitution: string;
+	country: string;
+	city: string;
+	startDate: string;
+	endDate: string;
+	status: PlacementStatus;
+	academicCredits: string; // string in form, parsed to number on submit
+	department: string;
+	supervisorName: string;
+	notes: string;
+}
+
+export const PLACEMENT_STATUSES: PlacementStatus[] = [
+	"Upcoming",
+	"Ongoing",
+	"Completed",
+	"Cancelled",
+];
+
+export const placementStatusConfig: Record<PlacementStatus, { badge: string; dot: string }> = {
+	Upcoming: {
+		badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
+		dot: "bg-amber-500",
+	},
+	Ongoing: {
+		badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
+		dot: "bg-emerald-500",
+	},
+	Completed: {
+		badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
+		dot: "bg-blue-500",
+	},
+	Cancelled: {
+		badge: "bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700",
+		dot: "bg-zinc-400",
+	},
+};
+
+export const placementTypeConfig: Record<PlacementType, { badge: string }> = {
+	Exchange: {
+		badge: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
+	},
+	Internship: {
+		badge: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
+	},
+};
+
+export const MOCK_PLACEMENTS: ExchangePlacement[] = [
+	{
+		id: "1",
+		type: "Exchange",
+		scholarId: "1",
+		scholarName: "Alice Johnson",
+		studentId: "A0234567B",
+		faculty: "School of Computing",
+		hostInstitution: "ETH Zürich",
+		country: "Switzerland",
+		city: "Zürich",
+		startDate: "2024-02-01",
+		endDate: "2024-06-30",
+		status: "Completed",
+		academicCredits: 20,
+		notes: "Completed NOC programme. Final transcript received.",
+		createdAt: "2023-11-01",
+	},
+	{
+		id: "2",
+		type: "Internship",
+		scholarId: "2",
+		scholarName: "Bob Smith",
+		studentId: "A0234568C",
+		faculty: "NUS Business School",
+		hostInstitution: "McKinsey & Company",
+		country: "Singapore",
+		city: "Singapore",
+		startDate: "2026-05-12",
+		endDate: "2026-08-08",
+		status: "Ongoing",
+		department: "Strategy & Analytics",
+		supervisorName: "Mr. James Lim",
+		notes: "Summer internship. Mid-point review scheduled for Week 6.",
+		createdAt: "2026-03-15",
+	},
+	{
+		id: "3",
+		type: "Exchange",
+		scholarId: "3",
+		scholarName: "Carol White",
+		studentId: "A0234569D",
+		faculty: "College of Humanities & Sciences",
+		hostInstitution: "University of Amsterdam",
+		country: "Netherlands",
+		city: "Amsterdam",
+		startDate: "2026-09-01",
+		endDate: "2027-01-31",
+		status: "Upcoming",
+		academicCredits: 24,
+		createdAt: "2026-04-20",
+	},
+	{
+		id: "4",
+		type: "Internship",
+		scholarId: "4",
+		scholarName: "David Tan",
+		studentId: "A0211234E",
+		faculty: "College of Design & Engineering",
+		hostInstitution: "ST Engineering",
+		country: "Singapore",
+		city: "Singapore",
+		startDate: "2025-05-05",
+		endDate: "2025-07-25",
+		status: "Completed",
+		department: "Aerospace Systems",
+		supervisorName: "Dr. Rachel Ng",
+		notes: "Industrial attachment. Return-to-hire offer extended.",
+		createdAt: "2025-02-10",
+	},
+	{
+		id: "5",
+		type: "Exchange",
+		scholarId: "5",
+		scholarName: "Emily Chen",
+		studentId: "A0198765F",
+		faculty: "Yong Loo Lin School of Medicine",
+		hostInstitution: "Johns Hopkins University",
+		country: "United States",
+		city: "Baltimore",
+		startDate: "2022-07-01",
+		endDate: "2022-12-15",
+		status: "Completed",
+		academicCredits: 18,
+		notes: "Clinical elective rotation. Excellent evaluation from host supervisor.",
+		createdAt: "2022-03-01",
+	},
+	{
+		id: "6",
+		type: "Internship",
+		scholarId: "1",
+		scholarName: "Alice Johnson",
+		studentId: "A0234567B",
+		faculty: "School of Computing",
+		hostInstitution: "Google",
+		country: "Singapore",
+		city: "Singapore",
+		startDate: "2026-06-02",
+		endDate: "2026-08-22",
+		status: "Ongoing",
+		department: "Cloud Infrastructure",
+		supervisorName: "Ms. Priya Menon",
+		createdAt: "2026-03-28",
+	},
+];
