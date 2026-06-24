@@ -67,18 +67,29 @@ export function TicketDetailsPage() {
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
-				scholar: {
-						...data.scholar,
-						studentId: data.scholar.student_id ?? "",
-						faculty: data.scholar.faculty ?? "",
-						program: data.scholar.program ?? "",
-						yearOfStudy: data.scholar.year_of_study ?? "",
-						preferredContact: data.scholar.preferred_contact ?? "Email",
-						scholarshipType: data.scholar.scholarship_type ?? "",
-						status: data.scholar.status ?? "Active",
-						tickets: [],
-					},
-				officer: data.assigned_to,
+				scholar: data.scholar
+					? {
+							id: data.scholar.id,
+							name: data.scholar.name,
+							email: data.scholar.email,
+							phone: data.scholar.phone ?? "",
+							studentId: data.scholar.student_id ?? "",
+							faculty: data.scholar.faculty ?? "",
+							program: data.scholar.program ?? "",
+							yearOfStudy: data.scholar.year_of_study ?? "",
+							preferredContact: data.scholar.preferred_contact ?? "Email",
+							scholarshipType: data.scholar.scholarship_type ?? "",
+							status: data.scholar.status ?? "Active",
+							tickets: [],
+						}
+					: undefined,
+				officer: data.assigned_officer
+					? {
+							id: data.assigned_officer.id,
+							name: data.assigned_officer.name,
+							email: data.assigned_officer.email,
+						}
+					: undefined,
 				attachments: data.attachments ?? [],
 			};
 			setTicket(formattedTicket);
