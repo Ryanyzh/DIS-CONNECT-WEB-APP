@@ -8,7 +8,7 @@ import {
 	MOCK_ACTIVITY_LOGS,
 } from "../../types/ActivityLog";
 import { getInitials } from "../../types/Scholar";
-import { MOCK_SCHOLARS } from "../../types/Scholar";
+import { MOCK_SCHOLARS } from "../../data/mockScholars";
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -254,7 +254,7 @@ export function ScholarActivityLogsPage() {
 						<option value="All">All Scholars</option>
 						{MOCK_SCHOLARS.map((s) => (
 							<option key={s.id} value={s.id}>
-								{s.fullName}
+								{s.name}
 							</option>
 						))}
 					</select>

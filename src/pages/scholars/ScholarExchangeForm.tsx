@@ -8,7 +8,7 @@ import {
 	PLACEMENT_STATUSES,
 	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
-import { MOCK_SCHOLARS } from "../../types/Scholar";
+import { MOCK_SCHOLARS } from "../../data/mockScholars";
 
 const EMPTY_FORM: ExchangePlacementFormData = {
 	type: "Exchange",
@@ -96,7 +96,7 @@ export function ScholarExchangeFormPage() {
 		const scholar = MOCK_SCHOLARS.find((s) => s.id === form.scholarId);
 		const payload = {
 			...form,
-			scholarName: scholar?.fullName ?? "",
+			scholarName: scholar?.name ?? "",
 			studentId: scholar?.studentId ?? "",
 			faculty: scholar?.faculty ?? "",
 			academicCredits: form.academicCredits ? Number(form.academicCredits) : undefined,
@@ -196,7 +196,7 @@ export function ScholarExchangeFormPage() {
 							<option value="">Select a scholar…</option>
 							{MOCK_SCHOLARS.map((s) => (
 								<option key={s.id} value={s.id}>
-									{s.fullName} — {s.studentId}
+									{s.name} — {s.studentId}
 								</option>
 							))}
 						</select>
