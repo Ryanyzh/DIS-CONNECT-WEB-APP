@@ -2,9 +2,11 @@ import { useState } from "react";
 import PageShell from "../PageShell";
 import TicketCard, { type TicketStatus, statusStyles } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
+import { useCategories } from "../../hooks/useCategories";
 
 export function AllTicketsPage() {
-	const { tickets, triggerRefresh, loading } = useTickets();
+	const { tickets, loading } = useTickets();
+	const categories = useCategories();
 	const [statusFilter, setStatusFilter] = useState<string>("All");
 	const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
@@ -119,21 +121,15 @@ export function AllTicketsPage() {
 								<option value="All" className="bg-zinc-900 text-zinc-100">
 									Category: All
 								</option>
-								<option value="Reimbursement" className="bg-zinc-900 text-zinc-100">
-									Category: Reimbursement
-								</option>
-								<option value="Exchange" className="bg-zinc-900 text-zinc-100">
-									Category: Exchange
-								</option>
-								<option value="Policy" className="bg-zinc-900 text-zinc-100">
-									Category: Policy
-								</option>
-								<option value="Finance" className="bg-zinc-900 text-zinc-100">
-									Category: Finance
-								</option>
-								<option value="General Query" className="bg-zinc-900 text-zinc-100">
-									Category: General Query
-								</option>
+								{categories.map((cat) => (
+									<option
+										key={cat.category_id}
+										value={cat.category_name}
+										className="bg-zinc-900 text-zinc-100"
+									>
+										Category: {cat.category_name}
+									</option>
+								))}
 							</select>
 						</div>
 					</div>
