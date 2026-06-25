@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiFetch } from "../../../lib/apiFetch";
-import { ConversationTab } from "../../../components/ConversationTab";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 
 import "@testing-library/jest-dom/vitest";
 import { ActivityTab } from "../../../components/ActivityTab";
