@@ -119,7 +119,7 @@ const mockMessages = {
 	],
 };
 
-describe("Conversation Tab", () => {
+describe("Conversation Tab test", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		window.HTMLElement.prototype.scrollIntoView = vi.fn();
