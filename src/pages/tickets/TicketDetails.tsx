@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { getCurrentUser, getIdToken } from "../../lib/authRepository";
+import { getCurrentUser } from "../../lib/authRepository";
 import {
 	type TicketProps,
 	statusStyles,
@@ -10,10 +10,11 @@ import {
 } from "../../components/TicketCard";
 import { useState, useEffect, useCallback } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
-import { STATUS_IDS, storage } from "../../lib/firebase";
+import { storage } from "../../lib/firebase";
 import { ActionsPanel } from "../../components/ActionsPanel";
 import { TicketInfoPanel } from "../../components/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
+import { useStatuses } from "../../hooks/useStatuses";
 import { ActivityTab } from "../../components/ActivityTab";
 import { ConversationTab } from "../../components/ConversationTab";
 import { formatDate } from "../../types/Scholar";
@@ -38,6 +39,7 @@ export function TicketDetailsPage() {
 	const { role, roleLoading } = useRole(getCurrentUser()?.uid);
 	const { ticketId } = useParams<{ ticketId: string }>();
 	const navigate = useNavigate();
+	const statusIdMap = useStatuses();
 
 	const [ticket, setTicket] = useState<TicketProps>();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -80,6 +82,7 @@ export function TicketDetailsPage() {
 							preferredContact: data.scholar.preferred_contact ?? "Email",
 							scholarshipType: data.scholar.scholarship_type ?? "",
 							status: data.scholar.status ?? "Active",
+							createdAt: data.scholar.created_at ?? "",
 							tickets: [],
 						}
 					: undefined,
@@ -107,7 +110,7 @@ export function TicketDetailsPage() {
 	async function handleExecuteAction(nextStatus: TicketStatus, metadata?: Record<string, any>) {
 		if (!ticketId) return;
 
-		const nextStatusId = STATUS_IDS[nextStatus];
+		const nextStatusId = statusIdMap[nextStatus];
 		if (!nextStatusId) {
 			console.error(`No status ID found for ${nextStatus}`);
 			return;
@@ -116,9 +119,13 @@ export function TicketDetailsPage() {
 		try {
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
+<<<<<<< HEAD
 				headers: {
 					"Content-Type": "application/json",
 				},
+=======
+				headers: { "Content-Type": "application/json" },
+>>>>>>> 0cb08e8 (Fix web TicketCard status body to use status_id from database rather than hardcoded status)
 				body: JSON.stringify({
 					status_id: nextStatusId,
 					...metadata,
@@ -130,7 +137,6 @@ export function TicketDetailsPage() {
 			}
 
 			setRefresh((prev) => prev + 1);
-			console.log("Successfully executed action");
 		} catch (error) {
 			console.error("Failed to execute action: ", error);
 		}
