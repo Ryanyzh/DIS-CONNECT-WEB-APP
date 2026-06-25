@@ -8,6 +8,7 @@ interface TicketInfo {
     status: TicketStatus;
     priority: number;
     category: TicketCategory;
+    createdAt: string;
     deadline: string;
     lastUpdated: string;
 }
@@ -38,6 +39,9 @@ export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
                 <div>Category</div>
                 <div className={`w-fit px-1.5 py-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}>{ticket.category}</div>
 
+                <div>Created At</div>
+                <div>{formatDate(ticket.createdAt)}</div>
+                
                 <div>Due By</div>
                 <div className={`${isOverdue ? "text-rose-500" : "text-green-500"}`}>{formatDate(ticket.deadline)}</div>
 

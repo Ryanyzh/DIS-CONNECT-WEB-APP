@@ -103,13 +103,10 @@ export function TicketDetailsPage() {
 		}
 
 		try {
-			const idToken = await getIdToken();
-
-			const response = await fetch(`/api/v1/tickets/${ticketId}/status`, {
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
-					authorization: idToken ? `Bearer ${idToken}` : "",
 				},
 				body: JSON.stringify({
 					status_id: nextStatusId,

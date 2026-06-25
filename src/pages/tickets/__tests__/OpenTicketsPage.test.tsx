@@ -10,31 +10,30 @@ declare module "vitest" {
 	interface AsymmetricMatchersContaining extends jest.Matchers<void, any> {}
 }
 
-describe("AllTicketsPage Integration Test", () => {
+describe("OpenTicketsPage Integration Test", () => {
 	const mockTickets = {
 		tickets: [
 			{
 				escalated_at: null,
 				created_at: "2026-06-07T14:34:14.132781+00:00",
-				is_escalated: false,
+				is_escalated: true,
 				scholar_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
 				description:
 					"Enquiry regarding the process and implications of changing major from Computer Science to Business Administration",
 				due_at: null,
 				escalated_to: null,
-				assigned_to: null,
 				source: "mobile",
 				ticket_id: "6ff67865-dfdf-486b-85ea-6e969ef5d705",
 				closed_at: null,
 				subject: "Enquiry regarding major change",
-				updated_at: "2026-06-07T14:34:14.132781+00:00",
 				ticket_code: "TKT-2026-500E17",
+				updated_at: "2026-06-23T03:12:23.072689+00:00",
 				resolved_at: null,
 				status: {
-					status_id: "ece14a06-c6fd-55e6-8017-1cad1c82d0ce",
+					status_id: "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
 					status_name: "Closed", // CLOSED TICKET
 					status_type: "terminal",
-					is_closed: true,
+					is_closed: false,
 				},
 				priority: {
 					priority_id: "f1b9f4e8-4723-50b5-92ae-ddd8d5b929db",
@@ -46,6 +45,14 @@ describe("AllTicketsPage Integration Test", () => {
 					category_id: "4308c61a-353f-5c6c-b09c-830cbe0cb101",
 					category_name: "Policy",
 				},
+				scholar: {
+					id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
+					name: "Ryan Tan",
+					email: "ryan.tan@u.nus.edu",
+					phone: "+65 9123 4567",
+					createdAt: "2026-05-24T17:29:40.259379+00:00",
+				},
+				assigned_to: null,
 				attachments: [
 					{
 						attachment_id: "986a5517-9220-4fdb-a641-4f9161a8be8b",
@@ -67,7 +74,6 @@ describe("AllTicketsPage Integration Test", () => {
 					"Requesting reimbursement for hostel fees for Year 1 Semester 1 - Resubmission after rejection",
 				due_at: null,
 				escalated_to: null,
-				assigned_to: null,
 				source: "mobile",
 				ticket_id: "aa765f16-f5e3-43e8-88c5-370e4cd9ce96",
 				closed_at: null,
@@ -91,28 +97,35 @@ describe("AllTicketsPage Integration Test", () => {
 					category_id: "503b3a9a-fc71-5c51-83b9-f24ddf9725dc",
 					category_name: "Reimbursement",
 				},
+				scholar: {
+					id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
+					name: "Ryan Tan",
+					email: "ryan.tan@u.nus.edu",
+					phone: "+65 9123 4567",
+					createdAt: "2026-05-24T17:29:40.259379+00:00",
+				},
+				assigned_to: null,
 				attachments: [],
 			},
 			{
 				escalated_at: null,
 				created_at: "2026-06-06T14:05:01.385264+00:00",
-				is_escalated: false,
+				is_escalated: true,
 				scholar_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
 				description:
 					"I would like to submit my reimbursement claim for my flight ticket to Toronto for the NOC programme. I have attached the invoice and payment receipt. Could HR advise if the claim amount and supporting documents are sufficient?",
 				due_at: null,
 				escalated_to: null,
-				assigned_to: null,
 				source: "mobile",
 				ticket_id: "64e57d1e-e7ce-4aa9-a163-b4604559c218",
 				closed_at: null,
-				updated_at: "2026-06-06T14:05:01.385265+00:00",
-				subject: "Reimbursement claim for overseas exchange flight ticket",
 				ticket_code: "TKT-2026-B0E7C1",
+				subject: "Reimbursement claim for overseas exchange flight ticket",
+				updated_at: "2026-06-23T03:16:01.886146+00:00",
 				resolved_at: null,
 				status: {
-					status_id: "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
-					status_name: "In Review",
+					status_id: "52YiKzCj6wkXszMAt8xn",
+					status_name: "Escalated",
 					status_type: "active",
 					is_closed: false,
 				},
@@ -125,6 +138,18 @@ describe("AllTicketsPage Integration Test", () => {
 				category: {
 					category_id: "503b3a9a-fc71-5c51-83b9-f24ddf9725dc",
 					category_name: "Reimbursement",
+				},
+				scholar: {
+					id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
+					name: "Ryan Tan",
+					email: "ryan.tan@u.nus.edu",
+					phone: "+65 9123 4567",
+					createdAt: "2026-05-24T17:29:40.259379+00:00",
+				},
+				assigned_to: {
+					id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
+					name: "Daniel Wong",
+					email: "daniel.wong@scholarhr.edu.sg",
 				},
 				attachments: [
 					{
@@ -142,37 +167,39 @@ describe("AllTicketsPage Integration Test", () => {
 		],
 	};
 
-    beforeEach(() => {
-        vi.spyOn(globalThis, "fetch").mockResolvedValue(
-            Response.json(mockTickets, { status: 200 })
-        );
-    });
+	beforeEach(() => {
+		vi.spyOn(globalThis, "fetch").mockResolvedValue(
+			Response.json(mockTickets, { status: 200 })
+		);
+	});
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-    });
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 
-    it("renders active open tickets and excludes closed tickets", async () => {
-        render(
-            <MemoryRouter>
-                <OpenTicketsPage />
-            </MemoryRouter>
-        )
+	it("renders active open tickets and excludes closed tickets", async () => {
+		render(
+			<MemoryRouter>
+				<OpenTicketsPage />
+			</MemoryRouter>
+		);
 
-        // open tickets should appear
-        const openTicket1 = await screen.findAllByText("TKT-2026-31791D");
-        expect(openTicket1[0]).toBeInTheDocument();
-        expect(screen.getAllByText("Hostel Reimbursement Resubmission")[0]).toBeInTheDocument();
+		// open tickets should appear
+		const openTicket1 = await screen.findAllByText("TKT-2026-31791D");
+		expect(openTicket1[0]).toBeInTheDocument();
+		expect(screen.getAllByText("Hostel Reimbursement Resubmission")[0]).toBeInTheDocument();
 
-        const openTicket2 = await screen.findAllByText("TKT-2026-B0E7C1");
-        expect(openTicket2[0]).toBeInTheDocument();
-        expect(screen.getAllByText("Reimbursement claim for overseas exchange flight ticket")[0]).toBeInTheDocument();
+		const openTicket2 = await screen.findAllByText("TKT-2026-B0E7C1");
+		expect(openTicket2[0]).toBeInTheDocument();
+		expect(
+			screen.getAllByText("Reimbursement claim for overseas exchange flight ticket")[0]
+		).toBeInTheDocument();
 
-        // closed tickets should not appear
-        const closedTicket = screen.queryByText("TKT-2026-500E17");
-        const closedTicketSubject = screen.queryByText("Enquiry regarding major change");
+		// closed tickets should not appear
+		const closedTicket = screen.queryByText("TKT-2026-500E17");
+		const closedTicketSubject = screen.queryByText("Enquiry regarding major change");
 
-        expect(closedTicket).not.toBeInTheDocument();
-        expect(closedTicketSubject).not.toBeInTheDocument();
-    })
+		expect(closedTicket).not.toBeInTheDocument();
+		expect(closedTicketSubject).not.toBeInTheDocument();
+	});
 });
