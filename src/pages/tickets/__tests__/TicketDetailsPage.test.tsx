@@ -4,7 +4,6 @@ import { TicketDetailsPage } from "../TicketDetails";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
 import "@testing-library/jest-dom/vitest";
-import { STATUS_IDS } from "../../../lib/firebase";
 
 declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}
@@ -39,6 +38,15 @@ vi.mock("firebase/storage", () => {
 });
 
 describe("TicketDetailsPage Integration Test", () => {
+	const statusIdMap = {
+		Resolved: "15d186e3-c9eb-5c97-8765-1da3093041a9",
+		"In Review": "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
+		Escalated: "52YiKzCj6wkXszMAt8xn",
+		"Waiting for Response": "c8b8f6f5-d021-5086-94c0-8aad835a92fe",
+		Open: "e252e869-ceff-5a1f-987f-c781100eda4c",
+		Closed: "ece14a06-c6fd-55e6-8017-1cad1c82d0ce",
+	};
+
 	const mockTicketDetails = {
 		escalated_at: null,
 		created_at: "2026-06-06T14:05:01.385264+00:00",
@@ -105,6 +113,15 @@ describe("TicketDetailsPage Integration Test", () => {
 		vi.spyOn(globalThis, "fetch").mockImplementation((url) => {
 			const urlString = url.toString();
 
+			if (urlString.includes("/api/v1/tickets/statuses")) {
+				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
+                    status_id: id,
+                    status_name: name,
+                }));
+
+                return Promise.resolve(Response.json(mockStatusesResponse, { status: 200 }));
+			}
+			
 			if (urlString.includes("XDRno5f0JAbAsOfV8WzbvQYxn253")) {
 				return Promise.resolve(
 					Response.json(
@@ -259,23 +276,27 @@ describe("TicketDetailsPage Integration Test", () => {
 		);
 
 		const escalateBtn = await screen.findByRole("button", { name: /escalate/i });
-        expect(escalateBtn).toBeInTheDocument();
+		expect(escalateBtn).toBeInTheDocument();
 		fireEvent.click(escalateBtn);
 
 		// check that a PATCH request was sent
 		await waitFor(() => {
-            const statusUpdateRequest = fetchSpy.mock.calls.find((call) => call[0].toString().includes("/status"));
+			const statusUpdateRequest = fetchSpy.mock.calls.find((call) =>
+				call[0].toString().includes("/status") && call[1]?.method == "PATCH"
+			);
 
 			expect(statusUpdateRequest).toBeDefined();
 
-			expect(statusUpdateRequest![0]).toContain("/api/v1/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/status");
+			expect(statusUpdateRequest![0]).toContain(
+				"/api/v1/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/status"
+			);
 
 			expect(statusUpdateRequest![1]).toEqual(
 				expect.objectContaining({
 					method: "PATCH",
-					body: expect.stringContaining(`"status_id":"${STATUS_IDS["Escalated"]}"`)
+					body: expect.stringContaining(`"status_id":"${statusIdMap["Escalated"]}"`),
 				})
-			)
-        });
+			);
+		});
 	});
 });
