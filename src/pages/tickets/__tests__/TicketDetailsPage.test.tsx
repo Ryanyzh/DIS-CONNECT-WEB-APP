@@ -4,11 +4,18 @@ import { TicketDetailsPage } from "../TicketDetails";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
 import "@testing-library/jest-dom/vitest";
+import { STATUS_IDS } from "../../../lib/firebase";
 
 declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}
 	interface AsymmetricMatchersContaining extends jest.Matchers<void, any> {}
 }
+
+// mock useRole hook
+const mockUseRole = vi.hoisted(() => vi.fn());
+vi.mock("../../../hooks/useRole", () => ({
+	useRole: mockUseRole,
+}));
 
 // mock firebase
 vi.mock("../../../lib/firebase", async (importOriginal) => {
@@ -25,7 +32,7 @@ vi.mock("firebase/storage", () => {
 		ref: vi.fn(() => ({})),
 		getDownloadURL: vi.fn(() =>
 			Promise.resolve(
-				"https://firebasestorage.googleapis.com/v0/b/orbital-dis-connect.firebasestorage.app/o/tickets%2F6ff67865-dfdf-486b-85ea-6e969ef5d705%2Fnew-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG?alt=media&token=54443b42-6bac-40e8-a113-b4dcc767b799"
+				"https://firebasestorage.googleapis.com/v0/b/orbital-dis-connect.firebasestorage.app/o/tickets%2F64e57d1e-e7ce-4aa9-a163-b4604559c218%2FTesting%20Attachment%20(JPG)-7472B1ED-8D97-4031-B552-888EF0B14783.JPG?alt=media&token=34580a9d-87f5-4b2b-a236-8049872514d0"
 			)
 		),
 	};
@@ -34,19 +41,19 @@ vi.mock("firebase/storage", () => {
 describe("TicketDetailsPage Integration Test", () => {
 	const mockTicketDetails = {
 		escalated_at: null,
-		created_at: "2026-06-07T14:34:14.132781+00:00",
-		is_escalated: true,
+		created_at: "2026-06-06T14:05:01.385264+00:00",
+		is_escalated: false,
 		scholar_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
 		description:
-			"Enquiry regarding the process and implications of changing major from Computer Science to Business Administration",
+			"I would like to submit my reimbursement claim for my flight ticket to Toronto for the NOC programme. I have attached the invoice and payment receipt. Could HR advise if the claim amount and supporting documents are sufficient?",
 		due_at: null,
-		escalated_to: null,
+		subject: "Reimbursement claim for overseas exchange flight ticket",
 		source: "mobile",
-		ticket_id: "6ff67865-dfdf-486b-85ea-6e969ef5d705",
+		ticket_id: "64e57d1e-e7ce-4aa9-a163-b4604559c218",
 		closed_at: null,
-		subject: "Enquiry regarding major change",
-		ticket_code: "TKT-2026-500E17",
-		updated_at: "2026-06-23T03:12:23.072689+00:00",
+		ticket_code: "TKT-2026-B0E7C1",
+		escalated_to: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
+		updated_at: "2026-06-26T07:09:35.782367+00:00",
 		resolved_at: null,
 		status: {
 			status_id: "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
@@ -55,14 +62,14 @@ describe("TicketDetailsPage Integration Test", () => {
 			is_closed: false,
 		},
 		priority: {
-			priority_id: "f1b9f4e8-4723-50b5-92ae-ddd8d5b929db",
-			priority_name: "High",
-			color_code: "#EF4444",
-			level: 3,
+			priority_id: "420abc47-82f8-5267-acc2-737d0ed0739b",
+			priority_name: "Medium",
+			color_code: "#F59E0B",
+			level: 2,
 		},
 		category: {
-			category_id: "4308c61a-353f-5c6c-b09c-830cbe0cb101",
-			category_name: "Policy",
+			category_id: "503b3a9a-fc71-5c51-83b9-f24ddf9725dc",
+			category_name: "Reimbursement",
 		},
 		scholar: {
 			id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
@@ -71,21 +78,30 @@ describe("TicketDetailsPage Integration Test", () => {
 			phone: "+65 9123 4567",
 			createdAt: "2026-05-24T17:29:40.259379+00:00",
 		},
-		assigned_to: null,
+		assigned_to: {
+			id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
+			name: "Daniel Wong",
+			email: "daniel.wong@scholarhr.edu.sg",
+		},
 		attachments: [
 			{
-				attachment_id: "986a5517-9220-4fdb-a641-4f9161a8be8b",
-				file_name: "new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG",
+				attachment_id: "bcf4cb78-3759-4056-aa9d-a4cc7606ae15",
+				file_name: "Testing Attachment (JPG)-7472B1ED-8D97-4031-B552-888EF0B14783.JPG",
 				file_path:
-					"tickets/6ff67865-dfdf-486b-85ea-6e969ef5d705/new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG",
-				file_type: "image/png",
-				file_size: 798456,
-				uploaded_at: "2026-06-07T14:34:18.613134+00:00",
+					"tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/Testing Attachment (JPG)-7472B1ED-8D97-4031-B552-888EF0B14783.JPG",
+				file_type: "image/jpeg",
+				file_size: 169938,
+				uploaded_at: "2026-06-06T14:05:05.690380+00:00",
 			},
 		],
 	};
 
 	beforeEach(() => {
+		mockUseRole.mockReturnValue({
+			role: "hr",
+			roleLoading: false,
+		});
+
 		vi.spyOn(globalThis, "fetch").mockImplementation((url) => {
 			const urlString = url.toString();
 
@@ -128,7 +144,7 @@ describe("TicketDetailsPage Integration Test", () => {
 			</MemoryRouter>
 		);
 
-		const ticketCode = await screen.findAllByText("TKT-2026-500E17");
+		const ticketCode = await screen.findAllByText("TKT-2026-B0E7C1");
 		expect(ticketCode[0]).toBeInTheDocument();
 
 		// Scholar name
@@ -137,7 +153,7 @@ describe("TicketDetailsPage Integration Test", () => {
 		// Ticket description
 		expect(
 			screen.getByText(
-				"Enquiry regarding the process and implications of changing major from Computer Science to Business Administration"
+				"I would like to submit my reimbursement claim for my flight ticket to Toronto for the NOC programme. I have attached the invoice and payment receipt. Could HR advise if the claim amount and supporting documents are sufficient?"
 			)
 		).toBeInTheDocument();
 
@@ -145,7 +161,7 @@ describe("TicketDetailsPage Integration Test", () => {
 		const ticketStatusElements = screen.getAllByText("In Review");
 		expect(ticketStatusElements[0]).toBeInTheDocument();
 		expect(ticketStatusElements[1]).toBeInTheDocument();
-		const ticketPriorityElements = screen.getAllByText("Low Priority 3");
+		const ticketPriorityElements = screen.getAllByText("Low Priority 2");
 		expect(ticketPriorityElements[0]).toBeInTheDocument();
 		expect(ticketPriorityElements[1]).toBeInTheDocument();
 
@@ -155,7 +171,7 @@ describe("TicketDetailsPage Integration Test", () => {
 
 		// test attachment preview
 		const attachment = await screen.findByRole("button", {
-			name: /new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG/,
+			name: /Testing Attachment \(JPG\)-7472B1ED-8D97-4031-B552-888EF0B14783\.JPG/i,
 		});
 		expect(attachment).toBeInTheDocument();
 		fireEvent.click(attachment);
@@ -165,11 +181,101 @@ describe("TicketDetailsPage Integration Test", () => {
 		});
 
 		expect(windowOpenSpy).toHaveBeenCalledWith(
-			expect.stringContaining("new-C6856264-0ECF-4C65-8DC0-FA86502FBF87.PNG"),
+			expect.stringMatching(/Testing.*Attachment.*7472B1ED-8D97-4031-B552-888EF0B14783/i),
 			"_blank",
 			"noopener,noreferrer"
 		);
 
 		windowOpenSpy.mockRestore();
+	});
+
+	it("displays action panel with action buttons when user is a HR officer", async () => {
+		render(
+			<MemoryRouter initialEntries={["/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218"]}>
+				<Routes>
+					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
+
+		await waitFor(() => {
+			const requestBtn = screen.getByRole("button", { name: /request/i });
+			const resolveBtn = screen.getByRole("button", { name: /resolve/i });
+			const escalateBtn = screen.getByRole("button", { name: /escalate/i });
+			const reassignBtn = screen.getByRole("button", { name: /reassign/i });
+
+			expect(requestBtn).toBeInTheDocument();
+			expect(resolveBtn).toBeInTheDocument();
+			expect(escalateBtn).toBeInTheDocument();
+			expect(reassignBtn).toBeInTheDocument();
+
+			// verify colours are correct
+			expect(requestBtn).toHaveClass("bg-purple-600");
+			expect(resolveBtn).toHaveClass("bg-emerald-600");
+			expect(escalateBtn).toHaveClass("bg-rose-600");
+			expect(reassignBtn).toHaveClass("bg-blue-600");
+		});
+	});
+
+	it("hides the action panel when user is a scholar", async () => {
+		// 1. Swap the hook to return a basic scholar session context
+		mockUseRole.mockReturnValue({
+			role: "scholar",
+			roleLoading: false,
+		});
+
+		render(
+			<MemoryRouter initialEntries={["/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218"]}>
+				<Routes>
+					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
+
+		// wait for the ticket header text to confirm data is fetched
+		await screen.findAllByText("TKT-2026-B0E7C1");
+
+		// action buttons should not be there
+		const requestBtn = screen.queryByRole("button", { name: /request/i });
+		const resolveBtn = screen.queryByRole("button", { name: /resolve/i });
+		const escalateBtn = screen.queryByRole("button", { name: /escalate/i });
+		const reassignBtn = screen.queryByRole("button", { name: /reassign/i });
+
+		expect(requestBtn).not.toBeInTheDocument();
+		expect(resolveBtn).not.toBeInTheDocument();
+		expect(escalateBtn).not.toBeInTheDocument();
+		expect(reassignBtn).not.toBeInTheDocument();
+	});
+
+	it("calls backend to update ticket status when escalate button is clicked", async () => {
+		const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+		render(
+			<MemoryRouter initialEntries={["/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218"]}>
+				<Routes>
+					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
+
+		const escalateBtn = await screen.findByRole("button", { name: /escalate/i });
+        expect(escalateBtn).toBeInTheDocument();
+		fireEvent.click(escalateBtn);
+
+		// check that a PATCH request was sent
+		await waitFor(() => {
+            const statusUpdateRequest = fetchSpy.mock.calls.find((call) => call[0].toString().includes("/status"));
+
+			expect(statusUpdateRequest).toBeDefined();
+
+			expect(statusUpdateRequest![0]).toContain("/api/v1/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/status");
+
+			expect(statusUpdateRequest![1]).toEqual(
+				expect.objectContaining({
+					method: "PATCH",
+					body: expect.stringContaining(`"status_id":"${STATUS_IDS["Escalated"]}"`)
+				})
+			)
+        });
 	});
 });

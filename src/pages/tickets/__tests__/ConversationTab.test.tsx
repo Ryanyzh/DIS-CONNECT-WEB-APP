@@ -165,10 +165,13 @@ describe("Conversation Tab test", () => {
 	});
 
 	it("sends new message payload through apiFetch when send button is clicked", async () => {
-		// mock GET request response
-		(apiFetch as any).mockResolvedValueOnce({
-			ok: true,
-			json: async () => ({ messages: [] }),
+		// mock POST and GET request responses
+		(apiFetch as any).mockImplementation(async () => {
+			return {
+				ok: true,
+				status: 200,
+				json: async () => ({ messages: [] }),
+			};
 		});
 
 		render(<ConversationTab ticketId="ticket3" />);

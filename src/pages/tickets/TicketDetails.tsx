@@ -50,8 +50,8 @@ export function TicketDetailsPage() {
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
-			
-			const response = await apiFetch(`/api/v1/tickets/${ticketId}`)
+
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}`);
 
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
@@ -69,30 +69,16 @@ export function TicketDetailsPage() {
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
-				scholar: data.scholar
-					? {
-							id: data.scholar.id,
-							name: data.scholar.name,
-							email: data.scholar.email,
-							phone: data.scholar.phone ?? "",
-							studentId: data.scholar.student_id ?? "",
-							faculty: data.scholar.faculty ?? "",
-							program: data.scholar.program ?? "",
-							yearOfStudy: data.scholar.year_of_study ?? "",
-							preferredContact: data.scholar.preferred_contact ?? "Email",
-							scholarshipType: data.scholar.scholarship_type ?? "",
-							status: data.scholar.status ?? "Active",
-							createdAt: data.scholar.created_at ?? "",
-							tickets: [],
-						}
-					: undefined,
-				officer: data.assigned_officer
-					? {
-							id: data.assigned_officer.id,
-							name: data.assigned_officer.name,
-							email: data.assigned_officer.email,
-						}
-					: undefined,
+				isEscalated: data.is_escalated,
+				scholar: {
+					...data.scholar,
+					studentId: data.scholar.student_id,
+					yearOfStudy: data.scholar.year_of_study,
+					preferredContact: data.scholar.preferred_contact,
+					scholarshipType: data.scholar.scholarship_type,
+					tickets: [],
+				},
+				officer: data.assigned_officer,
 				attachments: data.attachments ?? [],
 			};
 			setTicket(formattedTicket);
@@ -117,15 +103,13 @@ export function TicketDetailsPage() {
 		}
 
 		try {
+			setLoading(true);
+
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
-<<<<<<< HEAD
 				headers: {
 					"Content-Type": "application/json",
 				},
-=======
-				headers: { "Content-Type": "application/json" },
->>>>>>> 0cb08e8 (Fix web TicketCard status body to use status_id from database rather than hardcoded status)
 				body: JSON.stringify({
 					status_id: nextStatusId,
 					...metadata,
@@ -139,6 +123,8 @@ export function TicketDetailsPage() {
 			setRefresh((prev) => prev + 1);
 		} catch (error) {
 			console.error("Failed to execute action: ", error);
+		} finally {
+			setLoading(false);
 		}
 	}
 
@@ -209,9 +195,7 @@ export function TicketDetailsPage() {
 						<div className="text-sm text-zinc-400">Scholar</div>
 					</div>
 					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">
-							{formatDate(ticket.createdAt)}
-						</div>
+						<div className="text-lg mb-1">{formatDate(ticket.createdAt)}</div>
 						<div className="text-sm text-zinc-400">Created</div>
 					</div>
 					<div className="flex-1 flex-col">
@@ -275,9 +259,7 @@ export function TicketDetailsPage() {
 						</div>
 					)}
 
-					{activeTab == "Conversation" && (
-						<ConversationTab ticketId={ticketId} />
-					)}
+					{activeTab == "Conversation" && <ConversationTab ticketId={ticketId} />}
 
 					{activeTab == "Attachments" && (
 						<div className="h-full w-full flex flex-col gap-3">
@@ -317,7 +299,11 @@ export function TicketDetailsPage() {
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 				{role == "hr" && (
-					<ActionsPanel currentStatus={ticket.status} onAction={handleExecuteAction} />
+					<ActionsPanel
+						ticket={ticket}
+						currentStatus={ticket.status}
+						onAction={handleExecuteAction}
+					/>
 				)}
 			</div>
 		</div>

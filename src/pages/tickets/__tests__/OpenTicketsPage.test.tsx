@@ -30,10 +30,10 @@ describe("OpenTicketsPage Integration Test", () => {
 				updated_at: "2026-06-23T03:12:23.072689+00:00",
 				resolved_at: null,
 				status: {
-					status_id: "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
+					status_id: "ece14a06-c6fd-55e6-8017-1cad1c82d0ce",
 					status_name: "Closed", // CLOSED TICKET
 					status_type: "terminal",
-					is_closed: false,
+					is_closed: true,
 				},
 				priority: {
 					priority_id: "f1b9f4e8-4723-50b5-92ae-ddd8d5b929db",

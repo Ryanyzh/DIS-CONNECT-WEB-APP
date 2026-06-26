@@ -11,7 +11,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 		try {
 			setLoading(true);
 
-			const response = await apiFetch(endpointUrl)
+			const response = await apiFetch(endpointUrl);
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
 			}
@@ -28,35 +28,17 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					deadline: new Date(ticket.due_at),
 					lastUpdated: new Date(ticket.updated_at),
 					createdAt: new Date(ticket.created_at),
-					scholar: ticket.scholar
-						? {
-								id: ticket.scholar.id,
-								name: ticket.scholar.name,
-								email: ticket.scholar.email,
-								phone: ticket.scholar.phone ?? "",
-								studentId: ticket.scholar.student_id ?? "",
-								faculty: ticket.scholar.faculty ?? "",
-								program: ticket.scholar.program ?? "",
-								yearOfStudy: ticket.scholar.year_of_study ?? "",
-								preferredContact: ticket.scholar.preferred_contact ?? "Email",
-								scholarshipType: ticket.scholar.scholarship_type ?? "",
-								status: ticket.scholar.status ?? "Active",
-								tickets: [],
-							}
-						: undefined,
-					officer: ticket.assigned_officer
-						? {
-								id: ticket.assigned_officer.id,
-								name: ticket.assigned_officer.name,
-								email: ticket.assigned_officer.email,
-							}
-						: undefined,
-					attachments: ticket.attachments
-						? ticket.attachments.map((attachment: any) => ({
-								...attachment,
-								uploaded_at: new Date(attachment.uploaded_at),
-							}))
-						: [],
+					isEscalated: ticket.is_escalated,
+					scholar: {
+						...ticket.scholar,
+						studentId: ticket.scholar.student_id,
+						yearOfStudy: ticket.scholar.year_of_study,
+						preferredContact: ticket.scholar.preferred_contact,
+						scholarshipType: ticket.scholar.scholarship_type,
+						tickets: [],
+					},
+					officer: ticket.assigned_officer,
+					attachments: ticket.attachments ?? [],
 				};
 			});
 
