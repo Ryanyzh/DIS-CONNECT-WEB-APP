@@ -300,7 +300,7 @@ export function TicketDetailsPage() {
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 				{role == "hr" && (
-					<ActionsPanel currentStatus={ticket.status} onAction={handleExecuteAction} />
+					<ActionsPanel ticket={ticket} currentStatus={ticket.status} onAction={handleExecuteAction} />
 				)}
 			</div>
 		</div>

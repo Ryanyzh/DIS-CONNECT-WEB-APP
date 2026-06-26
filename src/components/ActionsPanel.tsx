@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { getCurrentUser } from "../lib/authRepository";
-import type { TicketStatus } from "./TicketCard";
+import type { TicketProps, TicketStatus } from "./TicketCard";
+import { AssignOfficerModal } from "./AssignOfficerModal";
 
 interface ActionsPanelProps {
+	ticket: TicketProps;
 	currentStatus: TicketStatus;
 	onAction: (nextStatus: TicketStatus, metadata?: Record<string, any>) => Promise<void>;
 }
 
-export function ActionsPanel({ currentStatus, onAction }: ActionsPanelProps) {
+export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelProps) {
+	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
+	
 	return (
 		<div className="w-full border-t rounded-lg rounded-t-none p-4 bg-wise-canvas flex flex-col gap-4 shadow-sm">
 			<span className="font-semibold">Actions</span>
@@ -23,11 +28,13 @@ export function ActionsPanel({ currentStatus, onAction }: ActionsPanelProps) {
 					</button>
 
 					<button
-						onClick={() => onAction("In Review")}
+						onClick={() => setIsAssignModalOpen(true)}
 						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
 					>
 						Assign Ticket
 					</button>
+
+					<AssignOfficerModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} nextStatus="In Review" onAction={onAction} />
 				</div>
 			)}
 
