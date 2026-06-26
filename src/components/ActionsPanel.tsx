@@ -136,9 +136,9 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 					>
 						Reassign Ticket
 					</button>
-					
+
 					<button
-						onClick={() => onAction("In Review")}
+						onClick={() => onAction("In Review", { action: "De-escalate" })}
 						className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-all"
 					>
 						De-escalate

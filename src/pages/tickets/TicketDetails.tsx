@@ -67,6 +67,7 @@ export function TicketDetailsPage() {
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
+				isEscalated: data.is_escalated,
 				scholar: {
 						...data.scholar,
 						studentId: data.scholar.student_id ?? "",

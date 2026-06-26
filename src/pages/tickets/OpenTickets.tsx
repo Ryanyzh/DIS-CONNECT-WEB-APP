@@ -47,7 +47,7 @@ const columns: {
 	{
 		title: "Escalated",
 		titleColor: "text-rose-500",
-		filterFunc: (ticket: TicketProps) => ticket.status == "Escalated",
+		filterFunc: (ticket: TicketProps) => ticket.isEscalated,
 		bgColor: "bg-rose-500/1",
 	},
 ];
@@ -80,7 +80,7 @@ export function OpenTicketsPage() {
 								(ticket) =>
 									ticket.officer?.id == getCurrentUser()?.uid ||
 									!ticket.officer ||
-									ticket.status == "Escalated"
+									ticket.isEscalated
 							)
 							.filter(filterFunc)
 							.toSorted((a, b) => b.priority - a.priority);

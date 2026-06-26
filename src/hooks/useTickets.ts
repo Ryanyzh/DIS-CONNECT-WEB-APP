@@ -28,6 +28,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					deadline: new Date(ticket.due_at),
 					lastUpdated: new Date(ticket.updated_at),
 					createdAt: new Date(ticket.created_at),
+					isEscalated: ticket.is_escalated,
 					scholar: {
 						...ticket.scholar,
 						studentId: ticket.scholar.student_id ?? "",

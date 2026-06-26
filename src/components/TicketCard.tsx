@@ -29,6 +29,7 @@ export interface TicketProps {
 	deadline: string; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
 	lastUpdated: string;
 	createdAt: string;
+	isEscalated: boolean;
 	scholar?: Scholar;
 	officer?: HrOfficer; // the HR officer assigned to the ticket
 	attachments: TicketAttachment[];
@@ -118,7 +119,7 @@ function TicketCard({ ticket }: TicketCardProps) {
 			<div className="flex flex-wrap justify-between items-center pt-3 text-sm text-zinc-400 gap-4">
 				<div className="flex flex-wrap items-center gap-4">
 					{ticket.officer ? (
-						<span>Assigned to: {ticket.officer.name}</span>
+						<span className={`${ticket.isEscalated ? "text-rose-500" : "text-zinc-400" }`}>Assigned to: {ticket.officer.name}</span>
 					) : (
 						<span className="text-pink-400">Unassigned</span>
 					)}

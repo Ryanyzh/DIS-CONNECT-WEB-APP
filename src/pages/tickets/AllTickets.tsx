@@ -37,10 +37,10 @@ export function AllTicketsPage() {
 			status: "Closed" as TicketStatus,
 			count: tickets.filter((ticket) => ticket.status == "Closed").length,
 		},
-        {
-            status: "Escalated" as TicketStatus,
-            count: tickets.filter((ticket) => ticket.status == "Escalated").length,
-        },
+		{
+			status: "Escalated" as TicketStatus,
+			count: tickets.filter((ticket) => ticket.isEscalated).length,
+		},
 	];
 
 	if (loading) {
@@ -140,7 +140,10 @@ export function AllTicketsPage() {
 					<div className="flex flex-col gap-3 justify-between h-full max-h-[100vh] min-h-0 overflow-y-auto">
 						{tickets
 							.filter(
-								(ticket) => statusFilter == "All" || ticket.status == statusFilter
+								(ticket) =>
+									statusFilter == "All" ||
+									ticket.status == statusFilter ||
+									(statusFilter == "Escalated" && ticket.isEscalated)
 							)
 							.filter(
 								(ticket) =>
@@ -148,10 +151,7 @@ export function AllTicketsPage() {
 							)
 							.toSorted((a, b) => b.priority - a.priority)
 							.map((ticket) => (
-								<TicketCard
-									key={ticket.id}
-									ticket={ticket}
-								/>
+								<TicketCard key={ticket.id} ticket={ticket} />
 							))}
 					</div>
 				</div>

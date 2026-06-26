@@ -11,6 +11,7 @@ interface TicketInfo {
     createdAt: string;
     deadline: string;
     lastUpdated: string;
+    isEscalated: boolean;
 }
 
 interface TicketInfoPanelProps {
@@ -50,6 +51,9 @@ export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
 
                 <div>Assigned Officer</div>
                 <div className={`${officer ? "text-black" : "text-pink-400"}`}>{officer ? officer.name : "Unassigned"}</div>
+
+                <div>Escalated</div>
+                <div className={`${ticket.isEscalated ? "text-rose-500" : "text-green-500"}`}>{ticket.isEscalated ? "Yes" : "No"}</div>
             </div>
 		</div>
 	);
