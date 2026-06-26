@@ -57,12 +57,13 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 					>
 						Resolve Ticket
 					</button>
-					<button
+					
+					{!ticket.isEscalated && (<button
 						onClick={() => onAction("Escalated")}
 						className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
 					>
 						Escalate Ticket
-					</button>
+					</button>)}
 
 					<button
 						onClick={() => setIsAssignModalOpen(true)}
