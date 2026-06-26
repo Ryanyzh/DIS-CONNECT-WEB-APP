@@ -38,7 +38,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 						tickets: [],
 					},
 					officer: ticket.assigned_officer,
-					attachments: data.attachments ?? [],
+					attachments: ticket.attachments ?? [],
 				};
 			});
 
