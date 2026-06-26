@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { FormEventHandler } from "react";
 import PageShell from "../PageShell";
+import { apiFetch } from "../../lib/apiFetch";
 
 export const facultyOptions = [
 	"College of Humanities & Sciences",
@@ -117,6 +117,8 @@ export function CreateStudentAccountPage() {
 	const [program, setProgram] = useState("");
 	const [yearOfStudy, setYearOfStudy] = useState("");
 	const [preferredContact, setPreferredContact] = useState("");
+	const [scholarshipType, setScholarshipType] = useState("");
+	const [submitting, setSubmitting] = useState(false);
 	const [notification, setNotification] = useState<{
 		type: "success" | "error";
 		text: string;
@@ -139,6 +141,7 @@ export function CreateStudentAccountPage() {
 		setProgram("");
 		setYearOfStudy("");
 		setPreferredContact("");
+		setScholarshipType("");
 		setShowPassword(false);
 	};
 
@@ -147,8 +150,9 @@ export function CreateStudentAccountPage() {
 		setPassword(code.toString());
 	};
 
-	const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+	const handleSubmit = async (event: { preventDefault(): void }) => {
 		event.preventDefault();
+		setSubmitting(true);
 
 		const payload = {
 			full_name: fullName,
@@ -160,31 +164,35 @@ export function CreateStudentAccountPage() {
 			program,
 			year_of_study: yearOfStudy,
 			preferred_contact: preferredContact,
+			scholarship_type: scholarshipType,
 		};
 
 		try {
-			const response = await fetch("http://localhost:8000/api/v1/auth/register-scholar", {
+			const res = await apiFetch("/api/v1/auth/register-scholar", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
 			});
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(errorText || "Failed to create student account.");
+			if (!res.ok) {
+				let detail = `Request failed with status ${res.status}`;
+				try {
+					const body = await res.json();
+					detail = body.detail ?? JSON.stringify(body);
+				} catch {
+					detail = (await res.text()) || detail;
+				}
+				showNotification("error", detail);
+				return;
 			}
 
-			showNotification(
-				"success",
-				`Student account for ${fullName} has been created successfully.`
-			);
+			showNotification("success", `Student account for ${fullName} has been created successfully.`);
 			resetForm();
 		} catch (error) {
 			console.error(error);
-			showNotification(
-				"error",
-				"Unable to submit student account. Please check the form and try again."
-			);
+			showNotification("error", String(error));
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -372,6 +380,16 @@ export function CreateStudentAccountPage() {
 								<option value="sms">SMS</option>
 							</select>
 						</label>
+
+						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
+							<span className="font-medium">Scholarship type</span>
+							<input
+								value={scholarshipType}
+								onChange={(event) => setScholarshipType(event.target.value)}
+								placeholder="e.g. ASEAN, MOE, PSC"
+								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
+							/>
+						</label>
 					</div>
 
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -380,9 +398,10 @@ export function CreateStudentAccountPage() {
 						</p>
 						<button
 							type="submit"
-							className="inline-flex items-center justify-center rounded-wisePill bg-wise-green px-6 py-3 text-body-md font-semibold text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral"
+							disabled={submitting}
+							className="inline-flex items-center justify-center rounded-wisePill bg-wise-green px-6 py-3 text-body-md font-semibold text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							Create student account
+							{submitting ? "Creating…" : "Create student account"}
 						</button>
 					</div>
 

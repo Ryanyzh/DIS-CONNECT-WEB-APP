@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../../lib/apiFetch";
 
 interface Student {
 	id: string;
@@ -24,65 +25,6 @@ interface HrOfficer {
 	createdAt: string;
 }
 
-const mockStudents: Student[] = [
-	{
-		id: "1",
-		fullName: "Alice Johnson",
-		email: "alice@example.com",
-		studentId: "S1234567",
-		faculty: "School of Computing",
-		program: "Computer Science",
-		yearOfStudy: "3",
-		phone: "+65 9123 4567",
-		createdAt: "2024-01-15",
-	},
-	{
-		id: "2",
-		fullName: "Bob Smith",
-		email: "bob@example.com",
-		studentId: "S1234568",
-		faculty: "NUS Business School",
-		program: "Finance",
-		yearOfStudy: "2",
-		phone: "+65 9234 5678",
-		createdAt: "2024-01-20",
-	},
-	{
-		id: "3",
-		fullName: "Carol White",
-		email: "carol@example.com",
-		studentId: "S1234569",
-		faculty: "College of Humanities & Sciences",
-		program: "Biology",
-		yearOfStudy: "1",
-		phone: "+65 9345 6789",
-		createdAt: "2024-02-01",
-	},
-];
-
-const mockHrOfficers: HrOfficer[] = [
-	{
-		id: "1",
-		fullName: "Sarah Williams",
-		email: "sarah@example.com",
-		employeeId: "HR-2048",
-		department: "Human Resources",
-		designation: "HR Officer",
-		phone: "+65 9456 7890",
-		createdAt: "2023-06-10",
-	},
-	{
-		id: "2",
-		fullName: "Mark Johnson",
-		email: "mark@example.com",
-		employeeId: "HR-2049",
-		department: "Human Resources",
-		designation: "Senior HR Officer",
-		phone: "+65 9567 8901",
-		createdAt: "2023-03-15",
-	},
-];
-
 function getInitials(name: string) {
 	return name
 		.split(" ")
@@ -93,6 +35,7 @@ function getInitials(name: string) {
 }
 
 function formatDate(iso: string) {
+	if (!iso) return "—";
 	return new Date(iso).toLocaleDateString("en-SG", {
 		day: "numeric",
 		month: "short",
@@ -116,15 +59,63 @@ export function AllAccountsPage() {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<"students" | "hr-officers">("students");
 	const [search, setSearch] = useState("");
+	const [students, setStudents] = useState<Student[]>([]);
+	const [hrOfficers, setHrOfficers] = useState<HrOfficer[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
-	const filteredStudents = mockStudents.filter(
+	useEffect(() => {
+		apiFetch("/api/v1/users/")
+			.then((res) => {
+				if (!res.ok) throw new Error(`Failed to load users (${res.status})`);
+				return res.json();
+			})
+			.then((users: Record<string, unknown>[]) => {
+				const scholars: Student[] = [];
+				const hr: HrOfficer[] = [];
+
+				for (const u of users) {
+					if (u.role === "scholar") {
+						scholars.push({
+							id: (u.user_id as string) ?? "",
+							fullName: (u.full_name as string) ?? "",
+							email: (u.email as string) ?? "",
+							studentId: (u.student_id as string) ?? "—",
+							faculty: (u.faculty as string) ?? "—",
+							program: (u.program as string) ?? "—",
+							yearOfStudy: u.year_of_study != null ? String(u.year_of_study) : "—",
+							phone: (u.phone as string) ?? "—",
+							createdAt: (u.created_at as string) ?? "",
+						});
+					} else if (u.role === "hr") {
+						hr.push({
+							id: (u.user_id as string) ?? "",
+							fullName: (u.full_name as string) ?? "",
+							email: (u.email as string) ?? "",
+							employeeId: (u.employee_id as string) ?? "—",
+							department: (u.department_id as string) ?? "—",
+							designation: (u.designation as string) ?? "—",
+							phone: (u.phone as string) ?? "—",
+							createdAt: (u.created_at as string) ?? "",
+						});
+					}
+				}
+
+				setStudents(scholars);
+				setHrOfficers(hr);
+			})
+			.catch((err: unknown) => setError(String(err)))
+			.finally(() => setLoading(false));
+	}, []);
+
+	const filteredStudents = students.filter(
 		(s) =>
 			s.fullName.toLowerCase().includes(search.toLowerCase()) ||
 			s.email.toLowerCase().includes(search.toLowerCase()) ||
 			s.studentId.toLowerCase().includes(search.toLowerCase())
 	);
 
-	const filteredOfficers = mockHrOfficers.filter(
+	const filteredOfficers = hrOfficers.filter(
 		(o) =>
 			o.fullName.toLowerCase().includes(search.toLowerCase()) ||
 			o.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -189,11 +180,11 @@ export function AllAccountsPage() {
 			<div className="grid grid-cols-3 gap-4">
 				<StatCard
 					label="Total Accounts"
-					value={mockStudents.length + mockHrOfficers.length}
+					value={students.length + hrOfficers.length}
 					sub="across all roles"
 				/>
-				<StatCard label="Students" value={mockStudents.length} sub="scholar accounts" />
-				<StatCard label="HR Officers" value={mockHrOfficers.length} sub="staff accounts" />
+				<StatCard label="Students" value={students.length} sub="scholar accounts" />
+				<StatCard label="HR Officers" value={hrOfficers.length} sub="staff accounts" />
 			</div>
 
 			{/* Search + Tabs */}
@@ -232,7 +223,7 @@ export function AllAccountsPage() {
 					>
 						Students
 						<span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
-							{mockStudents.length}
+							{students.length}
 						</span>
 					</button>
 					<button
@@ -245,7 +236,7 @@ export function AllAccountsPage() {
 					>
 						HR Officers
 						<span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
-							{mockHrOfficers.length}
+							{hrOfficers.length}
 						</span>
 					</button>
 				</div>
@@ -253,7 +244,11 @@ export function AllAccountsPage() {
 
 			{/* Tables */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
-				{activeTab === "students" && (
+				{loading ? (
+					<div className="text-center py-16 text-zinc-400 text-sm">Loading accounts…</div>
+				) : error ? (
+					<div className="text-center py-16 text-red-500 text-sm">{error}</div>
+				) : activeTab === "students" ? (
 					<>
 						{filteredStudents.length === 0 ? (
 							<div className="text-center py-16 text-zinc-400 text-sm">
@@ -319,7 +314,9 @@ export function AllAccountsPage() {
 											</td>
 											<td className="px-5 py-3.5">
 												<span className="text-wise-body dark:text-zinc-400">
-													Year {student.yearOfStudy}
+													{student.yearOfStudy !== "—"
+														? `Year ${student.yearOfStudy}`
+														: "—"}
 												</span>
 											</td>
 											<td className="px-5 py-3.5 text-wise-body dark:text-zinc-400">
@@ -334,9 +331,7 @@ export function AllAccountsPage() {
 							</table>
 						)}
 					</>
-				)}
-
-				{activeTab === "hr-officers" && (
+				) : (
 					<>
 						{filteredOfficers.length === 0 ? (
 							<div className="text-center py-16 text-zinc-400 text-sm">
