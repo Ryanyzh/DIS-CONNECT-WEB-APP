@@ -11,7 +11,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 		try {
 			setLoading(true);
 
-			const response = await apiFetch(endpointUrl)
+			const response = await apiFetch(endpointUrl);
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
 			}
@@ -38,14 +38,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 						tickets: [],
 					},
 					officer: ticket.assigned_officer,
-					attachments: data.attachments
-						? data.attachments.map((attachment: any) => {
-								return {
-									...attachment,
-									uploaded_at: new Date(attachment.uploaded_at),
-								};
-							})
-						: [],
+					attachments: data.attachments ?? [],
 				};
 			});
 
