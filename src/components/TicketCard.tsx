@@ -1,6 +1,4 @@
 import type { HrOfficer } from "../types/HrOfficer";
-import React, { useState } from "react";
-import { getIdToken } from "../lib/authRepository";
 import { useNavigate } from "react-router-dom";
 import type { TicketAttachment } from "../types/TicketAttachment";
 import { formatDate, type Scholar } from "../types/Scholar";
@@ -131,7 +129,7 @@ function TicketCard({ ticket }: TicketCardProps) {
 					</span>
 					<span>Last updated: {formatDate(ticket.lastUpdated)}</span>
 					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
-						Due by: {formatDate(ticket.deadline)}
+						{formatDate(ticket.deadline) ? `Due by: ${formatDate(ticket.deadline)}` : ""}
 					</span>
 				</div>
 				<span

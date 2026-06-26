@@ -95,11 +95,11 @@ export function getInitials(name: string) {
 }
 
 export function formatDate(iso: string) {
-	return new Date(iso).toLocaleDateString("en-SG", {
+	return iso ? new Date(iso).toLocaleDateString("en-SG", {
 		day: "numeric",
 		month: "short",
 		year: "numeric",
-	});
+	}) : "";
 }
 
 export const MOCK_SCHOLARS: Scholar[] = [

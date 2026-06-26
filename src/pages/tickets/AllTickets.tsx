@@ -75,6 +75,12 @@ export function AllTicketsPage() {
 						</div>
 					))}
 				</div>
+				<div className="bg-wise-canvas border border-t-0 -mt-3 p-2 px-6 flex flex-row gap-2 justify-end items-center text-xs rounded-b-xl text-neutral-500">
+					<span>Total Tickets</span>
+					<span className="bg-neutral-100 px-2.5 py-0.5 rounded-full font-semibold text-neutral-700">
+						{tickets.length}
+					</span>
+				</div>
 
 				{/* Ticket List */}
 				<div className="bg-wise-canvas h-full min-h-0 w-full">
