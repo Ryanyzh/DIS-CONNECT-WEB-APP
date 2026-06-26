@@ -11,7 +11,7 @@ interface ActionsPanelProps {
 
 export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelProps) {
 	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
-	
+
 	return (
 		<div className="w-full border-t rounded-lg rounded-t-none p-4 bg-wise-canvas flex flex-col gap-4 shadow-sm">
 			<span className="font-semibold">Actions</span>
@@ -34,7 +34,12 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 						Assign Ticket
 					</button>
 
-					<AssignOfficerModal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)} nextStatus="In Review" onAction={onAction} />
+					<AssignOfficerModal
+						isOpen={isAssignModalOpen}
+						onClose={() => setIsAssignModalOpen(false)}
+						nextStatus="In Review"
+						onAction={onAction}
+					/>
 				</div>
 			)}
 
@@ -58,16 +63,46 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 					>
 						Escalate Ticket
 					</button>
+
+					<button
+						onClick={() => setIsAssignModalOpen(true)}
+						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
+					>
+						Reassign Ticket
+					</button>
+
+					<AssignOfficerModal
+						isOpen={isAssignModalOpen}
+						onClose={() => setIsAssignModalOpen(false)}
+						nextStatus="In Review"
+						onAction={onAction}
+					/>
 				</div>
 			)}
 
 			{currentStatus == "Waiting for Response" && (
-				<button
-					onClick={() => onAction("In Review")}
-					className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
-				>
-					Resume Review
-				</button>
+				<div className="flex flex-col gap-4">
+					<button
+						onClick={() => onAction("In Review")}
+						className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
+					>
+						Resume Review
+					</button>
+
+					<button
+						onClick={() => setIsAssignModalOpen(true)}
+						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
+					>
+						Reassign Ticket
+					</button>
+
+					<AssignOfficerModal
+						isOpen={isAssignModalOpen}
+						onClose={() => setIsAssignModalOpen(false)}
+						nextStatus="In Review"
+						onAction={onAction}
+					/>
+				</div>
 			)}
 
 			{currentStatus == "Resolved" && (
@@ -94,12 +129,28 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 			)}
 
 			{currentStatus == "Escalated" && (
-				<button
-					onClick={() => onAction("In Review")}
-					className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
-				>
-					Resolve Escalation
-				</button>
+				<div className="flex flex-col gap-4">
+					<button
+						onClick={() => setIsAssignModalOpen(true)}
+						className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
+					>
+						Reassign Ticket
+					</button>
+					
+					<button
+						onClick={() => onAction("In Review")}
+						className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-all"
+					>
+						De-escalate
+					</button>
+
+					<AssignOfficerModal
+						isOpen={isAssignModalOpen}
+						onClose={() => setIsAssignModalOpen(false)}
+						nextStatus="In Review"
+						onAction={onAction}
+					/>
+				</div>
 			)}
 		</div>
 	);
