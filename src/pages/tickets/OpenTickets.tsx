@@ -47,7 +47,7 @@ const columns: {
 	{
 		title: "Escalated",
 		titleColor: "text-rose-500",
-		filterFunc: (ticket: TicketProps) => ticket.isEscalated,
+		filterFunc: (ticket: TicketProps) => ticket.isEscalated && ticket.status != "Resolved" && ticket.status != "Closed",
 		bgColor: "bg-rose-500/1",
 	},
 ];
