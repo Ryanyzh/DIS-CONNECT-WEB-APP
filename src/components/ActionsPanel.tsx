@@ -57,13 +57,24 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 					>
 						Resolve Ticket
 					</button>
-					
-					{!ticket.isEscalated && (<button
-						onClick={() => onAction("Escalated")}
-						className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
-					>
-						Escalate Ticket
-					</button>)}
+
+					{!ticket.isEscalated && (
+						<button
+							onClick={() => onAction("Escalated")}
+							className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
+						>
+							Escalate Ticket
+						</button>
+					)}
+
+					{ticket.isEscalated && (
+						<button
+							onClick={() => onAction("In Review", { action: "De-escalate" })}
+							className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-all"
+						>
+							De-escalate
+						</button>
+					)}
 
 					<button
 						onClick={() => setIsAssignModalOpen(true)}
