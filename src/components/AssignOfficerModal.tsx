@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../lib/apiFetch";
 import { type HrOfficer } from "../types/HrOfficer";
-import type { TicketStatus } from "./TicketCard";
+import type { TicketProps, TicketStatus } from "./TicketCard";
 
 interface AssignModalProps {
 	isOpen: boolean;
 	onClose: () => void;
+	ticket: TicketProps;
 	nextStatus: TicketStatus;
 	onAction: (nextStatus: TicketStatus, metadata?: Record<string, any>) => Promise<void>;
 }
@@ -13,6 +14,7 @@ interface AssignModalProps {
 export function AssignOfficerModal({
 	isOpen,
 	onClose,
+	ticket,
 	nextStatus,
 	onAction,
 }: AssignModalProps) {
@@ -56,7 +58,12 @@ export function AssignOfficerModal({
 		try {
 			setAssigning(true);
 
-			await onAction(nextStatus, { assigned_to: officerId });
+			if (!ticket.isEscalated) {
+				await onAction(nextStatus, { action: "Assignment", assigned_to: officerId });
+			} else {
+                await onAction(nextStatus, { action: "Assignment", escalated_to: officerId });
+            }
+
 
 			onClose();
 		} catch (error) {
@@ -99,9 +106,9 @@ export function AssignOfficerModal({
 									<p className="text-xs text-zinc-400">{officer.email}</p>
 								</div>
 
-                                <span className="text-xs font-semibold text-blue-500 opacity-0 group-hover:opacity-100 transition-all">
-                                    Assign &rarr;
-                                </span>
+								<span className="text-xs font-semibold text-blue-500 opacity-0 group-hover:opacity-100 transition-all">
+									Assign &rarr;
+								</span>
 							</button>
 						))
 					)}

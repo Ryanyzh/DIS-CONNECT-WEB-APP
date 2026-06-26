@@ -104,6 +104,8 @@ export function TicketDetailsPage() {
 		}
 
 		try {
+			setLoading(true);
+			
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
 				headers: {
@@ -123,6 +125,8 @@ export function TicketDetailsPage() {
 			console.log("Successfully executed action");
 		} catch (error) {
 			console.error("Failed to execute action: ", error);
+		} finally {
+			setLoading(false);
 		}
 	}
 
