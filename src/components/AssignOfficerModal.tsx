@@ -25,7 +25,7 @@ export function AssignOfficerModal({
 	async function fetchOfficers() {
 		try {
 			setLoading(true);
-			const response = await apiFetch("/api/v1/users");
+			const response = await apiFetch("/api/v1/users/");
 
 			if (!response.ok) {
 				throw new Error(`Error fetching officers: ${response.status}`);
