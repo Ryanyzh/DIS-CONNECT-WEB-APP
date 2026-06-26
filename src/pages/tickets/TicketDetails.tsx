@@ -48,8 +48,8 @@ export function TicketDetailsPage() {
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
-			
-			const response = await apiFetch(`/api/v1/tickets/${ticketId}`)
+
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}`);
 
 			if (!response.ok) {
 				throw new Error(`Error retrieving tickets: ${response.status}`);
@@ -69,17 +69,14 @@ export function TicketDetailsPage() {
 				createdAt: data.created_at,
 				isEscalated: data.is_escalated,
 				scholar: {
-						...data.scholar,
-						studentId: data.scholar.student_id ?? "",
-						faculty: data.scholar.faculty ?? "",
-						program: data.scholar.program ?? "",
-						yearOfStudy: data.scholar.year_of_study ?? "",
-						preferredContact: data.scholar.preferred_contact ?? "Email",
-						scholarshipType: data.scholar.scholarship_type ?? "",
-						status: data.scholar.status ?? "Active",
-						tickets: [],
-					},
-				officer: data.assigned_to,
+					...data.scholar,
+					studentId: data.scholar.student_id,
+					yearOfStudy: data.scholar.year_of_study,
+					preferredContact: data.scholar.preferred_contact,
+					scholarshipType: data.scholar.scholarship_type,
+					tickets: [],
+				},
+				officer: data.assigned_officer,
 				attachments: data.attachments ?? [],
 			};
 			setTicket(formattedTicket);
@@ -105,7 +102,7 @@ export function TicketDetailsPage() {
 
 		try {
 			setLoading(true);
-			
+
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
 				headers: {
@@ -197,9 +194,7 @@ export function TicketDetailsPage() {
 						<div className="text-sm text-zinc-400">Scholar</div>
 					</div>
 					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">
-							{formatDate(ticket.createdAt)}
-						</div>
+						<div className="text-lg mb-1">{formatDate(ticket.createdAt)}</div>
 						<div className="text-sm text-zinc-400">Created</div>
 					</div>
 					<div className="flex-1 flex-col">
@@ -263,9 +258,7 @@ export function TicketDetailsPage() {
 						</div>
 					)}
 
-					{activeTab == "Conversation" && (
-						<ConversationTab ticketId={ticketId} />
-					)}
+					{activeTab == "Conversation" && <ConversationTab ticketId={ticketId} />}
 
 					{activeTab == "Attachments" && (
 						<div className="h-full w-full flex flex-col gap-3">
@@ -305,7 +298,11 @@ export function TicketDetailsPage() {
 			<div className="h-full w-full flex flex-col border rounded-lg">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 				{role == "hr" && (
-					<ActionsPanel ticket={ticket} currentStatus={ticket.status} onAction={handleExecuteAction} />
+					<ActionsPanel
+						ticket={ticket}
+						currentStatus={ticket.status}
+						onAction={handleExecuteAction}
+					/>
 				)}
 			</div>
 		</div>

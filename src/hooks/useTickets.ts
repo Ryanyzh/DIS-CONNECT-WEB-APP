@@ -31,16 +31,13 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					isEscalated: ticket.is_escalated,
 					scholar: {
 						...ticket.scholar,
-						studentId: ticket.scholar.student_id ?? "",
-						faculty: ticket.scholar.faculty ?? "",
-						program: ticket.scholar.program ?? "",
-						yearOfStudy: ticket.scholar.year_of_study ?? "",
-						preferredContact: ticket.scholar.preferred_contact ?? "Email",
-						scholarshipType: ticket.scholar.scholarship_type ?? "",
-						status: ticket.scholar.status ?? "Active",
+						studentId: ticket.scholar.student_id,
+						yearOfStudy: ticket.scholar.year_of_study,
+						preferredContact: ticket.scholar.preferred_contact,
+						scholarshipType: ticket.scholar.scholarship_type,
 						tickets: [],
 					},
-					officer: ticket.assigned_to,
+					officer: ticket.assigned_officer,
 					attachments: data.attachments
 						? data.attachments.map((attachment: any) => {
 								return {
