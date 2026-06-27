@@ -53,7 +53,7 @@ const columns: {
 ];
 
 export function OpenTicketsPage() {
-	const { tickets, triggerRefresh, loading } = useTickets();
+	const { tickets, loading } = useTickets();
 
 	if (loading) {
 		return (

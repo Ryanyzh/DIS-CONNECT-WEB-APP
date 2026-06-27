@@ -62,22 +62,24 @@ export function TicketDetailsPage() {
 				id: data.ticket_id,
 				code: data.ticket_code,
 				title: data.subject,
-				category: data.category.category_name,
+				category: data.category?.category_name ?? "General Query",
 				description: data.description,
-				priority: data.priority.level,
-				status: data.status.status_name,
+				priority: data.priority?.level ?? 1,
+				status: data.status?.status_name ?? "Open",
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
 				isEscalated: data.is_escalated,
-				scholar: {
-					...data.scholar,
-					studentId: data.scholar.student_id,
-					yearOfStudy: data.scholar.year_of_study,
-					preferredContact: data.scholar.preferred_contact,
-					scholarshipType: data.scholar.scholarship_type,
-					tickets: [],
-				},
+				scholar: data.scholar
+					? {
+							...data.scholar,
+							studentId: data.scholar.student_id,
+							yearOfStudy: data.scholar.year_of_study,
+							preferredContact: data.scholar.preferred_contact,
+							scholarshipType: data.scholar.scholarship_type,
+							tickets: [],
+					  }
+					: undefined,
 				officer: data.assigned_officer,
 				attachments: data.attachments ?? [],
 			};
@@ -87,7 +89,7 @@ export function TicketDetailsPage() {
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [ticketId]);
 
 	useEffect(() => {
 		getTicketData();

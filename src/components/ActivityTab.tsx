@@ -17,18 +17,11 @@ export function ActivityTab({
 	ticketId: string | undefined;
 	refresh: number;
 }) {
-	if (!ticketId) {
-		return (
-			<div className="bg-wise-canvas h-full w-full flex flex-col gap-4 p-6 text-3xl font-semibold">
-				<span className="text-center">This ticket could not be found.</span>
-			</div>
-		);
-	}
-
 	const [history, setHistory] = useState<HistoryLog[]>([]);
 	const [activityLoading, setActivityLoading] = useState<boolean>(true);
 
 	async function fetchHistory() {
+		if (!ticketId) return;
 		try {
 			setActivityLoading(true);
 
@@ -57,6 +50,14 @@ export function ActivityTab({
 	useEffect(() => {
 		fetchHistory();
 	}, [ticketId, refresh]);
+
+	if (!ticketId) {
+		return (
+			<div className="bg-wise-canvas h-full w-full flex flex-col gap-4 p-6 text-3xl font-semibold">
+				<span className="text-center">This ticket could not be found.</span>
+			</div>
+		);
+	}
 
 	if (activityLoading) {
 		return (

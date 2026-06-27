@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getIdToken } from "../lib/authRepository";
 import type { TicketAttachment } from "../types/TicketAttachment";
 import { apiFetch } from "../lib/apiFetch";
 
@@ -14,19 +13,12 @@ interface Message {
 }
 
 export function ConversationTab({ ticketId }: { ticketId: string | undefined }) {
-	if (!ticketId) {
-		return (
-			<div className="bg-wise-canvas h-full w-full flex flex-col gap-4 p-6 text-3xl font-semibold">
-				<span className="text-center">This ticket could not be found.</span>
-			</div>
-		);
-	}
-
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [newMessage, setNewMessage] = useState<string>("");
 	const [sending, setSending] = useState<boolean>(false);
 
 	async function fetchMessages() {
+		if (!ticketId) return;
 		try {
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`)
 
@@ -51,6 +43,14 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 	useEffect(() => {
 		fetchMessages();
 	}, [ticketId]);
+
+	if (!ticketId) {
+		return (
+			<div className="bg-wise-canvas h-full w-full flex flex-col gap-4 p-6 text-3xl font-semibold">
+				<span className="text-center">This ticket could not be found.</span>
+			</div>
+		);
+	}
 
 	const sendMessage = async (e: React.SubmitEvent) => {
 		e.preventDefault();
