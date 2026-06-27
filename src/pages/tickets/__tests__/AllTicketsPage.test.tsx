@@ -168,9 +168,74 @@ describe("AllTicketsPage Integration Test", () => {
 	};
 
 	beforeEach(() => {
-		vi.spyOn(globalThis, "fetch").mockResolvedValue(
-			Response.json(mockTickets, { status: 200 })
-		);
+		vi.spyOn(globalThis, "fetch").mockImplementation((url) => {
+			const urlString = url.toString();
+
+			// Intercept useCategories() endpoint
+			if (urlString.includes("/api/v1/categories")) {
+				const mockCategories = [
+					{
+						category_id: "2d267226-a9d7-50f9-a6f6-c36ebee38261",
+						description: "Internship-related forms, approvals, and documentation",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Internship",
+						department_id: null,
+					},
+					{
+						category_id: "4308c61a-353f-5c6c-b09c-830cbe0cb101",
+						description: "Policy clarifications and compliance-related enquiries",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Policy",
+						department_id: null,
+					},
+					{
+						category_id: "503b3a9a-fc71-5c51-83b9-f24ddf9725dc",
+						description: "Claims and reimbursements for approved expenses",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Reimbursement",
+						department_id: null,
+					},
+					{
+						category_id: "50739be1-ff48-5fe4-8704-a31a47df2558",
+						description: "Leave applications and approvals",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Leave",
+						department_id: null,
+					},
+					{
+						category_id: "9d250fae-12f8-5a62-b383-11434111cf6c",
+						description: "Student exchange programme requests and coordination",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Exchange",
+						department_id: null,
+					},
+					{
+						category_id: "b149db0c-ce44-5ee7-8565-21a65c4891b3",
+						description: "Scholarship applications, declarations, and disbursements",
+						created_at: "2026-06-06T06:57:50.356727+00:00",
+						updated_at: "2026-06-06T06:57:50.356727+00:00",
+						category_name: "Scholarship",
+						department_id: null,
+					},
+				];
+				return Promise.resolve(
+					new Response(JSON.stringify(mockCategories), { status: 200 })
+				);
+			}
+
+			// standard tickets fetch request
+			return Promise.resolve(
+				new Response(JSON.stringify(mockTickets), {
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				})
+			);
+		});
 	});
 
 	afterEach(() => {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getIdToken } from "../lib/authRepository";
 import { apiFetch } from "../lib/apiFetch";
 
 interface HistoryLog {
