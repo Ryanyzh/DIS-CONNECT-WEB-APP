@@ -2,7 +2,6 @@ import type { HrOfficer } from "../types/HrOfficer";
 import { formatDate } from "../types/Scholar";
 import { categoryStyles, priorityLabels, priorityStyles, statusStyles, type TicketCategory, type TicketStatus } from "./TicketCard";
 
-
 interface TicketInfo {
     code: string;
     status: TicketStatus;
@@ -19,42 +18,76 @@ interface TicketInfoPanelProps {
     officer?: HrOfficer;
 }
 
-export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
-	const isOverdue =
-		new Date(ticket.deadline) < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
-    
+function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
     return (
-		<div className="flex flex-col p-4 gap-4">
-			<span className="font-semibold">Ticket Information</span>
-            
-            <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-sm">
-                <div>Ticket Code</div>
-                <div>{ticket.code}</div>
+        <>
+            <dt className="text-xs font-medium text-dc-text-muted">{label}</dt>
+            <dd className="text-sm text-dc-text dark:text-white">{children}</dd>
+        </>
+    );
+}
 
-                <div>Status</div>
-                <div className={`w-fit px-1.5 py-1 rounded-md font-semibold ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}>{ticket.status}</div>
+export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
+    const isOverdue =
+        new Date(ticket.deadline) < new Date() &&
+        ticket.status !== "Resolved" &&
+        ticket.status !== "Closed";
 
-                <div>Priority</div>
-                <div className={`w-fit px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}>{priorityLabels[ticket.priority]}</div>
+    return (
+        <div className="flex flex-col p-5 gap-5">
+            <span className="text-sm font-semibold text-dc-text dark:text-white">Ticket Information</span>
 
-                <div>Category</div>
-                <div className={`w-fit px-1.5 py-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}>{ticket.category}</div>
+            <dl className="grid grid-cols-2 gap-y-4 gap-x-3">
+                <InfoRow label="Code">
+                    <span className="font-mono text-xs">{ticket.code}</span>
+                </InfoRow>
 
-                <div>Created At</div>
-                <div>{formatDate(ticket.createdAt)}</div>
-                
-                <div>Due By</div>
-                <div className={`${isOverdue ? "text-rose-500" : "text-green-500"}`}>{formatDate(ticket.deadline)}</div>
+                <InfoRow label="Status">
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-semibold ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}>
+                        {ticket.status}
+                    </span>
+                </InfoRow>
 
-                <div>Last Updated</div>
-                <div>{formatDate(ticket.lastUpdated)}</div>
+                <InfoRow label="Priority">
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-semibold ${priorityStyles[ticket.priority]}`}>
+                        {priorityLabels[ticket.priority]}
+                    </span>
+                </InfoRow>
 
-                <div>Assigned Officer</div>
-                <div className={`${officer ? "text-black" : "text-pink-400"}`}>{officer ? officer.name : "Unassigned"}</div>
+                <InfoRow label="Category">
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-semibold ${categoryStyles[ticket.category]}`}>
+                        {ticket.category}
+                    </span>
+                </InfoRow>
 
-                <div>Escalated</div>
-                <div className={`${ticket.isEscalated ? "text-rose-500" : "text-green-500"}`}>{ticket.isEscalated ? "Yes" : "No"}</div>
-            </div>
-		</div>
-	);
+                <InfoRow label="Created">
+                    <span className="text-dc-text-muted text-xs">{formatDate(ticket.createdAt)}</span>
+                </InfoRow>
+
+                <InfoRow label="Due By">
+                    <span className={`text-xs font-medium ${isOverdue ? "text-dc-error dark:text-dc-error-dark" : "text-emerald-600 dark:text-emerald-400"}`}>
+                        {formatDate(ticket.deadline) || "—"}
+                    </span>
+                </InfoRow>
+
+                <InfoRow label="Last Updated">
+                    <span className="text-dc-text-muted text-xs">{formatDate(ticket.lastUpdated)}</span>
+                </InfoRow>
+
+                <InfoRow label="Officer">
+                    {officer ? (
+                        <span className="font-medium">{officer.name}</span>
+                    ) : (
+                        <span className="text-dc-error dark:text-dc-error-dark font-medium">Unassigned</span>
+                    )}
+                </InfoRow>
+
+                <InfoRow label="Escalated">
+                    <span className={`text-xs font-semibold ${ticket.isEscalated ? "text-dc-error dark:text-dc-error-dark" : "text-emerald-600 dark:text-emerald-400"}`}>
+                        {ticket.isEscalated ? "Yes" : "No"}
+                    </span>
+                </InfoRow>
+            </dl>
+        </div>
+    );
 }

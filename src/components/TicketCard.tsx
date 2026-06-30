@@ -12,7 +12,7 @@ export type TicketStatus =
 	| "Closed"
 	| "Escalated";
 
-// ticket categorys
+// ticket categories
 export type TicketCategory = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
 
 // fields that a ticket will have when created
@@ -21,120 +21,116 @@ export interface TicketProps {
 	code: string;
 	title: string;
 	category: TicketCategory;
-	description: string; // description of the issue
-	priority: number; // priority of the ticket, higher number means higher priority (e.g. 1-5, 1 = very low priority, 5 = very high priority)
+	description: string;
+	priority: number;
 	status: TicketStatus;
-	deadline: string; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
+	deadline: string;
 	lastUpdated: string;
 	createdAt: string;
 	isEscalated: boolean;
 	scholar?: Scholar;
-	officer?: HrOfficer; // the HR officer assigned to the ticket
+	officer?: HrOfficer;
 	attachments: TicketAttachment[];
 }
 
-// props for TicketCard component, for things specific to the UI of the ticket card
 export interface TicketCardProps {
 	ticket: TicketProps;
 }
 
 export const categoryStyles: Record<TicketCategory, string> = {
-	Reimbursement: "bg-blue-600/15 text-blue-800",
-	Exchange: "bg-amber-600/15 text-amber-800",
-	Policy: "bg-emerald-600/15 text-emerald-800",
-	Finance: "bg-rose-600/15 text-rose-800",
-	"General Query": "bg-cyan-600/15 text-cyan-800",
+	Reimbursement: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+	Exchange:      "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+	Policy:        "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+	Finance:       "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
+	"General Query": "bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
 };
 
 export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = {
-	Open: { text: "text-pink-400", bg: "bg-pink-400/15" },
-	"In Review": { text: "text-blue-400", bg: "bg-blue-400/15" },
-	"Waiting for Response": { text: "text-amber-400", bg: "bg-amber-400/15" },
-	Resolved: { text: "text-emerald-400", bg: "bg-emerald-400/15" },
-	Closed: { text: "text-violet-500", bg: "bg-violet-500/15" },
-	Escalated: { text: "text-rose-500", bg: "bg-rose-500/15" },
+	Open:                   { text: "text-rose-600 dark:text-rose-400",    bg: "bg-rose-50 dark:bg-rose-400/15" },
+	"In Review":            { text: "text-blue-600 dark:text-blue-400",    bg: "bg-blue-50 dark:bg-blue-400/15" },
+	"Waiting for Response": { text: "text-amber-600 dark:text-amber-400",  bg: "bg-amber-50 dark:bg-amber-400/15" },
+	Resolved:               { text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-400/15" },
+	Closed:                 { text: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-400/15" },
+	Escalated:              { text: "text-red-600 dark:text-red-400",      bg: "bg-red-50 dark:bg-red-500/15" },
 };
 
 export const priorityLabels: Record<number, string> = {
-	1: "Low Priority 1",
-	2: "Low Priority 2",
-	3: "Low Priority 3",
-	4: "Medium Priority 4",
-	5: "Medium Priority 5",
-	6: "Medium Priority 6",
-	7: "Medium Priority 7",
-	8: "High Priority 8",
-	9: "High Priority 9",
-	10: "High Priority 10",
+	1: "P1 · Low",
+	2: "P2 · Low",
+	3: "P3 · Low",
+	4: "P4 · Medium",
+	5: "P5 · Medium",
+	6: "P6 · Medium",
+	7: "P7 · Medium",
+	8: "P8 · High",
+	9: "P9 · High",
+	10: "P10 · High",
 };
 
 export const priorityStyles: Record<number, string> = {
-	1: "text-green-400 bg-green-400/15",
-	2: "text-green-400 bg-green-400/15",
-	3: "text-green-400 bg-green-400/15",
-	4: "text-yellow-400 bg-yellow-400/15",
-	5: "text-yellow-400 bg-yellow-400/15",
-	6: "text-yellow-400 bg-yellow-400/15",
-	7: "text-yellow-400 bg-yellow-400/15",
-	8: "text-red-400 bg-red-400/15",
-	9: "text-red-400 bg-red-400/15",
-	10: "text-red-400 bg-red-400/15",
+	1:  "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
+	2:  "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
+	3:  "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
+	4:  "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
+	5:  "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
+	6:  "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
+	7:  "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
+	8:  "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
+	9:  "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
+	10: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
 };
 
 function TicketCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
-	const handleCardClick = () => {
-		navigate(`/tickets/${ticket.id}`);
-	};
 
 	const isOverdue =
-		new Date(ticket.deadline) < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
+		new Date(ticket.deadline) < new Date() &&
+		ticket.status !== "Resolved" &&
+		ticket.status !== "Closed";
 
 	return (
 		<div
-			onClick={handleCardClick}
-			className="bg-wise-canvas p-4 rounded-xl border border-zinc-300/40 shadow-md hover:border-zinc-700/40 transition-all w-full flex flex-col justify-between relative cursor-pointer"
+			onClick={() => navigate(`/tickets/${ticket.id}`)}
+			className="bg-dc-surface dark:bg-dc-surface-dark p-4 rounded-xl border border-dc-border dark:border-dc-border-dark shadow-dc-sm hover:shadow-dc-md hover:border-dc-primary/40 dark:hover:border-dc-primary/60 transition-all w-full flex flex-col justify-between cursor-pointer"
 		>
-			{/* Ticket ID and status dropdown */}
+			{/* Ticket code and status */}
 			<div className="flex flex-row justify-between mb-2 items-center">
-				<span className="line-clamp-2 min-h-0 text-xs font-mono tracking-wider text-zinc-400">
+				<span className="text-xs font-mono tracking-wider text-dc-text-muted">
 					{ticket.code}
 				</span>
-
 				<span
-					className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-1.5 py-1 rounded-md`}
+					className={`text-xs font-semibold px-2 py-0.5 rounded-md ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}
 				>
 					{ticket.status}
 				</span>
 			</div>
 
-			{/* Ticket title */}
-			<div className="text-lg font-semibold leading-snug tracking-tight line-clamp-2">
+			{/* Title */}
+			<div className="text-sm font-semibold leading-snug tracking-tight line-clamp-2 text-dc-text dark:text-white mb-1">
 				{ticket.title}
 			</div>
 
-			{/* Assigned Officer, ticket category, last updated, deadline */}
-			<div className="flex flex-wrap justify-between items-center pt-3 text-sm text-zinc-400 gap-4">
-				<div className="flex flex-wrap items-center gap-4">
+			{/* Meta row */}
+			<div className="flex flex-wrap justify-between items-center pt-3 text-xs text-dc-text-muted gap-3">
+				<div className="flex flex-wrap items-center gap-3">
 					{ticket.officer ? (
-						<span className={`${ticket.isEscalated ? "text-rose-500" : "text-zinc-400" }`}>Assigned to: {ticket.officer.name}</span>
+						<span className={ticket.isEscalated ? "text-dc-error dark:text-dc-error-dark" : "text-dc-text-muted"}>
+							{ticket.officer.name}
+						</span>
 					) : (
-						<span className="text-pink-400">Unassigned</span>
+						<span className="text-dc-error dark:text-dc-error-dark font-medium">Unassigned</span>
 					)}
 
-					<span
-						className={`text-xs px-1.5 py-1 mr-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
-					>
+					<span className={`px-1.5 py-0.5 rounded-md font-semibold text-xs ${categoryStyles[ticket.category]}`}>
 						{ticket.category}
 					</span>
-					<span>Last updated: {formatDate(ticket.lastUpdated)}</span>
-					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
-						{formatDate(ticket.deadline) ? `Due by: ${formatDate(ticket.deadline)}` : ""}
+
+					<span className={isOverdue ? "text-dc-error dark:text-dc-error-dark font-medium" : ""}>
+						{formatDate(ticket.deadline) ? `Due ${formatDate(ticket.deadline)}` : ""}
 					</span>
 				</div>
-				<span
-					className={`px-1.5 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
-				>
+
+				<span className={`px-1.5 py-0.5 rounded-md font-semibold text-xs ${priorityStyles[ticket.priority]}`}>
 					{priorityLabels[ticket.priority]}
 				</span>
 			</div>
