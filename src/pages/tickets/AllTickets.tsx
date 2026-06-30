@@ -10,152 +10,89 @@ export function AllTicketsPage() {
 	const [statusFilter, setStatusFilter] = useState<string>("All");
 	const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
-	const changeStatusFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setStatusFilter(e.target.value);
-	};
-
-	const changeCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setCategoryFilter(e.target.value);
-	};
-
 	const stats = [
-		{
-			status: "Open" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.status == "Open").length,
-		},
-		{
-			status: "In Review" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.status == "In Review").length,
-		},
-		{
-			status: "Waiting for Response" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.status == "Waiting for Response").length,
-		},
-		{
-			status: "Resolved" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.status == "Resolved").length,
-		},
-		{
-			status: "Closed" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.status == "Closed").length,
-		},
-		{
-			status: "Escalated" as TicketStatus,
-			count: tickets.filter((ticket) => ticket.isEscalated).length,
-		},
+		{ status: "Open" as TicketStatus,                   count: tickets.filter((t) => t.status === "Open").length },
+		{ status: "In Review" as TicketStatus,              count: tickets.filter((t) => t.status === "In Review").length },
+		{ status: "Waiting for Response" as TicketStatus,   count: tickets.filter((t) => t.status === "Waiting for Response").length },
+		{ status: "Resolved" as TicketStatus,               count: tickets.filter((t) => t.status === "Resolved").length },
+		{ status: "Closed" as TicketStatus,                 count: tickets.filter((t) => t.status === "Closed").length },
+		{ status: "Escalated" as TicketStatus,              count: tickets.filter((t) => t.isEscalated).length },
 	];
 
 	if (loading) {
 		return (
-			<PageShell
-				title="All Tickets"
-				description="View every ticket in the system and filter by status, category, or owner."
-			>
-				<div className="bg-wise-canvas h-full w-full flex flex-col items-center justify-center">
-					<div className="flex flex-col items-center gap-3">
-						<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
-					</div>
+			<PageShell title="All Tickets" description="View every ticket in the system and filter by status, category, or owner.">
+				<div className="flex items-center justify-center h-48">
+					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-dc-border-dark border-t-dc-primary" />
 				</div>
 			</PageShell>
 		);
 	}
 
 	return (
-		<PageShell
-			title="All Tickets"
-			description="View every ticket in the system and filter by status, category, or owner."
-		>
-			<div className="bg-wise-canvas h-full w-full flex flex-col">
-				{/* Summary Banner */}
-				<div className="bg-wise-canvas flex flex-row w-full border p-4 justify-between rounded-xl items-center divide-x">
-					{stats.map(({ status, count }) => (
-						<div key={status} className="flex flex-col px-4">
-							<span className={`text-sm ${statusStyles[status].text}`}>{status}</span>
-							<span className="text-lg font-semibold">{count}</span>
-						</div>
-					))}
-				</div>
-				<div className="bg-wise-canvas border border-t-0 -mt-3 p-2 px-6 flex flex-row gap-2 justify-end items-center text-xs rounded-b-xl text-neutral-500">
-					<span>Total Tickets</span>
-					<span className="bg-neutral-100 px-2.5 py-0.5 rounded-full font-semibold text-neutral-700">
-						{tickets.length}
-					</span>
+		<PageShell title="All Tickets" description="View every ticket in the system and filter by status, category, or owner.">
+			<div className="flex flex-col gap-4">
+				{/* Status summary banner */}
+				<div className="bg-dc-surface dark:bg-dc-surface-dark border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden shadow-dc-sm">
+					<div className="grid grid-cols-6 divide-x divide-dc-border dark:divide-dc-border-dark">
+						{stats.map(({ status, count }) => (
+							<button
+								key={status}
+								onClick={() => setStatusFilter(statusFilter === status ? "All" : status)}
+								className={`flex flex-col items-center py-3 px-2 transition-colors hover:bg-dc-elevated dark:hover:bg-dc-elevated-dark ${statusFilter === status ? "bg-dc-elevated dark:bg-dc-elevated-dark" : ""}`}
+							>
+								<span className={`text-xl font-bold ${statusStyles[status].text}`}>{count}</span>
+								<span className="text-xs text-dc-text-muted mt-0.5 text-center leading-tight">{status}</span>
+							</button>
+						))}
+					</div>
+					<div className="border-t border-dc-border dark:border-dc-border-dark px-4 py-2 flex justify-end items-center gap-2 text-xs text-dc-text-muted">
+						<span>Total</span>
+						<span className="bg-dc-elevated dark:bg-dc-elevated-dark text-dc-text dark:text-white font-semibold px-2.5 py-0.5 rounded-full">
+							{tickets.length}
+						</span>
+					</div>
 				</div>
 
-				{/* Ticket List */}
-				<div className="bg-wise-canvas h-full min-h-0 w-full">
-					<div className="flex flex-row justify-between items-center">
-						{/* Ticket filters */}
-						<div className="flex flex-row w-full gap-4 items-center py-4">
-							<select
-								name="statusFilter"
-								value={statusFilter}
-								onChange={changeStatusFilter}
-								className="border p-2 rounded-xl line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
-							>
-								<option value="All" className="bg-zinc-900 text-zinc-100">
-									Status: All
-								</option>
-								<option value="Open" className="bg-zinc-900 text-zinc-100">
-									Status: Open
-								</option>
-								<option value="In Review" className="bg-zinc-900 text-zinc-100">
-									Status: In Review
-								</option>
-								<option
-									value="Waiting for Response"
-									className="bg-zinc-900 text-zinc-100"
-								>
-									Status: Waiting for Response
-								</option>
-								<option value="Resolved" className="bg-zinc-900 text-zinc-100">
-									Status: Resolved
-								</option>
-								<option value="Closed" className="bg-zinc-900 text-zinc-100">
-									Status: Closed
-								</option>
-								<option value="Escalated" className="bg-zinc-900 text-zinc-100">
-									Status: Escalated
-								</option>
-							</select>
-							<select
-								name="categoryFilter"
-								value={categoryFilter}
-								onChange={changeCategoryFilter}
-								className="border p-2 rounded-xl line-clamp-2 flex font-semibold w-fit min-h-0 text-xs leading-snug tracking-tight focus:outline-none"
-							>
-								<option value="All" className="bg-zinc-900 text-zinc-100">
-									Category: All
-								</option>
-								{categories.map((cat) => (
-									<option
-										key={cat.category_id}
-										value={cat.category_name}
-										className="bg-zinc-900 text-zinc-100"
-									>
-										Category: {cat.category_name}
-									</option>
-								))}
-							</select>
-						</div>
-					</div>
-					<div className="flex flex-col gap-3 justify-between h-full max-h-[100vh] min-h-0 overflow-y-auto">
-						{tickets
-							.filter(
-								(ticket) =>
-									statusFilter == "All" ||
-									ticket.status == statusFilter ||
-									(statusFilter == "Escalated" && ticket.isEscalated)
-							)
-							.filter(
-								(ticket) =>
-									categoryFilter == "All" || ticket.category == categoryFilter
-							)
-							.toSorted((a, b) => b.priority - a.priority)
-							.map((ticket) => (
-								<TicketCard key={ticket.id} ticket={ticket} />
-							))}
-					</div>
+				{/* Filters */}
+				<div className="flex flex-row gap-3 items-center">
+					<select
+						value={statusFilter}
+						onChange={(e) => setStatusFilter(e.target.value)}
+						className="text-xs font-medium border border-dc-border dark:border-dc-border-dark rounded-lg px-3 py-2 bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
+					>
+						<option value="All">Status: All</option>
+						<option value="Open">Status: Open</option>
+						<option value="In Review">Status: In Review</option>
+						<option value="Waiting for Response">Status: Waiting for Response</option>
+						<option value="Resolved">Status: Resolved</option>
+						<option value="Closed">Status: Closed</option>
+						<option value="Escalated">Status: Escalated</option>
+					</select>
+
+					<select
+						value={categoryFilter}
+						onChange={(e) => setCategoryFilter(e.target.value)}
+						className="text-xs font-medium border border-dc-border dark:border-dc-border-dark rounded-lg px-3 py-2 bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
+					>
+						<option value="All">Category: All</option>
+						{categories.map((cat) => (
+							<option key={cat.category_id} value={cat.category_name}>
+								Category: {cat.category_name}
+							</option>
+						))}
+					</select>
+				</div>
+
+				{/* Ticket list */}
+				<div className="flex flex-col gap-2.5 max-h-[72vh] overflow-y-auto pr-1">
+					{tickets
+						.filter((t) => statusFilter === "All" || t.status === statusFilter || (statusFilter === "Escalated" && t.isEscalated))
+						.filter((t) => categoryFilter === "All" || t.category === categoryFilter)
+						.toSorted((a, b) => b.priority - a.priority)
+						.map((ticket) => (
+							<TicketCard key={ticket.id} ticket={ticket} />
+						))}
 				</div>
 			</div>
 		</PageShell>
