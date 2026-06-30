@@ -5,7 +5,6 @@ import { LoginPage } from "./pages/Login";
 import { AnnouncementDetailPage } from "./pages/announcements/AnnouncementDetail";
 import { CreateAnnouncementPage as EditAnnouncementPage } from "./pages/announcements/CreateAnnouncement";
 import {
-	OverviewPage,
 	AllTicketsPage,
 	OpenTicketsPage,
 	SlaMonitoringPage,
@@ -38,7 +37,7 @@ function App() {
 				<Route path="/login" element={<LoginPage />} />
 				<Route element={<ProtectedRoute />}>
 					<Route element={<Layout />}>
-						<Route path="/" element={<OverviewPage />} />
+						<Route path="/" element={<Navigate to="/tickets/all" replace />} />
 						<Route path="/tickets/all" element={<AllTicketsPage />} />
 						<Route path="/tickets/open" element={<OpenTicketsPage />} />
 						<Route path="/tickets/sla" element={<SlaMonitoringPage />} />
