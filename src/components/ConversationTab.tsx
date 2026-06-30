@@ -20,21 +20,15 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 	async function fetchMessages() {
 		if (!ticketId) return;
 		try {
-			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`)
-
-			if (!response.ok) {
-				throw new Error(`Error fetching conversation history: ${response.status}`);
-			}
-
+			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`);
+			if (!response.ok) throw new Error(`Error fetching conversation history: ${response.status}`);
 			const data = await response.json();
-			const formattedData = data.messages.map((message: Message) => {
-				return {
+			setMessages(
+				data.messages.map((message: Message) => ({
 					...message,
 					created_at: new Date(message.created_at),
-				};
-			});
-
-			setMessages(formattedData);
+				}))
+			);
 		} catch (error) {
 			console.error("Error fetching ticket history: ", error);
 		}
@@ -46,31 +40,21 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 
 	if (!ticketId) {
 		return (
-			<div className="bg-wise-canvas h-full w-full flex flex-col gap-4 p-6 text-3xl font-semibold">
-				<span className="text-center">This ticket could not be found.</span>
-			</div>
+			<p className="text-sm text-dc-text-muted py-6 text-center">This ticket could not be found.</p>
 		);
 	}
 
-	const sendMessage = async (e: React.SubmitEvent) => {
+	const sendMessage = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!newMessage.trim() || sending) return;
-
 		try {
 			setSending(true);
-
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`, {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ message_text: newMessage }),
 			});
-
-			if (!response.ok) {
-				throw new Error(`Failed to send message ${response.status}`);
-			}
-
+			if (!response.ok) throw new Error(`Failed to send message ${response.status}`);
 			setNewMessage("");
 			await fetchMessages();
 		} catch (error) {
@@ -81,41 +65,55 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 	};
 
 	return (
-		<div className="bg-wise-canvas h-full w-full flex flex-col items-center justify-center">
-			<div className="px-10 py-4 rounded-lg h-[22vw] w-full flex flex-col gap-4 overflow-y-auto">
-				{messages.map((message) => (
-					<div key={message.message_id} className={`flex flex-col ${message.sender_role == "scholar" ? "self-start items-start" : "self-end items-end"}`}>
+		<div className="flex flex-col h-full min-h-0">
+			{/* Message list */}
+			<div className="flex flex-col gap-3 py-2 flex-1 overflow-y-auto max-h-[22rem]">
+				{messages.length === 0 && (
+					<p className="text-sm text-dc-text-muted py-4 text-center">No messages yet.</p>
+				)}
+				{messages.map((message) => {
+					const isScholar = message.sender_role === "scholar";
+					return (
 						<div
-							className={`flex flex-col w-fit border ${message.sender_role == "scholar" ? "rounded-tl-none" : "rounded-tr-none"} rounded-2xl p-3 shadow-sm`}
+							key={message.message_id}
+							className={`flex flex-col ${isScholar ? "items-start" : "items-end"}`}
 						>
-							<p className="text-sm">{message.message_text}</p>
+							<div
+								className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+									isScholar
+										? "rounded-tl-none bg-dc-elevated dark:bg-dc-elevated-dark text-dc-text dark:text-white border border-dc-border dark:border-dc-border-dark"
+										: "rounded-tr-none bg-dc-primary text-white"
+								}`}
+							>
+								{message.message_text}
+							</div>
+							<span className="text-xs text-dc-text-muted mt-1 mx-1 tracking-wide">
+								{message.sender_name} · {message.created_at.toLocaleString("en-SG")}
+							</span>
 						</div>
-
-						<span className="text-xs text-slate-400 mt-1 ml-1 tracking-wide">
-							{message.sender_name} at {message.created_at.toLocaleString("en-SG")}
-						</span>
-					</div>
-				))}
+					);
+				})}
 			</div>
 
+			{/* Send form */}
 			<form
 				onSubmit={sendMessage}
-				className="w-full p-3 bg-white border-t border-slate-200 flex gap-2 items-center"
+				className="flex gap-2 items-center pt-3 border-t border-dc-border dark:border-dc-border-dark mt-2"
 			>
 				<input
 					type="text"
 					value={newMessage}
 					onChange={(e) => setNewMessage(e.target.value)}
-					placeholder="Message"
-					className="flex-1 text-sm border border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-all text-slate-800 bg-slate-50"
+					placeholder="Type a message..."
+					className="flex-1 text-sm border border-dc-border dark:border-dc-border-dark rounded-lg px-4 py-2 bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white placeholder:text-dc-text-muted focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
 					disabled={sending}
 				/>
 				<button
 					type="submit"
 					disabled={!newMessage.trim() || sending}
-					className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-xs shrink-0"
+					className="bg-dc-primary hover:bg-dc-primary-hover disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
 				>
-					{sending ? "Sending..." : "Send"}
+					{sending ? "Sending…" : "Send"}
 				</button>
 			</form>
 		</div>
