@@ -21,9 +21,6 @@ export function LogoutPage() {
 	);
 }
 
-// Overview
-export { default as OverviewPage } from "./Overview";
-
 // Tickets
 export { AllTicketsPage } from "./tickets/AllTickets";
 export { OpenTicketsPage } from "./tickets/OpenTickets";
