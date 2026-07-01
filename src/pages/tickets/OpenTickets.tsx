@@ -5,38 +5,45 @@ import { getCurrentUser } from "../../lib/authRepository";
 
 const columns: {
 	title: string;
-	accent: string;
+	dot: string;
+	emptyMsg: string;
 	filterFunc: (ticket: TicketProps) => boolean;
 }[] = [
 	{
 		title: "Unassigned",
-		accent: "text-dc-error dark:text-dc-error-dark",
+		dot: "bg-red-500",
+		emptyMsg: "No unassigned tickets",
 		filterFunc: (t) => t.officer == undefined && t.status !== "Closed",
 	},
 	{
 		title: "In Review",
-		accent: "text-blue-600 dark:text-blue-400",
+		dot: "bg-indigo-500",
+		emptyMsg: "No tickets in review",
 		filterFunc: (t) => t.status === "In Review",
 	},
 	{
 		title: "Waiting",
-		accent: "text-amber-600 dark:text-amber-400",
+		dot: "bg-amber-400",
+		emptyMsg: "No tickets waiting",
 		filterFunc: (t) => t.status === "Waiting for Response",
 	},
 	{
 		title: "Resolved",
-		accent: "text-emerald-600 dark:text-emerald-400",
+		dot: "bg-emerald-500",
+		emptyMsg: "No resolved tickets",
 		filterFunc: (t) => t.status === "Resolved",
 	},
 	{
 		title: "Overdue",
-		accent: "text-dc-error dark:text-dc-error-dark",
+		dot: "bg-orange-500",
+		emptyMsg: "No overdue tickets",
 		filterFunc: (t) =>
 			new Date(t.deadline) < new Date() && t.status !== "Resolved" && t.status !== "Closed",
 	},
 	{
 		title: "Escalated",
-		accent: "text-dc-error dark:text-dc-error-dark",
+		dot: "bg-red-600",
+		emptyMsg: "No escalated tickets",
 		filterFunc: (t) => t.isEscalated && t.status !== "Resolved" && t.status !== "Closed",
 	},
 ];
@@ -46,42 +53,73 @@ export function OpenTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell title="Open Tickets" description="View and manage open tickets assigned to you, unassigned, or escalated.">
+			<PageShell
+				title="Open Tickets"
+				description="View and manage open tickets assigned to you, unassigned, or escalated."
+			>
 				<div className="flex items-center justify-center h-48">
-					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-dc-border-dark border-t-dc-primary" />
+					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
 			</PageShell>
 		);
 	}
 
 	return (
-		<PageShell title="Open Tickets" description="View and manage open tickets assigned to you, unassigned, or escalated.">
-			<div className="h-full max-h-[85vh] min-h-0 w-full">
-				<div className="grid grid-flow-col gap-3 h-full min-h-0 overflow-x-auto">
-					{columns.map(({ title, accent, filterFunc }) => {
+		<PageShell
+			title="Open Tickets"
+			description="View and manage open tickets assigned to you, unassigned, or escalated."
+		>
+			<div className="h-[72vh] min-h-0 w-full">
+				<div className="flex gap-3 h-full min-h-0 overflow-x-auto pb-2">
+					{columns.map(({ title, dot, emptyMsg, filterFunc }) => {
 						const filtered = tickets
-							.filter((t) => t.officer?.id === getCurrentUser()?.uid || !t.officer || t.isEscalated)
+							.filter(
+								(t) =>
+									t.officer?.id === getCurrentUser()?.uid ||
+									!t.officer ||
+									t.isEscalated
+							)
 							.filter(filterFunc)
 							.toSorted((a, b) => b.priority - a.priority);
 
 						return (
 							<div
 								key={title}
-								className="flex flex-1 flex-col border border-dc-border dark:border-dc-border-dark rounded-xl bg-dc-elevated dark:bg-dc-elevated-dark h-full min-h-0 w-full min-w-[15rem] overflow-hidden"
+								className="flex flex-col flex-shrink-0 w-[272px] rounded-xl border border-dc-border dark:border-zinc-800 bg-dc-elevated/40 dark:bg-white/[0.03] h-full min-h-0 overflow-hidden"
 							>
+								{/* Colored accent stripe */}
+								<div className={`h-0.5 flex-shrink-0 ${dot}`} />
+
 								{/* Column header */}
-								<div className={`flex items-center justify-between px-3 py-2.5 border-b border-dc-border dark:border-dc-border-dark bg-dc-surface dark:bg-dc-surface-dark`}>
-									<span className={`font-semibold text-sm ${accent}`}>{title}</span>
-									<span className="text-xs bg-dc-elevated dark:bg-dc-elevated-dark text-dc-text-muted font-medium px-2 py-0.5 rounded-full">
+								<div className="flex items-center justify-between px-3.5 py-2.5 border-b border-dc-border dark:border-zinc-800 flex-shrink-0">
+									<div className="flex items-center gap-2">
+										<div
+											className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`}
+										/>
+										<span className="text-sm font-semibold text-dc-text dark:text-white">
+											{title}
+										</span>
+									</div>
+									<span className="text-[11px] font-semibold bg-dc-border/60 dark:bg-zinc-800 text-dc-text-muted dark:text-zinc-400 px-2 py-0.5 rounded-full">
 										{filtered.length}
 									</span>
 								</div>
 
-								{/* Cards */}
-								<div className="flex flex-1 flex-col gap-2 overflow-y-auto p-2">
-									{filtered.map((ticket) => (
-										<TicketCard key={ticket.id} ticket={ticket} />
-									))}
+								{/* Cards — use view="card" for vertical kanban layout */}
+								<div className="flex flex-col gap-2 overflow-y-auto px-2.5 pt-2.5 pb-8 flex-1 min-h-0">
+									{filtered.length === 0 ? (
+										<div className="flex items-center justify-center h-16 mt-1 rounded-lg border border-dashed border-dc-border dark:border-zinc-700 text-xs text-dc-text-muted">
+											{emptyMsg}
+										</div>
+									) : (
+										filtered.map((ticket) => (
+											<TicketCard
+												key={ticket.id}
+												ticket={ticket}
+												view="card"
+											/>
+										))
+									)}
 								</div>
 							</div>
 						);
