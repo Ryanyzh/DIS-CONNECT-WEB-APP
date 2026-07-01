@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../lib/apiFetch";
 import { type Faq, type FaqCategory, FAQ_CATEGORIES, faqCategoryConfig } from "../../types/Faq";
+import PageShell from "../PageShell";
 
 function FaqItem({
 	faq,
@@ -141,32 +142,20 @@ export function AllFaqsPage() {
 	);
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						FAQ Articles
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						Manage frequently asked questions visible to scholars.
-					</p>
-				</div>
+		<PageShell
+			description="Manage frequently asked questions visible to scholars."
+			actions={
 				<button
 					onClick={() => navigate("/knowledge-base/faqs/create")}
-					className="flex items-center gap-2 bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+					className="flex items-center gap-1.5 bg-dc-primary text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-dc-primary-hover transition-colors"
 				>
-					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M12 4v16m8-8H4"
-						/>
+					<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 					</svg>
 					New FAQ
 				</button>
-			</div>
+			}
+		>
 
 			{/* Category filter */}
 			<div className="flex flex-wrap gap-2">
@@ -243,6 +232,6 @@ export function AllFaqsPage() {
 					})}
 				</div>
 			)}
-		</div>
+		</PageShell>
 	);
 }

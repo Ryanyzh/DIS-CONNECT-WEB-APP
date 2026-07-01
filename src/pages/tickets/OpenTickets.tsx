@@ -53,10 +53,7 @@ export function OpenTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell
-				title="Open Tickets"
-				description="View and manage open tickets assigned to you, unassigned, or escalated."
-			>
+			<PageShell description="View and manage open tickets assigned to you, unassigned, or escalated.">
 				<div className="flex items-center justify-center h-48">
 					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
@@ -65,10 +62,7 @@ export function OpenTicketsPage() {
 	}
 
 	return (
-		<PageShell
-			title="Open Tickets"
-			description="View and manage open tickets assigned to you, unassigned, or escalated."
-		>
+		<PageShell description="View and manage open tickets assigned to you, unassigned, or escalated.">
 			<div className="h-[72vh] min-h-0 w-full">
 				<div className="flex gap-3 h-full min-h-0 overflow-x-auto pb-2">
 					{columns.map(({ title, dot, emptyMsg, filterFunc }) => {

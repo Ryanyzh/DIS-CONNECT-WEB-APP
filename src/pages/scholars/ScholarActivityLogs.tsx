@@ -9,6 +9,7 @@ import {
 } from "../../types/ActivityLog";
 import { getInitials } from "../../types/Scholar";
 import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import PageShell from "../PageShell";
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
@@ -175,16 +176,7 @@ export function ScholarActivityLogsPage() {
 		search || scholarFilter !== "All" || typeFilter !== "All" || dateFrom || dateTo;
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-					Scholar Activity Logs
-				</h1>
-				<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-					Chronological audit trail of all scholar-related events across the system.
-				</p>
-			</div>
+		<PageShell description="Chronological audit trail of all scholar-related events across the system.">
 
 			{/* Stats */}
 			<div className="grid grid-cols-4 gap-4">
@@ -459,6 +451,6 @@ export function ScholarActivityLogsPage() {
 					))}
 				</div>
 			)}
-		</div>
+		</PageShell>
 	);
 }

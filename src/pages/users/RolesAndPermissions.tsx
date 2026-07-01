@@ -1,3 +1,5 @@
+import PageShell from "../PageShell";
+
 type Role = "hr_admin" | "hr_officer";
 
 interface RoleMeta {
@@ -117,19 +119,7 @@ function Check({ granted }: { granted: boolean }) {
 
 export function RolesAndPermissionsPage() {
 	return (
-		<div className="space-y-8">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						Roles & Permissions
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						Define what each HR role can access and manage across the dashboard.
-					</p>
-				</div>
-			</div>
-
+		<PageShell description="Define what each HR role can access and manage across the dashboard.">
 			{/* Role cards */}
 			<div className="grid grid-cols-2 gap-4">
 				{ROLES.map((role) => (
@@ -263,6 +253,6 @@ export function RolesAndPermissionsPage() {
 					Not allowed
 				</div>
 			</div>
-		</div>
+		</PageShell>
 	);
 }

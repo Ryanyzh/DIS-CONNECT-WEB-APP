@@ -217,10 +217,7 @@ export function AllTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell
-				title="All Tickets"
-				description="View every ticket in the system and filter by status, category, or owner."
-			>
+			<PageShell description="View every ticket in the system and filter by status, category, or owner.">
 				<div className="flex items-center justify-center h-48">
 					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
@@ -229,10 +226,7 @@ export function AllTicketsPage() {
 	}
 
 	return (
-		<PageShell
-			title="All Tickets"
-			description="View every ticket in the system and filter by status, category, or owner."
-		>
+		<PageShell description="View every ticket in the system and filter by status, category, or owner.">
 			<div className="flex flex-col gap-4">
 				{/* ── Status summary banner ─────────────────────────────────── */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl overflow-hidden shadow-dc-sm">

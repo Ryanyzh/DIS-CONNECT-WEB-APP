@@ -82,10 +82,7 @@ export function CreateHrOfficerAccountPage() {
 	};
 
 	return (
-		<PageShell
-			title="Create HR Officer Account"
-			description="Add a new HR officer account for user management, permissions, and authentication."
-		>
+		<PageShell description="Add a new HR officer account for user management, permissions, and authentication.">
 			<div className="rounded-wiseXl border border-wise-ink/10 bg-wise-canvas p-xl shadow-sm dark:border-wise-canvasSoft/20 dark:bg-[#151611]">
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div className="grid gap-6 md:grid-cols-2">

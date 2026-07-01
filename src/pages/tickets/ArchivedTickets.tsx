@@ -18,7 +18,7 @@ export function ArchivedTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell title="Archived / Closed Tickets" description="Browse tickets that have been resolved, archived, or closed.">
+			<PageShell description="Browse tickets that have been resolved, archived, or closed.">
 				<div className="flex items-center justify-center h-48">
 					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
@@ -27,7 +27,7 @@ export function ArchivedTicketsPage() {
 	}
 
 	return (
-		<PageShell title="Archived / Closed Tickets" description="Browse tickets that have been resolved, archived, or closed.">
+		<PageShell description="Browse tickets that have been resolved, archived, or closed.">
 			<div className="flex flex-col gap-4">
 				{closedTickets.length === 0 ? (
 					<p className="text-sm text-dc-text-muted py-8 text-center">No archived tickets found.</p>

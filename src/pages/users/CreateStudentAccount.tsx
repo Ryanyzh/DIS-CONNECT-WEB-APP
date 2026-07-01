@@ -197,10 +197,7 @@ export function CreateStudentAccountPage() {
 	};
 
 	return (
-		<PageShell
-			title="Create Student Account"
-			description="Add a new student account to the system for user management and authentication."
-		>
+		<PageShell description="Add a new student account to the system for user management and authentication.">
 			<div className="rounded-wiseXl border border-wise-ink/10 bg-wise-canvas p-xl shadow-sm dark:border-wise-canvasSoft/20 dark:bg-[#151611]">
 				<form onSubmit={handleSubmit} className="space-y-6">
 					<div className="grid gap-6 md:grid-cols-2">

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import PageShell from "./PageShell";
 import { signOut } from "../lib/authRepository";
 
-const createPage = (title: string, description: string) => {
+const createPage = (description: string) => {
 	return function Page() {
-		return <PageShell title={title} description={description} />;
+		return <PageShell description={description} />;
 	};
 };
 
@@ -27,7 +27,6 @@ export { OpenTicketsPage } from "./tickets/OpenTickets";
 export { ArchivedTicketsPage } from "./tickets/ArchivedTickets";
 export { TicketDetailsPage } from "./tickets/TicketDetails";
 export const SlaMonitoringPage = createPage(
-	"SLA Monitoring",
 	"Keep SLA compliance visible and catch upcoming or breached deadlines."
 );
 
@@ -48,22 +47,16 @@ export { CreateFaqPage } from "./faq/CreateFaq";
 
 // Analytics
 export const TicketAnalyticsPage = createPage(
-	"Ticket Analytics",
 	"Explore ticket volume, resolution patterns, and team performance."
 );
 export const SlaAnalyticsPage = createPage(
-	"SLA Analytics",
 	"Review SLA metrics for service performance and compliance."
 );
 
 // Notifications
-export const InboxPage = createPage("Inbox", "View all incoming notifications and messages.");
-export const AlertsPage = createPage(
-	"Alerts",
-	"Manage system alerts and escalation notifications."
-);
+export const InboxPage = createPage("View all incoming notifications and messages.");
+export const AlertsPage = createPage("Manage system alerts and escalation notifications.");
 export const NotificationSettingsPage = createPage(
-	"Notification Settings",
 	"Configure notification preferences and delivery channels."
 );
 
@@ -75,10 +68,6 @@ export { RolesAndPermissionsPage } from "./users/RolesAndPermissions";
 
 // Profile
 export const MyAccountPage = createPage(
-	"My Account",
 	"Update your profile, contact information, and preferences."
 );
-export const SecurityPage = createPage(
-	"Security",
-	"Manage your password and account security settings."
-);
+export const SecurityPage = createPage("Manage your password and account security settings.");
