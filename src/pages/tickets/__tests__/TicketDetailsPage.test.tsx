@@ -37,7 +37,7 @@ vi.mock("firebase/storage", () => {
 	};
 });
 
-describe("TicketDetailsPage Integration Test", () => {
+describe("TicketDetailsPage System Test", () => {
 	const statusIdMap = {
 		Resolved: "15d186e3-c9eb-5c97-8765-1da3093041a9",
 		"In Review": "22a6d9cf-7356-55e3-b1c7-223b34bd0225",
@@ -115,13 +115,13 @@ describe("TicketDetailsPage Integration Test", () => {
 
 			if (urlString.includes("/api/v1/tickets/statuses")) {
 				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
-                    status_id: id,
-                    status_name: name,
-                }));
+					status_id: id,
+					status_name: name,
+				}));
 
-                return Promise.resolve(Response.json(mockStatusesResponse, { status: 200 }));
+				return Promise.resolve(Response.json(mockStatusesResponse, { status: 200 }));
 			}
-			
+
 			if (urlString.includes("XDRno5f0JAbAsOfV8WzbvQYxn253")) {
 				return Promise.resolve(
 					Response.json(
@@ -281,8 +281,8 @@ describe("TicketDetailsPage Integration Test", () => {
 
 		// check that a PATCH request was sent
 		await waitFor(() => {
-			const statusUpdateRequest = fetchSpy.mock.calls.find((call) =>
-				call[0].toString().includes("/status") && call[1]?.method == "PATCH"
+			const statusUpdateRequest = fetchSpy.mock.calls.find(
+				(call) => call[0].toString().includes("/status") && call[1]?.method == "PATCH"
 			);
 
 			expect(statusUpdateRequest).toBeDefined();
@@ -298,5 +298,69 @@ describe("TicketDetailsPage Integration Test", () => {
 				})
 			);
 		});
+	});
+
+	it("displays an error popup when status update returns a 403 error", async () => {
+		const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url, options) => {
+			const urlString = url.toString();
+
+			// Intercept the PATCH status route and throw 403
+			if (
+				urlString.includes("/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/status") &&
+				options?.method === "PATCH"
+			) {
+				return new Response(null, { status: 403 });
+			}
+
+			// Return the correct status maps so "Escalated" status name can be resolved to a status id
+			if (urlString.includes("/tickets/statuses")) {
+				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
+					status_id: id,
+					status_name: name,
+				}));
+				return new Response(JSON.stringify(mockStatusesResponse), {
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				});
+			}
+
+			// Return mock ticket details
+			return new Response(JSON.stringify(mockTicketDetails), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			});
+		});
+
+		render(
+			<MemoryRouter initialEntries={["/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218"]}>
+				<Routes>
+					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
+
+		// Find and click the Escalate button
+		const escalateBtn = await screen.findByRole("button", { name: /Escalate Ticket/i });
+		fireEvent.click(escalateBtn);
+
+		// Verify the error popup shows up
+		const errorPopup = await screen.findByText(
+			/Action denied: You are not the assigned officer/i
+		);
+		expect(errorPopup).toBeInTheDocument();
+
+		// Find and click the close button
+		const closeButton = screen.queryByRole("button", { name: /×/ }) || screen.getByText("×");
+		fireEvent.click(closeButton);
+
+		// Verify that the error popup is gone after clicking close button
+		await waitFor(() => {
+			expect(
+				screen.queryByText(/Action denied: You are not the assigned officer/i)
+			).not.toBeInTheDocument();
+		});
+
+		// Clean up global spy
+		fetchSpy.mockRestore();
 	});
 });

@@ -36,7 +36,7 @@ const mockHistory = {
 	],
 };
 
-describe("Activity Tab test", () => {
+describe("Activity Tab Integration Test", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
