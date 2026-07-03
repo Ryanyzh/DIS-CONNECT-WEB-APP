@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import TicketCard, { type TicketProps, type TicketStatus } from "../TicketCard";
 
@@ -115,7 +115,7 @@ describe("TicketCard Unit Tests", () => {
 		expect(deadlineElement).toHaveClass("text-rose-500");
 	});
 
-	it("keeps the standard text-zinc-400 style for overdue deadlines if the status is Closed or Resolved", () => {
+	it("keeps the standard text-zinc-400 style for overdue deadlines if the status is Resolved or Closed", () => {
 		const resolvedOverdueTicket = {
 			...baseTicket,
 			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
@@ -123,7 +123,23 @@ describe("TicketCard Unit Tests", () => {
 		};
 		render(<TicketCard ticket={resolvedOverdueTicket} />);
 
-		const deadlineElement = screen.getByText(`Due by: ${formatDate(resolvedOverdueTicket.deadline)}`);
+		let deadlineElement = screen.getByText(`Due by: ${formatDate(resolvedOverdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-zinc-400");
+		expect(deadlineElement).not.toHaveClass("text-rose-500");
+
+        cleanup(); // cleanup previous render to test for closed ticket next
+
+        // previous ticket should not be on the screen now
+        expect(screen.queryByText(`Due by: ${formatDate(resolvedOverdueTicket.deadline)}`)).not.toBeInTheDocument();
+
+        const closedOverdueTicket = {
+			...baseTicket,
+			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
+			status: "Closed" as TicketStatus,
+		};
+		render(<TicketCard ticket={closedOverdueTicket} />);
+
+		deadlineElement = screen.getByText(`Due by: ${formatDate(closedOverdueTicket.deadline)}`);
 		expect(deadlineElement).toHaveClass("text-zinc-400");
 		expect(deadlineElement).not.toHaveClass("text-rose-500");
 	});
