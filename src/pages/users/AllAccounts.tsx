@@ -221,7 +221,7 @@ export function AllAccountsPage() {
 				{loading ? (
 					<div className="text-center py-16 text-zinc-400 text-sm">Loading accounts…</div>
 				) : error ? (
-					<div className="text-center py-16 text-red-500 text-sm">{error}</div>
+					<div className="text-center py-16 text-rose-500 dark:text-rose-400 text-sm">{error}</div>
 				) : activeTab === "students" ? (
 					<>
 						{filteredStudents.length === 0 ? (
@@ -260,7 +260,7 @@ export function AllAccountsPage() {
 										>
 											<td className="px-5 py-3.5">
 												<div className="flex items-center gap-3">
-													<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+													<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 														{getInitials(student.fullName)}
 													</div>
 													<div className="min-w-0">
@@ -340,7 +340,7 @@ export function AllAccountsPage() {
 										>
 											<td className="px-5 py-3.5">
 												<div className="flex items-center gap-3">
-													<div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+													<div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 														{getInitials(officer.fullName)}
 													</div>
 													<div className="min-w-0">

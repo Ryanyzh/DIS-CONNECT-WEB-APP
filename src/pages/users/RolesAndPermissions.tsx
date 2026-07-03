@@ -24,7 +24,7 @@ const ROLES: RoleMeta[] = [
 		label: "HR Admin",
 		description: "Full system access — manage accounts, settings, roles, and all content.",
 		badge: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
-		dot: "bg-violet-500",
+		dot: "bg-violet-500 dark:bg-violet-400",
 		userCount: 1,
 	},
 	{
@@ -32,7 +32,7 @@ const ROLES: RoleMeta[] = [
 		label: "HR Officer",
 		description: "Day-to-day operations — tickets, announcements, and scholar management.",
 		badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
-		dot: "bg-blue-500",
+		dot: "bg-blue-500 dark:bg-blue-400",
 		userCount: 2,
 	},
 ];
@@ -190,11 +190,11 @@ export function RolesAndPermissionsPage() {
 									<td className="px-5 py-3">
 										<div className="flex items-center gap-3">
 											{i === 0 && (
-												<span className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 w-28 flex-shrink-0">
+												<span className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 w-36 flex-shrink-0">
 													{area}
 												</span>
 											)}
-											{i !== 0 && <span className="w-28 flex-shrink-0" />}
+											{i !== 0 && <span className="w-36 flex-shrink-0" />}
 											<span className="text-wise-body dark:text-zinc-300">
 												{perm.action}
 											</span>
