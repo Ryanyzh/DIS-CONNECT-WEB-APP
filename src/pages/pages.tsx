@@ -46,9 +46,7 @@ export { AllFaqsPage as FaqArticlesPage } from "./faq/AllFaqs";
 export { CreateFaqPage } from "./faq/CreateFaq";
 
 // Analytics
-export const TicketAnalyticsPage = createPage(
-	"Explore ticket volume, resolution patterns, and team performance."
-);
+export { TicketAnalyticsPage } from "./analytics/TicketAnalytics";
 export const SlaAnalyticsPage = createPage(
 	"Review SLA metrics for service performance and compliance."
 );
