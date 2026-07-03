@@ -216,9 +216,9 @@ export function ScholarActivityLogsPage() {
 
 			{/* Filters */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-4 shadow-sm space-y-3">
-				<div className="flex items-center gap-3 flex-wrap">
+				<div className="flex items-center gap-4 flex-wrap">
 					{/* Search */}
-					<div className="relative flex-1 min-w-[200px]">
+					<div className="relative flex-1 min-w-[180px] max-w-xs">
 						<svg
 							className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"
 							fill="none"
@@ -236,8 +236,8 @@ export function ScholarActivityLogsPage() {
 							type="text"
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							placeholder="Search by scholar, description, or officer…"
-							className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+							placeholder="Search…"
+							className="w-full h-9 pl-9 pr-3 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
 						/>
 					</div>
 
@@ -245,7 +245,7 @@ export function ScholarActivityLogsPage() {
 					<select
 						value={scholarFilter}
 						onChange={(e) => setScholarFilter(e.target.value)}
-						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+						className="h-9 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
 					>
 						<option value="All">All Scholars</option>
 						{MOCK_SCHOLARS.map((s) => (
@@ -255,25 +255,27 @@ export function ScholarActivityLogsPage() {
 						))}
 					</select>
 
-					{/* Date range */}
-					<input
-						type="date"
-						value={dateFrom}
-						onChange={(e) => setDateFrom(e.target.value)}
-						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
-					/>
-					<span className="text-zinc-400 text-sm">to</span>
-					<input
-						type="date"
-						value={dateTo}
-						onChange={(e) => setDateTo(e.target.value)}
-						className="text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
-					/>
+					{/* Date range — grouped tightly */}
+					<div className="flex items-center gap-2">
+						<input
+							type="date"
+							value={dateFrom}
+							onChange={(e) => setDateFrom(e.target.value)}
+							className="h-9 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+						/>
+						<span className="text-xs text-zinc-400">to</span>
+						<input
+							type="date"
+							value={dateTo}
+							onChange={(e) => setDateTo(e.target.value)}
+							className="h-9 text-sm bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+						/>
+					</div>
 
 					{isFiltered && (
 						<button
 							onClick={clearFilters}
-							className="text-xs text-zinc-400 hover:text-rose-500 transition-colors whitespace-nowrap"
+							className="ml-auto text-xs text-zinc-400 hover:text-rose-500 transition-colors whitespace-nowrap"
 						>
 							Clear filters
 						</button>
@@ -354,7 +356,7 @@ export function ScholarActivityLogsPage() {
 														<div className="flex-1 min-w-0">
 															{/* Scholar */}
 															<div className="flex items-center gap-2 mb-0.5">
-																<div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0">
+																<div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0">
 																	{getInitials(log.scholarName)}
 																</div>
 																<span className="text-xs font-semibold text-wise-ink dark:text-zinc-200">

@@ -7,13 +7,14 @@ import {
 	formatDate,
 } from "../../types/Scholar";
 import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import PageShell from "../PageShell";
 
 const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
-	1: { label: "Very Low", color: "text-zinc-400" },
-	2: { label: "Low", color: "text-blue-500" },
-	3: { label: "Medium", color: "text-amber-500" },
-	4: { label: "High", color: "text-orange-500" },
-	5: { label: "Critical", color: "text-rose-500" },
+	1: { label: "Very Low", color: "text-zinc-400 dark:text-zinc-500" },
+	2: { label: "Low", color: "text-blue-500 dark:text-blue-400" },
+	3: { label: "Medium", color: "text-amber-500 dark:text-amber-400" },
+	4: { label: "High", color: "text-orange-500 dark:text-orange-400" },
+	5: { label: "Critical", color: "text-rose-500 dark:text-rose-400" },
 };
 
 function InfoRow({ label, value }: { label: string; value: string }) {
@@ -56,11 +57,11 @@ export function ScholarDetailPage() {
 	);
 
 	return (
-		<div className="max-w-5xl mx-auto space-y-6">
+		<PageShell>
 			{/* Back */}
 			<button
 				onClick={() => navigate("/scholars/profiles")}
-				className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 transition-colors"
+				className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 transition-colors -mt-1"
 			>
 				<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -76,7 +77,7 @@ export function ScholarDetailPage() {
 			{/* Profile hero */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-sm">
 				<div className="flex items-start gap-5">
-					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-semibold flex-shrink-0">
 						{getInitials(scholar.name)}
 					</div>
 					<div className="flex-1 min-w-0">
@@ -288,6 +289,6 @@ export function ScholarDetailPage() {
 					</div>
 				</div>
 			</div>
-		</div>
+		</PageShell>
 	);
 }
