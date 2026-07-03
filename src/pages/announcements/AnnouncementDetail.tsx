@@ -125,7 +125,7 @@ export function AnnouncementDetailPage() {
 						</p>
 						<div className="flex items-center gap-3">
 							<div
-								className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
+								className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-semibold flex-shrink-0`}
 							>
 								{initials}
 							</div>

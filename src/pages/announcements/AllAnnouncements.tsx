@@ -75,7 +75,7 @@ function AnnouncementCard({
 					{/* Author + meta */}
 					<div className="flex items-center gap-2.5 flex-wrap">
 						<div
-							className={`w-6 h-6 rounded-full ${avatarColor} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
+							className={`w-6 h-6 rounded-full ${avatarColor} flex items-center justify-center text-white text-xs font-semibold flex-shrink-0`}
 						>
 							{initials}
 						</div>

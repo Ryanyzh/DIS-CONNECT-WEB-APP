@@ -126,7 +126,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 							className="inline-flex items-center gap-2 rounded-full border border-wise-ink/20 bg-wise-canvas px-4 py-2 text-sm font-semibold text-wise-ink transition hover:bg-wise-active dark:border-wise-mute dark:bg-wise-body dark:text-white dark:hover:bg-[#1a1f14]"
 						>
 							<div
-								className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+								className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
 								style={{ backgroundColor: bgColor.bg, color: bgColor.text }}
 							>
 								{initials}
@@ -152,7 +152,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 								<div className="border-b border-wise-ink/10 px-4 py-4 dark:border-wise-canvasSoft/20">
 									<div className="flex items-center gap-3 mb-1">
 										<div
-											className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+											className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
 											style={{
 												backgroundColor: bgColor.bg,
 												color: bgColor.text,

@@ -25,7 +25,7 @@ function ScholarRow({ scholar, onClick }: { scholar: Scholar; onClick: () => voi
 		>
 			<td className="px-5 py-3.5">
 				<div className="flex items-center gap-3">
-					<div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+					<div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 						{getInitials(scholar.name)}
 					</div>
 					<div className="min-w-0">
