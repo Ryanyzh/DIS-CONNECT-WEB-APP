@@ -30,10 +30,12 @@ function PlacementRow({
 	placement,
 	onEdit,
 	onDelete,
+	className,
 }: {
 	placement: ExchangePlacement;
 	onEdit: () => void;
 	onDelete: () => void;
+	className?: string;
 }) {
 	const statusCfg = placementStatusConfig[placement.status];
 	const typeCfg = placementTypeConfig[placement.type];
@@ -46,11 +48,11 @@ function PlacementRow({
 	})();
 
 	return (
-		<tr className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+		<tr className={`border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors${className ? ` ${className}` : ""}`}>
 			{/* Scholar */}
 			<td className="px-5 py-3.5">
 				<div className="flex items-center gap-3">
-					<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+					<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 						{getInitials(placement.scholarName)}
 					</div>
 					<div className="min-w-0">
@@ -377,18 +379,13 @@ export function ScholarExchangePage() {
 						</thead>
 						<tbody>
 							{filtered.map((p) => (
-								<tr
+								<PlacementRow
 									key={p.id}
-									className={
-										deletingId === p.id ? "opacity-40 pointer-events-none" : ""
-									}
-								>
-									<PlacementRow
-										placement={p}
-										onEdit={() => navigate(`/scholars/exchange/${p.id}/edit`)}
-										onDelete={() => handleDelete(p)}
-									/>
-								</tr>
+									placement={p}
+									onEdit={() => navigate(`/scholars/exchange/${p.id}/edit`)}
+									onDelete={() => handleDelete(p)}
+									className={deletingId === p.id ? "opacity-40 pointer-events-none" : ""}
+								/>
 							))}
 						</tbody>
 					</table>
