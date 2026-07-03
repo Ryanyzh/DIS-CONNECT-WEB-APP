@@ -65,6 +65,46 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 	);
 }
 
+function BarRow({
+	label,
+	count,
+	total,
+	barColor,
+	textColor,
+	badge,
+}: {
+	label: string;
+	count: number;
+	total: number;
+	barColor: string;
+	textColor: string;
+	badge?: React.ReactNode;
+}) {
+	const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+	return (
+		<div className="flex items-center gap-3">
+			<span className={`text-xs font-medium w-32 flex-shrink-0 truncate ${textColor}`}>
+				{label}
+			</span>
+			<div className="flex-1 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+				<div
+					className={`h-full rounded-full transition-all ${barColor}`}
+					style={{ width: `${pct}%` }}
+				/>
+			</div>
+			<div className="flex items-center gap-2 flex-shrink-0">
+				{badge}
+				<span className="text-xs text-zinc-500 dark:text-zinc-400 w-8 text-right">
+					{count}
+				</span>
+				<span className="text-xs text-zinc-300 dark:text-zinc-700 w-8 text-right">
+					{pct}%
+				</span>
+			</div>
+		</div>
+	);
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function TicketAnalyticsPage() {
@@ -328,6 +368,109 @@ export function TicketAnalyticsPage() {
 									</div>
 								);
 							})}
+						</div>
+					</div>
+					{/* ── Category + Priority ──────────────────────────────── */}
+					<div className="grid grid-cols-5 gap-6">
+						{/* Category breakdown */}
+						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>By Category</SectionHeader>
+							<div className="space-y-3">
+								{Object.entries(m.byCategory)
+									.sort(([, a], [, b]) => b - a)
+									.map(([cat, count]) => (
+										<BarRow
+											key={cat}
+											label={cat}
+											count={count}
+											total={m.total}
+											barColor={CATEGORY_BAR[cat] ?? "bg-zinc-400"}
+											textColor={CATEGORY_TEXT[cat] ?? "text-zinc-500"}
+										/>
+									))}
+							</div>
+						</div>
+
+						{/* Priority distribution */}
+						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Priority Distribution</SectionHeader>
+							<div className="space-y-3 mb-6">
+								{(
+									[
+										{
+											key: "High",
+											color: "bg-rose-500",
+											text: "text-rose-600 dark:text-rose-400",
+										},
+										{
+											key: "Medium",
+											color: "bg-amber-400",
+											text: "text-amber-600 dark:text-amber-400",
+										},
+										{
+											key: "Low",
+											color: "bg-emerald-500",
+											text: "text-emerald-600 dark:text-emerald-400",
+										},
+									] as const
+								).map(({ key, color, text }) => (
+									<BarRow
+										key={key}
+										label={key}
+										count={m.priorityGroups[key]}
+										total={m.total}
+										barColor={color}
+										textColor={text}
+									/>
+								))}
+							</div>
+
+							{/* Resolution rate ring (CSS only) */}
+							<div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
+								<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
+									Resolution Rate
+								</p>
+								<div className="flex items-center gap-4">
+									<div className="relative w-16 h-16 flex-shrink-0">
+										<svg
+											viewBox="0 0 36 36"
+											className="w-full h-full -rotate-90"
+										>
+											<circle
+												cx="18"
+												cy="18"
+												r="15.9"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="3"
+												className="text-zinc-100 dark:text-zinc-800"
+											/>
+											<circle
+												cx="18"
+												cy="18"
+												r="15.9"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="3"
+												strokeDasharray={`${m.resolutionRate} ${100 - m.resolutionRate}`}
+												strokeLinecap="round"
+												className="text-emerald-500"
+											/>
+										</svg>
+										<span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-wise-ink dark:text-zinc-100">
+											{m.resolutionRate}%
+										</span>
+									</div>
+									<div>
+										<p className="text-2xl font-bold text-wise-ink dark:text-zinc-100">
+											{m.resolved}
+										</p>
+										<p className="text-xs text-zinc-400 mt-0.5">
+											of {m.total} tickets resolved or closed
+										</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
