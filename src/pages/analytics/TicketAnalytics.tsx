@@ -3,6 +3,29 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/TicketCard";
 
+// ── Colours ───────────────────────────────────────────────────────────────────
+
+const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
+	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
+	"In Review": {
+		label: "In Review",
+		bar: "bg-indigo-500",
+		text: "text-indigo-600 dark:text-indigo-400",
+	},
+	"Waiting for Response": {
+		label: "Waiting",
+		bar: "bg-amber-400",
+		text: "text-amber-600 dark:text-amber-400",
+	},
+	Resolved: {
+		label: "Resolved",
+		bar: "bg-emerald-500",
+		text: "text-emerald-600 dark:text-emerald-400",
+	},
+	Closed: { label: "Closed", bar: "bg-zinc-400", text: "text-zinc-500 dark:text-zinc-400" },
+	Escalated: { label: "Escalated", bar: "bg-rose-500", text: "text-rose-600 dark:text-rose-400" },
+};
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -31,6 +54,14 @@ function StatCard({
 				{sub && <p className="mt-1 text-xs text-zinc-400">{sub}</p>}
 			</div>
 		</div>
+	);
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+	return (
+		<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-4">
+			{children}
+		</h2>
 	);
 }
 
@@ -244,6 +275,60 @@ export function TicketAnalyticsPage() {
 								</svg>
 							}
 						/>
+					</div>
+					{/* ── Status overview stacked bar ──────────────────────── */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+						<SectionHeader>Status Overview</SectionHeader>
+
+						{/* Stacked bar */}
+						<div className="flex h-3 rounded-full overflow-hidden gap-px mb-4">
+							{STATUSES.map((s) => {
+								const count = m.byStatus[s] ?? 0;
+								const pct = m.total > 0 ? (count / m.total) * 100 : 0;
+								if (pct === 0) return null;
+								return (
+									<div
+										key={s}
+										title={`${s}: ${count}`}
+										className={`${STATUS_META[s].bar} transition-all`}
+										style={{ width: `${pct}%` }}
+									/>
+								);
+							})}
+						</div>
+
+						{/* Legend */}
+						<div className="grid grid-cols-3 gap-x-8 gap-y-3">
+							{STATUSES.map((s) => {
+								const count = m.byStatus[s] ?? 0;
+								const pct = m.total > 0 ? Math.round((count / m.total) * 100) : 0;
+								return (
+									<div
+										key={s}
+										className="flex items-center justify-between gap-2"
+									>
+										<div className="flex items-center gap-2 min-w-0">
+											<span
+												className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${STATUS_META[s].bar}`}
+											/>
+											<span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+												{STATUS_META[s].label}
+											</span>
+										</div>
+										<div className="flex items-center gap-1.5 flex-shrink-0">
+											<span
+												className={`text-xs font-semibold ${STATUS_META[s].text}`}
+											>
+												{count}
+											</span>
+											<span className="text-xs text-zinc-300 dark:text-zinc-700">
+												{pct}%
+											</span>
+										</div>
+									</div>
+								);
+							})}
+						</div>
 					</div>
 				</div>
 			)}
