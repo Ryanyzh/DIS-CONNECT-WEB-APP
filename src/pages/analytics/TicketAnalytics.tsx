@@ -3,6 +3,37 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/TicketCard";
 
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function StatCard({
+	label,
+	value,
+	sub,
+	valueColor = "text-wise-ink dark:text-zinc-100",
+	icon,
+}: {
+	label: string;
+	value: number | string;
+	sub?: string;
+	valueColor?: string;
+	icon: React.ReactNode;
+}) {
+	return (
+		<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-5 py-4 shadow-sm flex items-start gap-4">
+			<div className="flex-shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+				{icon}
+			</div>
+			<div className="min-w-0">
+				<p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide">
+					{label}
+				</p>
+				<p className={`mt-0.5 text-2xl font-bold leading-none ${valueColor}`}>{value}</p>
+				{sub && <p className="mt-1 text-xs text-zinc-400">{sub}</p>}
+			</div>
+		</div>
+	);
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function TicketAnalyticsPage() {
@@ -92,6 +123,130 @@ export function TicketAnalyticsPage() {
 	];
 
 	return (
-		<PageShell description="Explore ticket volume, resolution patterns, and team performance."></PageShell>
+		<PageShell description="Explore ticket volume, resolution patterns, and team performance.">
+			{loading && liveTickets.length === 0 ? (
+				<div className="flex items-center justify-center py-24">
+					<span className="text-zinc-400 text-sm">Loading analytics…</span>
+				</div>
+			) : (
+				<div className="space-y-6">
+					{/* ── Stat cards ─────────────────────────────────────────── */}
+					<div className="grid grid-cols-5 gap-4">
+						<StatCard
+							label="Total Tickets"
+							value={m.total}
+							sub="all time"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Active"
+							value={m.active}
+							sub="unresolved"
+							valueColor="text-blue-600 dark:text-blue-400"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Resolved"
+							value={m.resolved}
+							sub={`${m.resolutionRate}% resolution rate`}
+							valueColor="text-emerald-600 dark:text-emerald-400"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Escalated"
+							value={m.escalated}
+							sub="needs attention"
+							valueColor={
+								m.escalated > 0
+									? "text-rose-600 dark:text-rose-400"
+									: "text-wise-ink dark:text-zinc-100"
+							}
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Unassigned"
+							value={m.unassigned}
+							sub="no officer"
+							valueColor={
+								m.unassigned > 0
+									? "text-amber-600 dark:text-amber-400"
+									: "text-wise-ink dark:text-zinc-100"
+							}
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									/>
+								</svg>
+							}
+						/>
+					</div>
+				</div>
+			)}
+		</PageShell>
 	);
 }
