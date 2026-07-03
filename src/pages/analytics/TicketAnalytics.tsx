@@ -26,6 +26,26 @@ const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: stri
 	Escalated: { label: "Escalated", bar: "bg-rose-500", text: "text-rose-600 dark:text-rose-400" },
 };
 
+const CATEGORY_BAR: Record<string, string> = {
+	Reimbursement: "bg-blue-500",
+	Exchange: "bg-amber-500",
+	Policy: "bg-emerald-500",
+	Finance: "bg-rose-500",
+	"General Query": "bg-violet-500",
+	Leave: "bg-teal-500",
+	Internship: "bg-sky-500",
+};
+
+const CATEGORY_TEXT: Record<string, string> = {
+	Reimbursement: "text-blue-600 dark:text-blue-400",
+	Exchange: "text-amber-600 dark:text-amber-400",
+	Policy: "text-emerald-600 dark:text-emerald-400",
+	Finance: "text-rose-600 dark:text-rose-400",
+	"General Query": "text-violet-600 dark:text-violet-400",
+	Leave: "text-teal-600 dark:text-teal-400",
+	Internship: "text-sky-600 dark:text-sky-400",
+};
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -470,6 +490,103 @@ export function TicketAnalyticsPage() {
 										</p>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+					{/* ── Officer leaderboard + 14-day trend ──────────────── */}
+					<div className="grid grid-cols-5 gap-6">
+						{/* Officer leaderboard */}
+						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Officer Workload</SectionHeader>
+							{m.officers.length === 0 ? (
+								<p className="text-xs text-zinc-400 py-4 text-center">
+									No officers assigned yet.
+								</p>
+							) : (
+								<div className="space-y-4">
+									{m.officers.map((o, i) => {
+										const resolvedPct =
+											o.total > 0
+												? Math.round((o.resolved / o.total) * 100)
+												: 0;
+										return (
+											<div key={o.name}>
+												<div className="flex items-center gap-3 mb-1.5">
+													<span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 flex-shrink-0">
+														{i + 1}
+													</span>
+													<span className="text-sm font-medium text-wise-ink dark:text-zinc-100 flex-1 truncate">
+														{o.name}
+													</span>
+													<span className="text-xs text-zinc-400 flex-shrink-0">
+														{o.total} tickets
+													</span>
+												</div>
+												<div className="pl-8 flex items-center gap-2">
+													<div className="flex-1 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+														<div
+															className="h-full bg-emerald-500 rounded-full"
+															style={{ width: `${resolvedPct}%` }}
+														/>
+													</div>
+													<span className="text-[11px] text-zinc-400 w-12 text-right flex-shrink-0">
+														{resolvedPct}% resolved
+													</span>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							)}
+						</div>
+
+						{/* 14-day trend */}
+						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Tickets Created — Last 14 Days</SectionHeader>
+							<div className="flex items-end gap-1.5 h-28">
+								{m.dayBuckets.map((day) => {
+									const heightPct =
+										day.count === 0
+											? 0
+											: Math.max(
+													8,
+													Math.round((day.count / m.maxDayCount) * 100)
+												);
+									return (
+										<div
+											key={day.date}
+											className="flex-1 flex flex-col items-center gap-1 group"
+											title={`${day.label}: ${day.count} ticket${day.count !== 1 ? "s" : ""}`}
+										>
+											<span className="text-[10px] text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+												{day.count}
+											</span>
+											<div className="w-full flex items-end justify-center flex-1">
+												<div
+													className="w-full rounded-t-sm bg-dc-primary/80 dark:bg-dc-primary/70 hover:bg-dc-primary transition-colors"
+													style={{
+														height:
+															day.count === 0
+																? "3px"
+																: `${heightPct}%`,
+													}}
+												/>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+							{/* X-axis labels — show every other day to avoid crowding */}
+							<div className="flex gap-1.5 mt-2">
+								{m.dayBuckets.map((day, i) => (
+									<div key={day.date} className="flex-1 text-center">
+										<span
+											className={`text-[9px] text-zinc-400 ${i % 2 !== 0 ? "opacity-0" : ""}`}
+										>
+											{day.label}
+										</span>
+									</div>
+								))}
 							</div>
 						</div>
 					</div>
