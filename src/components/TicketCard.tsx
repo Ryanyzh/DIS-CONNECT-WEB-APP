@@ -12,8 +12,14 @@ export type TicketStatus =
 	| "Closed"
 	| "Escalated";
 
-// ticket categorys
-export type TicketCategory = "Reimbursement" | "Exchange" | "Policy" | "Finance" | "General Query";
+// ticket categories
+export type TicketCategory =
+	| "Reimbursement"
+	| "Exchange"
+	| "Policy"
+	| "Internship"
+	| "Leave"
+	| "Scholarship";
 
 // fields that a ticket will have when created
 export interface TicketProps {
@@ -24,7 +30,7 @@ export interface TicketProps {
 	description: string; // description of the issue
 	priority: number; // priority of the ticket, higher number means higher priority (e.g. 1-5, 1 = very low priority, 5 = very high priority)
 	status: TicketStatus;
-	deadline: string; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
+	deadline: string | null; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
 	lastUpdated: string;
 	createdAt: string;
 	isEscalated: boolean;
@@ -42,8 +48,9 @@ export const categoryStyles: Record<TicketCategory, string> = {
 	Reimbursement: "bg-blue-600/15 text-blue-800",
 	Exchange: "bg-amber-600/15 text-amber-800",
 	Policy: "bg-emerald-600/15 text-emerald-800",
-	Finance: "bg-rose-600/15 text-rose-800",
-	"General Query": "bg-cyan-600/15 text-cyan-800",
+	Internship: "bg-rose-600/15 text-rose-800",
+	Leave: "bg-cyan-600/15 text-cyan-800",
+	Scholarship: "bg-slate-600/15 text-slate-800",
 };
 
 export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = {
@@ -87,8 +94,11 @@ function TicketCard({ ticket }: TicketCardProps) {
 		navigate(`/tickets/${ticket.id}`);
 	};
 
-	const isOverdue =
-		new Date(ticket.deadline) < new Date() && ticket.status !== "Resolved" && ticket.status !== "Closed";
+	const isOverdue = ticket.deadline
+		? new Date(ticket.deadline) < new Date() &&
+			ticket.status !== "Resolved" &&
+			ticket.status !== "Closed"
+		: false;
 
 	return (
 		<div
@@ -117,7 +127,11 @@ function TicketCard({ ticket }: TicketCardProps) {
 			<div className="flex flex-wrap justify-between items-center pt-3 text-sm text-zinc-400 gap-4">
 				<div className="flex flex-wrap items-center gap-4">
 					{ticket.officer ? (
-						<span className={`${ticket.isEscalated ? "text-rose-500" : "text-zinc-400" }`}>Assigned to: {ticket.officer.name}</span>
+						<span
+							className={`${ticket.isEscalated ? "text-rose-500" : "text-zinc-400"}`}
+						>
+							Assigned to: {ticket.officer.name}
+						</span>
 					) : (
 						<span className="text-pink-400">Unassigned</span>
 					)}
@@ -129,7 +143,9 @@ function TicketCard({ ticket }: TicketCardProps) {
 					</span>
 					<span>Last updated: {formatDate(ticket.lastUpdated)}</span>
 					<span className={`text-sm ${isOverdue ? "text-rose-500" : "text-zinc-400"}`}>
-						{formatDate(ticket.deadline) ? `Due by: ${formatDate(ticket.deadline)}` : ""}
+						{formatDate(ticket.deadline)
+							? `Due by: ${formatDate(ticket.deadline)}`
+							: ""}
 					</span>
 				</div>
 				<span

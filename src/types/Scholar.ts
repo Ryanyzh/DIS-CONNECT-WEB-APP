@@ -81,8 +81,9 @@ export const ticketCategoryConfig: Record<TicketCategory, string> = {
 	Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
 	Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
 	Policy: "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
-	Finance: "bg-rose-950/40 text-rose-300 border-rose-900/40",
-	"General Query": "bg-cyan-950/40 text-cyan-300 border-cyan-900/40",
+	Internship: "bg-rose-950/40 text-rose-300 border-rose-900/40",
+	Leave: "bg-cyan-950/40 text-cyan-300 border-cyan-900/40",
+	Scholarship: "bg-slate-950/40 text-slate-300 border-slate-900/40",
 };
 
 export function getInitials(name: string) {
@@ -94,12 +95,14 @@ export function getInitials(name: string) {
 		.toUpperCase();
 }
 
-export function formatDate(iso: string) {
-	return iso ? new Date(iso).toLocaleDateString("en-SG", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-	}) : "";
+export function formatDate(iso: string | null) {
+	return iso
+		? new Date(iso).toLocaleDateString("en-SG", {
+				day: "numeric",
+				month: "short",
+				year: "numeric",
+			})
+		: "";
 }
 
 export const MOCK_SCHOLARS: Scholar[] = [
@@ -161,7 +164,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-003",
 				title: "Allowance disbursement delay — May 2024",
-				category: "Finance",
+				category: "Scholarship",
 				status: "In Review",
 				priority: 4,
 				createdAt: "2024-05-20",
@@ -201,7 +204,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "GEN-2024-012",
 				title: "Leave of absence documentation request",
-				category: "General Query",
+				category: "Leave",
 				status: "Waiting for Response",
 				priority: 3,
 				createdAt: "2024-06-01",
@@ -210,7 +213,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-009",
 				title: "Stipend suspension during leave period",
-				category: "Finance",
+				category: "Leave",
 				status: "Open",
 				priority: 5,
 				createdAt: "2024-06-10",
