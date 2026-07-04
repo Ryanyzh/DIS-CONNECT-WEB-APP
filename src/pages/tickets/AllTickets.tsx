@@ -175,27 +175,11 @@ export function AllTicketsPage() {
 	const [perPage, setPerPage] = useState(10);
 
 	const stats = [
-		{
-			status: "Open" as TicketStatus,
-			count: tickets.filter((t) => t.status === "Open").length,
-		},
-		{
-			status: "In Review" as TicketStatus,
-			count: tickets.filter((t) => t.status === "In Review").length,
-		},
-		{
-			status: "Waiting for Response" as TicketStatus,
-			count: tickets.filter((t) => t.status === "Waiting for Response").length,
-		},
-		{
-			status: "Resolved" as TicketStatus,
-			count: tickets.filter((t) => t.status === "Resolved").length,
-		},
-		{
-			status: "Closed" as TicketStatus,
-			count: tickets.filter((t) => t.status === "Closed").length,
-		},
-		{ status: "Escalated" as TicketStatus, count: tickets.filter((t) => t.isEscalated).length },
+		{ status: "Open" as TicketStatus,      count: tickets.filter((t) => t.status === "Open").length },
+		{ status: "In Review" as TicketStatus,  count: tickets.filter((t) => t.status === "In Review").length },
+		{ status: "Waiting" as TicketStatus,    count: tickets.filter((t) => t.status === "Waiting").length },
+		{ status: "Resolved" as TicketStatus,   count: tickets.filter((t) => t.status === "Resolved").length },
+		{ status: "Closed" as TicketStatus,     count: tickets.filter((t) => t.status === "Closed").length },
 	];
 
 	const filteredTickets = tickets
@@ -287,7 +271,7 @@ export function AllTicketsPage() {
 							<option value="All">Status: All</option>
 							<option value="Open">Status: Open</option>
 							<option value="In Review">Status: In Review</option>
-							<option value="Waiting for Response">Status: Waiting for Response</option>
+							<option value="Waiting">Status: Waiting</option>
 							<option value="Resolved">Status: Resolved</option>
 							<option value="Closed">Status: Closed</option>
 							<option value="Escalated">Status: Escalated</option>

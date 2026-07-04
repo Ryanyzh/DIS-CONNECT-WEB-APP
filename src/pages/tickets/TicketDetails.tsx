@@ -8,6 +8,7 @@ import {
 	priorityLabels,
 	type TicketStatus,
 } from "../../components/TicketCard";
+import type { TicketAttachment } from "../../types/TicketAttachment";
 import { useState, useEffect, useCallback } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "../../lib/firebase";
@@ -258,7 +259,7 @@ export function TicketDetailsPage() {
 							</h2>
 							{ticket.attachments.length > 0 ? (
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-									{ticket.attachments.map((file: any) => (
+									{ticket.attachments.map((file: TicketAttachment) => (
 										<div
 											key={file.attachment_id}
 											onClick={() => handleAttachmentPreview(file.file_path)}

@@ -25,7 +25,7 @@ const columns: {
 		title: "Waiting",
 		dot: "bg-amber-400",
 		emptyMsg: "No tickets waiting",
-		filterFunc: (t) => t.status === "Waiting for Response",
+		filterFunc: (t) => t.status === "Waiting",
 	},
 	{
 		title: "Resolved",

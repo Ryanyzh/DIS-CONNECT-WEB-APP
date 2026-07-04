@@ -63,7 +63,7 @@ export const ticketStatusConfig: Record<TicketStatus, { badge: string }> = {
 	"In Review": {
 		badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
 	},
-	"Waiting for Response": {
+	Waiting: {
 		badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
 	},
 	Resolved: {
@@ -83,7 +83,7 @@ export const ticketCategoryConfig: Record<TicketCategory, string> = {
 	Policy: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
 	Internship: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800",
 	Leave: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
-  Scholarship: "bg-slate-950/40 text-slate-300 border-slate-900/40",
+	Scholarship: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
 };
 
 export function getInitials(name: string) {
@@ -205,7 +205,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 				id: "GEN-2024-012",
 				title: "Leave of absence documentation request",
 				category: "Leave",
-				status: "Waiting for Response",
+				status: "Waiting",
 				priority: 3,
 				createdAt: "2024-06-01",
 				lastUpdated: "2024-06-05",
@@ -215,7 +215,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 				title: "Stipend suspension during leave period",
 				category: "Leave",
 				status: "Open",
-				priority: 5,
+				priority: 3,
 				createdAt: "2024-06-10",
 				lastUpdated: "2024-06-10",
 			},

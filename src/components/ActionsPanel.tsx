@@ -68,7 +68,7 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 
 			{currentStatus === "In Review" && (
 				<div className="flex flex-col gap-2.5">
-					<ActionButton variant="primary" onClick={() => onAction("Waiting for Response", { action: "Waiting for Response" })}>
+					<ActionButton variant="primary" onClick={() => onAction("Waiting", { action: "Waiting" })}>
 						Request Info
 					</ActionButton>
 					<ActionButton variant="success" onClick={() => onAction("Resolved", { action: "Resolved" })}>
@@ -97,7 +97,7 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 				</div>
 			)}
 
-			{currentStatus === "Waiting for Response" && (
+			{currentStatus === "Waiting" && (
 				<div className="flex flex-col gap-2.5">
 					<ActionButton variant="warning" onClick={() => onAction("In Review", { action: "In Review" })}>
 						Resume Review

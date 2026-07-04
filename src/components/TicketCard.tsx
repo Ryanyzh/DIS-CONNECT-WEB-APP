@@ -6,7 +6,7 @@ import { formatDate, type Scholar } from "../types/Scholar";
 export type TicketStatus =
 	| "Open"
 	| "In Review"
-	| "Waiting for Response"
+	| "Waiting"
 	| "Resolved"
 	| "Closed"
 	| "Escalated";
@@ -16,8 +16,7 @@ export type TicketCategory =
 	| "Reimbursement"
 	| "Exchange"
 	| "Policy"
-	| "Finance"
-	| "General Query"
+	| "Scholarship"
 	| "Leave"
 	| "Internship"
 	| string;
@@ -50,78 +49,56 @@ export const LIST_GRID_COLS = "1fr 108px 132px 88px 100px 118px 16px";
 
 export const categoryStyles: Record<string, string> = {
 	Reimbursement: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-	Exchange: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-	Policy: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-	Finance: "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-	"General Query": "bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-	Leave: "bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
-	Internship: "bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+	Exchange:      "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+	Policy:        "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+	Scholarship:   "bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
+	Leave:         "bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
+	Internship:    "bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
 };
 
 // Fallback for any category not in the map above
 const CATEGORY_FALLBACK = "bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-300";
 
 export const statusStyles: Record<TicketStatus, { text: string; bg: string }> = {
-	Open: { text: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-400/15" },
-	"In Review": {
-		text: "text-indigo-600 dark:text-indigo-400",
-		bg: "bg-indigo-50 dark:bg-indigo-400/15",
-	},
-	"Waiting for Response": {
-		text: "text-amber-600 dark:text-amber-400",
-		bg: "bg-amber-50 dark:bg-amber-400/15",
-	},
-	Resolved: {
-		text: "text-emerald-600 dark:text-emerald-400",
-		bg: "bg-emerald-50 dark:bg-emerald-400/15",
-	},
-	Closed: { text: "text-gray-500 dark:text-gray-400", bg: "bg-gray-100 dark:bg-gray-400/15" },
-	Escalated: { text: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-500/15" },
+	Open:        { text: "text-blue-600 dark:text-blue-400",    bg: "bg-blue-50 dark:bg-blue-400/15" },
+	"In Review": { text: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-400/15" },
+	Waiting:     { text: "text-amber-600 dark:text-amber-400",  bg: "bg-amber-50 dark:bg-amber-400/15" },
+	Resolved:    { text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-400/15" },
+	Closed:      { text: "text-gray-500 dark:text-gray-400",    bg: "bg-gray-100 dark:bg-gray-400/15" },
+	Escalated:   { text: "text-rose-600 dark:text-rose-400",    bg: "bg-rose-50 dark:bg-rose-400/15" },
 };
 
 export const statusStripeStyles: Record<TicketStatus, string> = {
-	Open: "bg-blue-500",
+	Open:        "bg-blue-500",
 	"In Review": "bg-indigo-500",
-	"Waiting for Response": "bg-amber-400",
-	Resolved: "bg-emerald-500",
-	Closed: "bg-gray-400",
-	Escalated: "bg-red-600",
+	Waiting:     "bg-amber-400",
+	Resolved:    "bg-emerald-500",
+	Closed:      "bg-gray-400",
+	Escalated:   "bg-rose-500",
 };
 
 // Abbreviated labels for compact list/table cells
 export const statusShort: Record<TicketStatus, string> = {
-	Open: "Open",
+	Open:        "Open",
 	"In Review": "In Review",
-	"Waiting for Response": "Waiting",
-	Resolved: "Resolved",
-	Closed: "Closed",
-	Escalated: "Escalated",
+	Waiting:     "Waiting",
+	Resolved:    "Resolved",
+	Closed:      "Closed",
+	Escalated:   "Escalated",
 };
 
 export const priorityLabels: Record<number, string> = {
-	1: "P1 · Low",
-	2: "P2 · Low",
-	3: "P3 · Low",
-	4: "P4 · Medium",
-	5: "P5 · Medium",
-	6: "P6 · Medium",
-	7: "P7 · Medium",
-	8: "P8 · High",
-	9: "P9 · High",
-	10: "P10 · High",
+	1: "Low",
+	2: "Medium",
+	3: "High",
+	4: "Critical",
 };
 
 export const priorityStyles: Record<number, string> = {
 	1: "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
-	2: "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
-	3: "text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-400/15",
-	4: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
-	5: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
-	6: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
-	7: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
-	8: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
-	9: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
-	10: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
+	2: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-400/15",
+	3: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
+	4: "text-violet-700 bg-violet-50 dark:text-violet-400 dark:bg-violet-400/15",
 };
 
 // ─── List view ────────────────────────────────────────────────────────────────
@@ -244,6 +221,7 @@ function CardView({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
 
 	const isOverdue =
+		!!ticket.deadline &&
 		new Date(ticket.deadline) < new Date() &&
 		ticket.status !== "Resolved" &&
 		ticket.status !== "Closed";
