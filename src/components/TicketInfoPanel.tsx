@@ -1,21 +1,28 @@
 import type { HrOfficer } from "../types/HrOfficer";
 import { formatDate } from "../types/Scholar";
-import { categoryStyles, priorityLabels, priorityStyles, statusStyles, type TicketCategory, type TicketStatus } from "./TicketCard";
+import {
+	categoryStyles,
+	priorityLabels,
+	priorityStyles,
+	statusStyles,
+	type TicketCategory,
+	type TicketStatus,
+} from "./TicketCard";
 
 interface TicketInfo {
-    code: string;
-    status: TicketStatus;
-    priority: number;
-    category: TicketCategory;
-    createdAt: string;
-    deadline: string;
-    lastUpdated: string;
-    isEscalated: boolean;
+	code: string;
+	status: TicketStatus;
+	priority: number;
+	category: TicketCategory;
+	createdAt: string;
+	deadline: string | null;
+	lastUpdated: string;
+	isEscalated: boolean;
 }
 
 interface TicketInfoPanelProps {
-    ticket: TicketInfo;
-    officer?: HrOfficer;
+	ticket: TicketInfo;
+	officer?: HrOfficer;
 }
 
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {

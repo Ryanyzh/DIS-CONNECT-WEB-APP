@@ -81,8 +81,9 @@ export const ticketCategoryConfig: Record<TicketCategory, string> = {
 	Reimbursement: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
 	Exchange: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
 	Policy: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
-	Finance: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800",
-	"General Query": "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
+	Internship: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800",
+	Leave: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
+  Scholarship: "bg-slate-950/40 text-slate-300 border-slate-900/40",
 };
 
 export function getInitials(name: string) {
@@ -94,12 +95,14 @@ export function getInitials(name: string) {
 		.toUpperCase();
 }
 
-export function formatDate(iso: string) {
-	return iso ? new Date(iso).toLocaleDateString("en-SG", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-	}) : "";
+export function formatDate(iso: string | null) {
+	return iso
+		? new Date(iso).toLocaleDateString("en-SG", {
+				day: "numeric",
+				month: "short",
+				year: "numeric",
+			})
+		: "";
 }
 
 export const MOCK_SCHOLARS: Scholar[] = [
@@ -161,7 +164,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-003",
 				title: "Allowance disbursement delay — May 2024",
-				category: "Finance",
+				category: "Scholarship",
 				status: "In Review",
 				priority: 4,
 				createdAt: "2024-05-20",
@@ -201,7 +204,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "GEN-2024-012",
 				title: "Leave of absence documentation request",
-				category: "General Query",
+				category: "Leave",
 				status: "Waiting for Response",
 				priority: 3,
 				createdAt: "2024-06-01",
@@ -210,7 +213,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
 			{
 				id: "FIN-2024-009",
 				title: "Stipend suspension during leave period",
-				category: "Finance",
+				category: "Leave",
 				status: "Open",
 				priority: 5,
 				createdAt: "2024-06-10",

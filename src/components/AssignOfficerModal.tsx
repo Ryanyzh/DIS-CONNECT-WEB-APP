@@ -76,7 +76,7 @@ export function AssignOfficerModal({
 	if (!isOpen) return null;
 
 	return (
-		<div className="bg-wise-canvas flex flex-col fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+		<div className="flex flex-col fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
 			<div className="bg-wise-canvas flex flex-col w-full max-w-md border rounded-xl shadow-xl">
 				<div className="p-4 flex flex-row justify-between items-center">
 					<span className="font-semibold">Select Officer for Assignment</span>

@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import type { TicketAttachment } from "../types/TicketAttachment";
 import { apiFetch } from "../lib/apiFetch";
+import { getDatabase, ref as rtdbRef, onValue } from "firebase/database";
+import { app } from "../lib/firebase";
 
 interface Message {
 	message_id: string;
@@ -17,26 +19,69 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 	const [newMessage, setNewMessage] = useState<string>("");
 	const [sending, setSending] = useState<boolean>(false);
 
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
 	async function fetchMessages() {
 		if (!ticketId) return;
+
 		try {
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`);
-			if (!response.ok) throw new Error(`Error fetching conversation history: ${response.status}`);
+
+			if (!response.ok) {
+				throw new Error(`Error fetching ticket messages: ${response.status}`);
+			}
+
 			const data = await response.json();
-			setMessages(
-				data.messages.map((message: Message) => ({
-					...message,
-					created_at: new Date(message.created_at),
-				}))
-			);
+			const formattedData = data.messages.map((msg: any) => {
+				return {
+					...msg,
+					created_at: new Date(msg.created_at),
+				};
+			});
+
+			setMessages(formattedData);
 		} catch (error) {
-			console.error("Error fetching ticket history: ", error);
+			console.error("Error fetching ticket messages: ", error);
 		}
 	}
 
 	useEffect(() => {
 		fetchMessages();
 	}, [ticketId]);
+
+	// listen for incoming messages
+	useEffect(() => {
+		if (!ticketId) return;
+
+		const db = getDatabase(app);
+		const messagesRef = rtdbRef(db, `ticket_messages/${ticketId}`);
+
+		const stopListening = onValue(messagesRef, (snapshot) => {
+			const data = snapshot.val();
+			if (data) {
+				const formattedData: Message[] = Object.keys(data).map((key) => {
+					return {
+						...data[key],
+						created_at: new Date(data[key].created_at),
+					};
+				});
+
+				formattedData.sort(
+					(a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+				);
+
+				setMessages(formattedData);
+			} else {
+				setMessages([]);
+			}
+		});
+
+		return () => stopListening();
+	}, [ticketId]);
+
+	useLayoutEffect(() => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	if (!ticketId) {
 		return (

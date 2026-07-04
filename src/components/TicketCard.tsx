@@ -11,6 +11,7 @@ export type TicketStatus =
 	| "Closed"
 	| "Escalated";
 
+// ticket categories
 export type TicketCategory =
 	| "Reimbursement"
 	| "Exchange"
@@ -30,7 +31,7 @@ export interface TicketProps {
 	description: string;
 	priority: number;
 	status: TicketStatus;
-	deadline: string;
+	deadline: string | null; // deadline for resolving the ticket, can be used to compute "days until deadline/days overdue", maybe can also be used to compute priority
 	lastUpdated: string;
 	createdAt: string;
 	isEscalated: boolean;
@@ -130,10 +131,11 @@ export const priorityStyles: Record<number, string> = {
 function ListCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
 
-	const isOverdue =
-		new Date(ticket.deadline) < new Date() &&
-		ticket.status !== "Resolved" &&
-		ticket.status !== "Closed";
+	const isOverdue = ticket.deadline
+		? new Date(ticket.deadline) < new Date() &&
+			ticket.status !== "Resolved" &&
+			ticket.status !== "Closed"
+		: false;
 
 	return (
 		<div

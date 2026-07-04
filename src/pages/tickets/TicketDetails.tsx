@@ -44,6 +44,9 @@ export function TicketDetailsPage() {
 	const [refresh, setRefresh] = useState<number>(0);
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
 
+	const [showErrorPopup, setShowErrorPopup] = useState<boolean>(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
+
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -71,7 +74,7 @@ export function TicketDetailsPage() {
 							preferredContact: data.scholar.preferred_contact,
 							scholarshipType: data.scholar.scholarship_type,
 							tickets: [],
-					  }
+						}
 					: undefined,
 				officer: data.assigned_officer,
 				attachments: data.attachments ?? [],
@@ -102,7 +105,23 @@ export function TicketDetailsPage() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ status_id: nextStatusId, ...metadata }),
 			});
-			if (!response.ok) throw new Error(`Error executing action: ${response.status}`);
+
+
+			if (response.status == 403) {
+				setErrorMessage("Action denied: You are not the assigned officer for this ticket.");
+				setShowErrorPopup(true);
+
+				setTimeout(() => {
+					setShowErrorPopup(false);
+				}, 4000); // after 4 seconds close the popup
+
+				return;
+			}
+
+			if (!response.ok) {
+				throw new Error(`Error executing action: ${response.status}`);
+			}
+
 			setRefresh((prev) => prev + 1);
 		} catch (error) {
 			console.error("Failed to execute action: ", error);
@@ -270,6 +289,21 @@ export function TicketDetailsPage() {
 					<ActionsPanel ticket={ticket} currentStatus={ticket.status} onAction={handleExecuteAction} />
 				)}
 			</div>
+
+			{/* Error popup for non-assigned officers */}
+			{showErrorPopup && (
+				<div className="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-red-600 text-white px-5 py-3 rounded-lg shadow-xl animate-fade-in-up border border-red-700">
+					<div className="flex flex-col text-sm font-medium">{errorMessage}</div>
+
+					{/* Manual Close Button */}
+					<button
+						onClick={() => setShowErrorPopup(false)}
+						className="ml-2 text-white hover:text-red-200 transition-colors focus:outline-none"
+					>
+						&times;
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }
