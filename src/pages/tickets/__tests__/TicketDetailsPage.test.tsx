@@ -186,7 +186,7 @@ describe("TicketDetailsPage System Test", () => {
 		const ticketStatusElements = screen.getAllByText("In Review");
 		expect(ticketStatusElements[0]).toBeInTheDocument();
 		expect(ticketStatusElements[1]).toBeInTheDocument();
-		const ticketPriorityElements = screen.getAllByText("Low Priority 2");
+		const ticketPriorityElements = screen.getAllByText("Medium");
 		expect(ticketPriorityElements[0]).toBeInTheDocument();
 		expect(ticketPriorityElements[1]).toBeInTheDocument();
 
@@ -235,10 +235,10 @@ describe("TicketDetailsPage System Test", () => {
 			expect(reassignBtn).toBeInTheDocument();
 
 			// verify colours are correct
-			expect(requestBtn).toHaveClass("bg-purple-600");
-			expect(resolveBtn).toHaveClass("bg-emerald-600");
-			expect(escalateBtn).toHaveClass("bg-rose-600");
-			expect(reassignBtn).toHaveClass("bg-blue-600");
+			expect(requestBtn).toHaveClass("btn-gradient text-white");
+			expect(resolveBtn).toHaveClass("bg-emerald-600 hover:bg-emerald-700 text-white");
+			expect(escalateBtn).toHaveClass("bg-dc-error hover:bg-red-700 text-white");
+			expect(reassignBtn).toHaveClass("bg-dc-secondary hover:bg-dc-secondary-hover text-white");
 		});
 	});
 

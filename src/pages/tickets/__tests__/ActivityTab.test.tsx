@@ -56,10 +56,10 @@ describe("Activity Tab Integration Test", () => {
 				screen.getByText("Ticket status updated from 'In Review' to 'Escalated'")
 			).toBeInTheDocument();
 			expect(
-				screen.getByText("By Daniel Wong at 23/06/2026, 11:15:56 am")
+				screen.getByText("By Daniel Wong · 23/06/2026, 11:15:56 am")
 			).toBeInTheDocument();
 			expect(
-				screen.getByText("By Daniel Wong at 23/06/2026, 11:16:01 am")
+				screen.getByText("By Daniel Wong · 23/06/2026, 11:16:01 am")
 			).toBeInTheDocument();
 		});
 	});
@@ -81,8 +81,8 @@ describe("Activity Tab Integration Test", () => {
 			const escalatedBubble = escalatedAction.closest("div");
 			const normalBubble = normalAction.closest("div");
 
-			expect(escalatedBubble).toHaveClass("border-rose-200");
-			expect(normalBubble).toHaveClass("border-slate-200");
+			expect(escalatedBubble).toHaveClass("border-dc-error/30 dark:border-dc-error-dark/30 bg-rose-50 dark:bg-rose-500/10 text-dc-error dark:text-dc-error-dark");
+			expect(normalBubble).toHaveClass("border-dc-border dark:border-dc-border-dark bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white");
 		});
 	});
 

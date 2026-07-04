@@ -85,7 +85,9 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 
 	if (!ticketId) {
 		return (
-			<p className="text-sm text-dc-text-muted py-6 text-center">This ticket could not be found.</p>
+			<p className="text-sm text-dc-text-muted py-6 text-center">
+				This ticket could not be found.
+			</p>
 		);
 	}
 
@@ -116,11 +118,12 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 				{messages.length === 0 && (
 					<p className="text-sm text-dc-text-muted py-4 text-center">No messages yet.</p>
 				)}
-				{messages.map((message) => {
+				{messages.map((message, idx) => {
 					const isScholar = message.sender_role === "scholar";
 					return (
 						<div
 							key={message.message_id}
+							ref={idx == messages.length - 1 ? messagesEndRef : null}
 							className={`flex flex-col ${isScholar ? "items-start" : "items-end"}`}
 						>
 							<div

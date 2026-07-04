@@ -150,16 +150,14 @@ describe("Conversation Tab Integration Test", () => {
 		render(<ConversationTab ticketId="ticket2" />);
 
 		await waitFor(() => {
-			const scholarBubble = screen
-				.getByText("this is another message hello hello")
-				.closest(".flex-col")?.parentElement;
-			const officerBubble = screen
-				.getByText("test message from officer")
-				.closest(".flex-col")?.parentElement;
+			const scholarBubble = screen.getByText(
+				"this is another message hello hello"
+			).parentElement;
+			const officerBubble = screen.getByText("test message from officer").parentElement;
 
-			expect(scholarBubble).toHaveClass("self-start", "items-start");
+			expect(scholarBubble).toHaveClass("items-start");
 			expect(scholarBubble?.firstChild).toHaveClass("rounded-tl-none");
-			expect(officerBubble).toHaveClass("self-end", "items-end");
+			expect(officerBubble).toHaveClass("items-end");
 			expect(officerBubble?.firstChild).toHaveClass("rounded-tr-none");
 		});
 	});
@@ -176,7 +174,7 @@ describe("Conversation Tab Integration Test", () => {
 
 		render(<ConversationTab ticketId="ticket3" />);
 
-		const inputField = screen.getByPlaceholderText("Message");
+		const inputField = screen.getByPlaceholderText("Type a message...");
 		const sendButton = screen.getByRole("button", { name: /Send/ });
 
 		// simulate typing message

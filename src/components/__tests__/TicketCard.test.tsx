@@ -66,90 +66,147 @@ describe("TicketCard Unit Tests", () => {
 	});
 
 	it("renders ticket information, correctly mapping props to text elements", () => {
-		render(<TicketCard ticket={baseTicket} />);
+		render(<TicketCard ticket={baseTicket} view="list" />);
 
 		expect(screen.getByText("TKT-2026-C6A06A")).toBeInTheDocument();
 		expect(screen.getByText("Internship extension request — extra 4 weeks")).toBeInTheDocument();
 		expect(screen.getByText("In Review")).toBeInTheDocument();
 		expect(screen.getByText("Internship")).toBeInTheDocument();
-		expect(screen.getByText("Low Priority 3")).toBeInTheDocument();
-		expect(screen.getByText("Last updated: 27 Jun 2026")).toBeInTheDocument();
-		expect(screen.getByText("Due by: 31 Jul 2026")).toBeInTheDocument();
-        expect(screen.getByText("Assigned to: Daniel Wong")).toBeInTheDocument();
+		expect(screen.getByText("High")).toBeInTheDocument();
+		expect(screen.getByText("31 Jul 2026")).toBeInTheDocument();
+        expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
+
+		cleanup()
+
+		render(<TicketCard ticket={baseTicket} view="card" />);
+
+		expect(screen.getByText("TKT-2026-C6A06A")).toBeInTheDocument();
+		expect(screen.getByText("Internship extension request — extra 4 weeks")).toBeInTheDocument();
+		expect(screen.getByText("In Review")).toBeInTheDocument();
+		expect(screen.getByText("Internship")).toBeInTheDocument();
+		expect(screen.getByText("High")).toBeInTheDocument();
+		expect(screen.getByText("Due 31 Jul 2026")).toBeInTheDocument();
+        expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
 	});
 
 	it("navigates to the ticket details view route when the ticket card is clicked", () => {
-		render(<TicketCard ticket={baseTicket} />);
+		render(<TicketCard ticket={baseTicket} view="list" />);
 
-		const cardContainer = screen.getByText("Internship extension request — extra 4 weeks").parentElement!;
+		let cardContainer = screen.getByText("Internship extension request — extra 4 weeks").parentElement!;
+		fireEvent.click(cardContainer);
+
+		expect(mockNavigate).toHaveBeenCalledWith("/tickets/1943d175-dcb7-47cd-aa71-2b6b39654452");
+
+		cleanup();
+
+		render(<TicketCard ticket={baseTicket} view="card" />);
+
+		cardContainer = screen.getByText("Internship extension request — extra 4 weeks").parentElement!;
 		fireEvent.click(cardContainer);
 
 		expect(mockNavigate).toHaveBeenCalledWith("/tickets/1943d175-dcb7-47cd-aa71-2b6b39654452");
 	});
 
-	it("displays pink Unassigned text when no officer assignee is attached", () => {
+	it("displays coloured Unassigned text when no officer assignee is attached", () => {
 		const unassignedTicket = { ...baseTicket, officer: undefined };
 		render(<TicketCard ticket={unassignedTicket} />);
 
 		const unassignedElement = screen.getByText("Unassigned");
 		expect(unassignedElement).toBeInTheDocument();
-		expect(unassignedElement).toHaveClass("text-pink-400");
+		expect(unassignedElement).toHaveClass("text-dc-error dark:text-dc-error-dark");
 	});
 
-	it("applies the text-rose-500 style to the assignee text if the ticket is escalated", () => {
+	it("applies text colouring to the assignee text if the ticket is escalated", () => {
 		const escalatedTicket = { ...baseTicket, isEscalated: true };
-		render(<TicketCard ticket={escalatedTicket} />);
+		render(<TicketCard ticket={escalatedTicket} view="list" />);
 
-		const assigneeElement = screen.getByText("Assigned to: Daniel Wong");
-		expect(assigneeElement).toHaveClass("text-rose-500");
+		let assigneeElement = screen.getByText("Daniel Wong");
+		expect(assigneeElement).toHaveClass("text-dc-error dark:text-dc-error-dark");
+
+		cleanup();
+
+		render(<TicketCard ticket={escalatedTicket} view="card" />);
+
+		assigneeElement = screen.getByText("Daniel Wong");
+		expect(assigneeElement).toHaveClass("text-dc-error dark:text-dc-error-dark");
 	});
 
-	it("applies the text-rose-500 style to the deadline text if the ticket date is overdue", () => {
+	it("applies text colouring to the deadline text if the ticket date is overdue", () => {
 		const overdueTicket = {
 			...baseTicket,
 			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
 		};
-		render(<TicketCard ticket={overdueTicket} />);
+		render(<TicketCard ticket={overdueTicket} view="list" />);
 
-		const deadlineElement = screen.getByText(`Due by: ${formatDate(overdueTicket.deadline)}`);
-		expect(deadlineElement).toHaveClass("text-rose-500");
+		let deadlineElement = screen.getByText(`${formatDate(overdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-dc-error dark:text-dc-error-dark");
+
+		cleanup();
+
+		render(<TicketCard ticket={overdueTicket} view="card" />);
+
+		deadlineElement = screen.getByText("Overdue");
+		expect(deadlineElement).toHaveClass("text-orange-500 dark:text-orange-400");
 	});
 
-	it("keeps the standard text-zinc-400 style for overdue deadlines if the status is Resolved or Closed", () => {
+	it("keeps the standard text style for overdue deadlines if the status is Resolved or Closed", () => {
 		const resolvedOverdueTicket = {
 			...baseTicket,
 			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
 			status: "Resolved" as TicketStatus,
 		};
-		render(<TicketCard ticket={resolvedOverdueTicket} />);
+		render(<TicketCard ticket={resolvedOverdueTicket} view="list" />);
 
-		let deadlineElement = screen.getByText(`Due by: ${formatDate(resolvedOverdueTicket.deadline)}`);
-		expect(deadlineElement).toHaveClass("text-zinc-400");
-		expect(deadlineElement).not.toHaveClass("text-rose-500");
+		let deadlineElement = screen.getByText(`${formatDate(resolvedOverdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-dc-text-muted");
+		expect(deadlineElement).not.toHaveClass("text-dc-error dark:text-dc-error-dark");
 
-        cleanup(); // cleanup previous render to test for closed ticket next
+		cleanup();
+
+		render(<TicketCard ticket={resolvedOverdueTicket} view="card" />);
+
+		deadlineElement = screen.getByText(`Due ${formatDate(resolvedOverdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-dc-text-muted");
+		expect(deadlineElement).not.toHaveClass("text-orange-500 dark:text-orange-400");
+
+        cleanup(); // test for closed ticket next
 
         // previous ticket should not be on the screen now
-        expect(screen.queryByText(`Due by: ${formatDate(resolvedOverdueTicket.deadline)}`)).not.toBeInTheDocument();
+        expect(screen.queryByText(`Due ${formatDate(resolvedOverdueTicket.deadline)}`)).not.toBeInTheDocument();
 
         const closedOverdueTicket = {
 			...baseTicket,
 			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
 			status: "Closed" as TicketStatus,
 		};
-		render(<TicketCard ticket={closedOverdueTicket} />);
+		render(<TicketCard ticket={closedOverdueTicket} view="list" />);
 
-		deadlineElement = screen.getByText(`Due by: ${formatDate(closedOverdueTicket.deadline)}`);
-		expect(deadlineElement).toHaveClass("text-zinc-400");
-		expect(deadlineElement).not.toHaveClass("text-rose-500");
+		deadlineElement = screen.getByText(`${formatDate(resolvedOverdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-dc-text-muted");
+		expect(deadlineElement).not.toHaveClass("text-dc-error dark:text-dc-error-dark");
+
+		cleanup();
+
+		render(<TicketCard ticket={closedOverdueTicket} view="card" />);
+
+		deadlineElement = screen.getByText(`Due ${formatDate(resolvedOverdueTicket.deadline)}`);
+		expect(deadlineElement).toHaveClass("text-dc-text-muted");
+		expect(deadlineElement).not.toHaveClass("text-orange-500 dark:text-orange-400");
 	});
 
 	it("handles a null deadline gracefully without crashing or rendering a due string", () => {
 		const nullDeadlineTicket = { ...baseTicket, deadline: null };
-		render(<TicketCard ticket={nullDeadlineTicket} />);
+		render(<TicketCard ticket={nullDeadlineTicket} view="list" />);
 
-		// The component shouldn't display any "Due by:" text if formatDate returns empty string
-		const deadlineSpan = screen.queryByText(/Due by:/);
-		expect(deadlineSpan).not.toBeInTheDocument();
+		// The component should display "-" in place of the due date for list view
+		let deadlineSpan = screen.getByText("—");
+		expect(deadlineSpan).toBeInTheDocument();
+
+		cleanup();
+
+		render(<TicketCard ticket={nullDeadlineTicket} view="card" />);
+
+		deadlineSpan = screen.getByText("—");
+		expect(deadlineSpan).toBeInTheDocument();
 	});
 });
