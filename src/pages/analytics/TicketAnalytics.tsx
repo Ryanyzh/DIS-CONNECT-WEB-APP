@@ -410,7 +410,7 @@ const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: stri
 		bar: "bg-indigo-500",
 		text: "text-indigo-600 dark:text-indigo-400",
 	},
-	"Waiting for Response": {
+	"Waiting": {
 		label: "Waiting",
 		bar: "bg-amber-400",
 		text: "text-amber-600 dark:text-amber-400",
@@ -428,8 +428,7 @@ const CATEGORY_BAR: Record<string, string> = {
 	Reimbursement: "bg-blue-500",
 	Exchange: "bg-amber-500",
 	Policy: "bg-emerald-500",
-	Finance: "bg-rose-500",
-	"General Query": "bg-violet-500",
+	Scholarship: "bg-violet-500",
 	Leave: "bg-teal-500",
 	Internship: "bg-sky-500",
 };
@@ -438,8 +437,7 @@ const CATEGORY_TEXT: Record<string, string> = {
 	Reimbursement: "text-blue-600 dark:text-blue-400",
 	Exchange: "text-amber-600 dark:text-amber-400",
 	Policy: "text-emerald-600 dark:text-emerald-400",
-	Finance: "text-rose-600 dark:text-rose-400",
-	"General Query": "text-violet-600 dark:text-violet-400",
+	Scholarship: "text-violet-600 dark:text-violet-400",
 	Leave: "text-teal-600 dark:text-teal-400",
 	Internship: "text-sky-600 dark:text-sky-400",
 };
@@ -527,7 +525,7 @@ function BarRow({
 
 export function TicketAnalyticsPage() {
 	const { tickets: liveTickets, loading } = useTickets();
-	const tickets: TicketProps[] = liveTickets.length > 0 ? liveTickets : MOCK_TICKETS;
+	const tickets: TicketProps[] = liveTickets;
 
 	const m = useMemo(() => {
 		const total = tickets.length;
@@ -581,11 +579,11 @@ export function TicketAnalyticsPage() {
 		const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
 		const maxDayCount = Math.max(...dayBuckets.map((b) => b.count), 1);
 
-		// Priority grouping
+		// Priority grouping (1=Low, 2=Medium, 3=High, 4=Critical → bucketed as High)
 		const priorityGroups = { Low: 0, Medium: 0, High: 0 };
 		for (const t of tickets) {
-			if (t.priority >= 8) priorityGroups.High++;
-			else if (t.priority >= 4) priorityGroups.Medium++;
+			if (t.priority >= 3) priorityGroups.High++;
+			else if (t.priority === 2) priorityGroups.Medium++;
 			else priorityGroups.Low++;
 		}
 
@@ -608,7 +606,7 @@ export function TicketAnalyticsPage() {
 	const STATUSES: TicketStatus[] = [
 		"Open",
 		"In Review",
-		"Waiting for Response",
+		"Waiting",
 		"Resolved",
 		"Closed",
 		"Escalated",
