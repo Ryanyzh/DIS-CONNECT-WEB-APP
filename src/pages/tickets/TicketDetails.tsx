@@ -26,8 +26,6 @@ const handleAttachmentPreview = async (filePath: string) => {
 	try {
 		const fileRef = ref(storage, filePath);
 		const previewUrl = await getDownloadURL(fileRef);
-
-		// open preview of attachment in browser
 		window.open(previewUrl, "_blank", "noopener,noreferrer");
 	} catch (error) {
 		console.error("Error previewing attachment: ", error);
@@ -44,7 +42,6 @@ export function TicketDetailsPage() {
 	const [ticket, setTicket] = useState<TicketProps>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [refresh, setRefresh] = useState<number>(0);
-
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
 
 	const [showErrorPopup, setShowErrorPopup] = useState<boolean>(false);
@@ -53,12 +50,8 @@ export function TicketDetailsPage() {
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
-
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}`);
-
-			if (!response.ok) {
-				throw new Error(`Error retrieving tickets: ${response.status}`);
-			}
+			if (!response.ok) throw new Error(`Error retrieving tickets: ${response.status}`);
 			const data = await response.json();
 
 			const formattedTicket: TicketProps = {
@@ -100,26 +93,19 @@ export function TicketDetailsPage() {
 
 	async function handleExecuteAction(nextStatus: TicketStatus, metadata?: Record<string, any>) {
 		if (!ticketId) return;
-
 		const nextStatusId = statusIdMap[nextStatus];
 		if (!nextStatusId) {
 			console.error(`No status ID found for ${nextStatus}`);
 			return;
 		}
-
 		try {
 			setLoading(true);
-
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					status_id: nextStatusId,
-					...metadata,
-				}),
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ status_id: nextStatusId, ...metadata }),
 			});
+
 
 			if (response.status == 403) {
 				setErrorMessage("Action denied: You are not the assigned officer for this ticket.");
@@ -146,180 +132,161 @@ export function TicketDetailsPage() {
 
 	if (loading || roleLoading) {
 		return (
-			<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-col items-center justify-center">
-				<div className="flex flex-col items-center gap-3">
-					<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
-				</div>
+			<div className="h-full w-full flex items-center justify-center">
+				<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-dc-border-dark border-t-dc-primary" />
 			</div>
 		);
 	}
 
 	if (!ticket || !ticket.scholar) {
 		return (
-			<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-col gap-4 p-6 text-3xl font-semibold">
+			<div className="h-full w-full flex flex-col gap-4 p-6">
 				<button
 					onClick={() => navigate(-1)}
-					className="w-fit block text-sm border rounded-md p-2 hover:border-zinc-400 transition-all font-normal"
+					className="w-fit text-sm font-medium text-dc-text-muted dark:text-dc-text-subtle hover:text-dc-primary dark:hover:text-dc-primary transition-colors flex items-center gap-1.5"
 				>
-					Back to tickets
+					← Back to tickets
 				</button>
-				<span className="text-center">This ticket could not be found.</span>
+				<span className="text-xl font-semibold text-dc-text dark:text-white text-center mt-8">
+					This ticket could not be found.
+				</span>
 			</div>
 		);
 	}
 
 	return (
-		<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-row gap-4">
-			<div className="bg-wise-canvas h-full w-full min-w-[50vw] flex flex-col gap-4">
+		<div className="h-full w-full flex flex-row gap-4">
+			{/* Main content */}
+			<div className="h-full w-full min-w-0 flex flex-col gap-4 flex-1">
 				<button
 					onClick={() => navigate(-1)}
-					className="w-fit block text-sm border rounded-md p-2 hover:border-zinc-400 transition-all font-normal mb-4"
+					className="w-fit text-sm font-medium text-dc-text-muted dark:text-dc-text-subtle hover:text-dc-primary dark:hover:text-dc-primary transition-colors flex items-center gap-1.5"
 				>
-					Back to tickets
+					← Back to tickets
 				</button>
 
-				<div className="font-semibold">{ticket.code}</div>
+				<span className="font-mono text-xs tracking-wider text-dc-text-muted">{ticket.code}</span>
 
-				{/* Ticket title and status */}
-				<div className="flex flex-row items-center text-xl font-semibold line-clamp-2 justify-between">
-					<span>{ticket.title}</span>
-					<span
-						className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-sm leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-2.5 py-1.5 rounded-md`}
-					>
+				{/* Title and status */}
+				<div className="flex flex-row items-start gap-3 justify-between">
+					<h1 className="text-xl font-bold text-dc-text dark:text-white leading-snug">{ticket.title}</h1>
+					<span className={`shrink-0 text-sm font-semibold px-2.5 py-1 rounded-md ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}>
 						{ticket.status}
 					</span>
 				</div>
 
-				{/* Ticket category and priority */}
-				<div className="flex flex-row items-center justify-start gap-3">
-					<span
-						className={`text-sm px-2 py-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
-					>
+				{/* Category and priority badges */}
+				<div className="flex flex-row items-center gap-2">
+					<span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${categoryStyles[ticket.category]}`}>
 						{ticket.category}
 					</span>
-					<span
-						className={`text-sm px-2 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
-					>
+					<span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}>
 						{priorityLabels[ticket.priority]}
 					</span>
 				</div>
 
-				{/* Scholar, created at, assigned officer */}
-				<div className="flex flex-row w-full text-center items-center justify-between divide-x">
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{ticket.scholar.name}</div>
-						<div className="text-sm text-zinc-400">Scholar</div>
-					</div>
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{formatDate(ticket.createdAt)}</div>
-						<div className="text-sm text-zinc-400">Created</div>
-					</div>
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">
-							{ticket.officer ? ticket.officer.name : "Unassigned"}
+				{/* Scholar / Created / Officer summary */}
+				<div className="flex flex-row w-full border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden divide-x divide-dc-border dark:divide-dc-border-dark">
+					{[
+						{ value: ticket.scholar.name, label: "Scholar" },
+						{ value: formatDate(ticket.createdAt), label: "Created" },
+						{ value: ticket.officer?.name ?? "Unassigned", label: "Officer" },
+					].map(({ value, label }) => (
+						<div key={label} className="flex-1 flex flex-col items-center py-3">
+							<span className="text-sm font-semibold text-dc-text dark:text-white">{value}</span>
+							<span className="text-xs text-dc-text-muted mt-0.5">{label}</span>
 						</div>
-						<div className="text-sm text-zinc-400">Assigned Officer</div>
-					</div>
+					))}
 				</div>
 
-				{/* Tabs for more info: Details, Conversation, Attachments, Activity (only details and attachments for now) */}
-				<div className="w-full flex flex-row items-center gap-6 text-sm text-zinc-400 px-2 pt-2 justify-start">
-					{(["Details", "Conversation", "Attachments", "Activity"] as TabType[]).map(
-						(tab) => {
-							const isActive = activeTab == tab;
+				{/* Tabs */}
+				<div className="flex flex-row gap-1 border-b border-dc-border dark:border-dc-border-dark">
+					{(["Details", "Conversation", "Attachments", "Activity"] as TabType[]).map((tab) => {
+						const isActive = activeTab === tab;
+						const count = tab === "Attachments" ? ticket.attachments.length : undefined;
 
-							// counts for conversation and attachments
-							let count: number | undefined;
-							if (tab == "Attachments") {
-								count = ticket.attachments.length;
-							}
-
-							return (
-								<button
-									key={tab}
-									onClick={() => setActiveTab(tab)}
-									className={`relative pb-2 transition-all hover:text-blue-600 ${isActive ? "text-blue-600 font-semibold border-b-2 border-blue-600" : "text-zinc-500 border-b-2 border-zinc-400"}`}
-								>
-									<div className="flex items-center gap-1.5">
-										<span>{tab}</span>
-										{count != undefined && (
-											<span className="text-xs bg-zinc-500/15 px-1.5 py-0.25 rounded-full text-zinc-600">
-												{count}
-											</span>
-										)}
-									</div>
-								</button>
-							);
-						}
-					)}
+						return (
+							<button
+								key={tab}
+								onClick={() => setActiveTab(tab)}
+								className={`relative px-3 pb-2 text-sm transition-colors flex items-center gap-1.5 border-b-2 -mb-px ${
+									isActive
+										? "text-dc-primary font-semibold border-dc-primary"
+										: "text-dc-text-muted border-transparent hover:text-dc-text dark:hover:text-white"
+								}`}
+							>
+								<span>{tab}</span>
+								{count !== undefined && (
+									<span className="text-xs bg-dc-elevated dark:bg-dc-elevated-dark text-dc-text-muted px-1.5 py-0.5 rounded-full font-medium">
+										{count}
+									</span>
+								)}
+							</button>
+						);
+					})}
 				</div>
 
-				{/* Body of information */}
-				<div className="h-full w-full flex flex-col gap-3">
-					{activeTab == "Details" && (
-						<div className="h-full w-full flex flex-col gap-3">
-							<div className="font-semibold">Description</div>
-							<div className="mb-4">{ticket.description}</div>
-
-							<div className="flex flex-row justify-start gap-40">
-								<div className="flex flex-col gap-3">
-									<div className="font-semibold">Category</div>
-									<div>{ticket.category}</div>
+				{/* Tab content */}
+				<div className="flex-1 min-h-0 w-full overflow-y-auto">
+					{activeTab === "Details" && (
+						<div className="flex flex-col gap-5">
+							<div>
+								<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-2">Description</h2>
+								<p className="text-sm text-dc-text dark:text-white leading-relaxed">{ticket.description}</p>
+							</div>
+							<div className="flex flex-row gap-12">
+								<div>
+									<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1">Category</h2>
+									<span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${categoryStyles[ticket.category]}`}>
+										{ticket.category}
+									</span>
 								</div>
-
-								<div className="flex flex-col gap-3">
-									<div className="font-semibold">Due Date</div>
-									<div>{formatDate(ticket.deadline)}</div>
+								<div>
+									<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1">Due Date</h2>
+									<span className="text-sm text-dc-text dark:text-white">{formatDate(ticket.deadline) || "—"}</span>
 								</div>
 							</div>
 						</div>
 					)}
 
-					{activeTab == "Conversation" && <ConversationTab ticketId={ticketId} />}
+					{activeTab === "Conversation" && <ConversationTab ticketId={ticketId} />}
 
-					{activeTab == "Attachments" && (
-						<div className="h-full w-full flex flex-col gap-3">
-							<div className="font-semibold">
+					{activeTab === "Attachments" && (
+						<div className="flex flex-col gap-3">
+							<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted">
 								Files Uploaded ({ticket.attachments.length})
-							</div>
+							</h2>
 							{ticket.attachments.length > 0 ? (
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
 									{ticket.attachments.map((file: any) => (
 										<div
 											key={file.attachment_id}
 											onClick={() => handleAttachmentPreview(file.file_path)}
-											data-testid="attachment-preview"
-											className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm select-none cursor-pointer hover:bg-zinc-100 transition-all"
+											className="border border-dc-border dark:border-dc-border-dark bg-dc-surface dark:bg-dc-surface-dark hover:border-dc-primary/40 dark:hover:border-dc-primary/60 hover:shadow-dc-sm p-3 rounded-xl flex justify-between items-center text-sm cursor-pointer transition-all"
 											role="button"
 										>
-											<span className="line-clamp-2">{file.file_name}</span>
-											<span className="text-xs text-zinc-500">
+											<span className="line-clamp-2 text-dc-text dark:text-white text-xs">{file.file_name}</span>
+											<span className="text-xs text-dc-text-muted shrink-0 ml-2">
 												{(file.file_size / 1024).toFixed(2)} KB
 											</span>
 										</div>
 									))}
 								</div>
 							) : (
-								<div className="text-sm">No attachments found.</div>
+								<p className="text-sm text-dc-text-muted py-6 text-center">No attachments found.</p>
 							)}
 						</div>
 					)}
 
-					{activeTab == "Activity" && (
-						<ActivityTab ticketId={ticketId} refresh={refresh} />
-					)}
+					{activeTab === "Activity" && <ActivityTab ticketId={ticketId} refresh={refresh} />}
 				</div>
 			</div>
 
-			{/* Ticket information and actions panel */}
-			<div className="h-full w-full flex flex-col border rounded-lg">
+			{/* Info + actions sidebar */}
+			<div className="h-full flex flex-col border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden bg-dc-surface dark:bg-dc-surface-dark shadow-dc-sm min-w-[14rem] max-w-[18rem]">
 				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
-				{role == "hr" && (
-					<ActionsPanel
-						ticket={ticket}
-						currentStatus={ticket.status}
-						onAction={handleExecuteAction}
-					/>
+				{role === "hr" && (
+					<ActionsPanel ticket={ticket} currentStatus={ticket.status} onAction={handleExecuteAction} />
 				)}
 			</div>
 

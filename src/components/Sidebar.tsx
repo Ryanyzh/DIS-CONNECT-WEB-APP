@@ -1,7 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import DisconnectLogo from "../assets/disconnect-logo.svg";
-import DisconnectName from "../assets/disconnect_word_logo_cropped.svg";
+import DisconnectLogo from "../assets/disconnect_logo_transparent.svg";
 
 const expandableSections = [
 	{
@@ -63,66 +62,85 @@ export default function Sidebar() {
 	}, [location.pathname]);
 
 	return (
-		<aside className="hidden w-full max-w-[280px] shrink-0 border-r border-wise-ink/10 text-wise-ink dark:border-wise-canvasSoft/20 dark:text-wise-canvas lg:flex lg:flex-col overflow-y-auto">
-			{/* Logo Section */}
-			<div className="border-b border-wise-ink/10 p-4 flex items-center gap-2.5">
-				<div className="flex h-10 w-10 items-center justify-center rounded-wiseXl bg-wise-green text-wise-ink flex-shrink-0">
-					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-8 w-8" />
+		<aside className="hidden w-full max-w-[280px] shrink-0 border-r border-wise-ink/10 dark:border-wise-canvasSoft/20 lg:flex lg:flex-col overflow-y-auto">
+			{/* Logo */}
+			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-5 py-3.5 flex items-center">
+				<div className="flex items-center justify-center flex-shrink-0">
+					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-10 w-auto" />
 				</div>
-				<img src={DisconnectName} alt="Disconnect Name" className="h-5 ml-1" />
+				<span
+					style={{ fontFamily: "'Poppins', sans-serif" }}
+					className="ml-2 text-2xl font-semibold tracking-tight text-wise-ink dark:text-wise-canvas"
+				>
+					dis-connect
+				</span>
 			</div>
 
-			<div className="flex-1 space-y-6 p-4">
-				{/* Main Navigation */}
-				<div className="space-y-2">
-					{expandableSections.map((section) => {
-						const isOpen = expandedSection === section.label;
-						return (
-							<div key={section.label}>
-								<button
-									onClick={() =>
-										setExpandedSection(isOpen ? null : section.label)
-									}
-									className="flex w-full items-center justify-between gap-3 rounded-wiseXl px-3 py-2.5 text-sm font-medium text-wise-ink transition hover:bg-wise-canvasSoft dark:text-wise-canvas dark:hover:bg-[#151611]"
+			<div className="flex-1 p-3 space-y-1.5">
+				{expandableSections.map((section) => {
+					const isOpen = expandedSection === section.label;
+					const isSectionActive = section.items.some(
+						(item) => location.pathname === item.path
+					);
+
+					return (
+						<div key={section.label}>
+							{/* Section header */}
+							<button
+								onClick={() => setExpandedSection(isOpen ? null : section.label)}
+								className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+									isSectionActive
+										? "font-semibold"
+										: "font-medium text-wise-ink dark:text-wise-canvas hover:bg-wise-canvasSoft dark:hover:bg-[#151611]"
+								}`}
+							>
+								<span className={isSectionActive ? "text-gradient" : ""}>
+									{section.label}
+								</span>
+								<svg
+									className={`h-4 w-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""} ${isSectionActive ? "text-dc-primary" : "text-wise-ink/40 dark:text-wise-canvasSoft/50"}`}
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
 								>
-									<span>{section.label}</span>
-									<svg
-										className={`h-4 w-4 text-wise-ink dark:text-wise-canvasSoft transition-transform ${isOpen ? "rotate-180" : ""}`}
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M19 9l-7 7-7-7"
-										/>
-									</svg>
-								</button>
-								{isOpen && (
-									<div className="space-y-1 border-l border-wise-ink/20 pl-3 ml-3 dark:border-wise-canvasSoft/20">
-										{section.items.map((item) => (
-											<NavLink
-												key={item.path}
-												to={item.path}
-												end={item.path === "/"}
-												className={({ isActive }) =>
-													"flex items-center gap-3 rounded-wiseXl px-3 py-2 text-sm font-medium transition " +
-													(isActive
-														? "text-wise-green dark:text-wise-active"
-														: "text-wise-ink hover:text-wise-inkDeep dark:text-wise-canvasSoft dark:hover:text-white")
-												}
-											>
-												{item.label}
-											</NavLink>
-										))}
-									</div>
-								)}
-							</div>
-						);
-					})}
-				</div>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+
+							{/* Expanded items */}
+							{isOpen && (
+								<div
+									className={`mt-1 mb-1.5 space-y-1 pl-3 ml-2.5 border-l ${
+										isSectionActive
+											? "border-dc-primary/30 dark:border-dc-primary/20"
+											: "border-wise-ink/10 dark:border-wise-canvasSoft/10"
+									}`}
+								>
+									{section.items.map((item) => (
+										<NavLink
+											key={item.path}
+											to={item.path}
+											end={item.path === "/"}
+											className={({ isActive }) =>
+												"flex items-center rounded-xl px-3 py-2 text-sm transition " +
+												(isActive
+													? "btn-gradient text-white font-semibold shadow-sm"
+													: "font-medium text-wise-ink/70 hover:text-wise-ink hover:bg-wise-canvasSoft dark:text-wise-canvasSoft/70 dark:hover:text-white dark:hover:bg-[#151611]")
+											}
+										>
+											{item.label}
+										</NavLink>
+									))}
+								</div>
+							)}
+						</div>
+					);
+				})}
 			</div>
 		</aside>
 	);

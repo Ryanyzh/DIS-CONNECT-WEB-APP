@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../lib/apiFetch";
 import { type Faq, type FaqCategory, FAQ_CATEGORIES, faqCategoryConfig } from "../../types/Faq";
+import PageShell from "../PageShell";
 
 function FaqItem({
 	faq,
@@ -21,70 +22,79 @@ function FaqItem({
 		>
 			<button
 				onClick={() => setOpen((o) => !o)}
-				className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+				className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
 			>
-				<span className="font-semibold text-wise-ink dark:text-zinc-100 text-sm leading-snug">
-					{faq.question}
-				</span>
+				<div className="flex-1 min-w-0">
+					<div className="flex items-center gap-2 mb-1.5">
+						<span
+							className={`text-xs font-semibold px-2 py-0.5 rounded border uppercase tracking-wide ${cfg.badge}`}
+						>
+							{faq.category}
+						</span>
+					</div>
+					<span className="font-semibold text-wise-ink dark:text-zinc-100 text-sm leading-snug">
+						{faq.question}
+					</span>
+				</div>
 				<svg
-					className={`w-4 h-4 text-zinc-400 flex-shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+					className={`w-4 h-4 text-zinc-400 flex-shrink-0 transition-transform duration-200 mt-1 ${open ? "rotate-180" : ""}`}
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 				>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth={2}
-						d="M19 9l-7 7-7-7"
-					/>
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
 				</svg>
 			</button>
 
 			{open && (
-				<div className="px-5 pb-4 border-t border-zinc-100 dark:border-zinc-800">
-					<p className="text-sm text-wise-body dark:text-zinc-300 leading-relaxed whitespace-pre-wrap pt-3">
-						{faq.answer}
-					</p>
-					<div className="flex items-center gap-3 mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-						<button
-							onClick={onEdit}
-							className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 transition-colors"
-						>
-							<svg
-								className="w-3.5 h-3.5"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+				<div className="border-t border-zinc-100 dark:border-zinc-800">
+					<div className="px-5 py-4">
+						<p className="text-sm text-wise-body dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
+							{faq.answer}
+						</p>
+					</div>
+					<div className="flex items-center justify-between px-5 py-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50">
+						<span className="text-xs text-zinc-400">Order #{faq.order}</span>
+						<div className="flex items-center gap-4">
+							<button
+								onClick={onEdit}
+								className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-wise-ink dark:hover:text-zinc-100 transition-colors"
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-								/>
-							</svg>
-							Edit
-						</button>
-						<button
-							onClick={onDelete}
-							className="flex items-center gap-1.5 text-xs text-rose-500 hover:text-rose-600 transition-colors"
-						>
-							<svg
-								className="w-3.5 h-3.5"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+								<svg
+									className="w-3.5 h-3.5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+									/>
+								</svg>
+								Edit
+							</button>
+							<button
+								onClick={onDelete}
+								className="flex items-center gap-1.5 text-xs font-medium text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-								/>
-							</svg>
-							Delete
-						</button>
+								<svg
+									className="w-3.5 h-3.5"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+									/>
+								</svg>
+								Delete
+							</button>
+						</div>
 					</div>
 				</div>
 			)}
@@ -141,22 +151,14 @@ export function AllFaqsPage() {
 	);
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						FAQ Articles
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						Manage frequently asked questions visible to scholars.
-					</p>
-				</div>
+		<PageShell
+			description="Manage frequently asked questions visible to scholars."
+			actions={
 				<button
 					onClick={() => navigate("/knowledge-base/faqs/create")}
-					className="flex items-center gap-2 bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+					className="flex items-center gap-1.5 btn-gradient text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
 				>
-					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
 							strokeLinecap="round"
 							strokeLinejoin="round"
@@ -166,28 +168,37 @@ export function AllFaqsPage() {
 					</svg>
 					New FAQ
 				</button>
-			</div>
-
+			}
+		>
 			{/* Category filter */}
 			<div className="flex flex-wrap gap-2">
-				{(["All", ...FAQ_CATEGORIES] as const).map((cat) => (
-					<button
-						key={cat}
-						onClick={() => setActiveCategory(cat)}
-						className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
-							activeCategory === cat
-								? "bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 border-wise-ink dark:border-zinc-100"
-								: "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
-						}`}
-					>
-						{cat}
-						{cat !== "All" && (
-							<span className="ml-1.5 opacity-60">
-								{faqs.filter((f) => f.category === cat).length}
-							</span>
-						)}
-					</button>
-				))}
+				{(["All", ...FAQ_CATEGORIES] as const).map((cat) => {
+					const active = activeCategory === cat;
+					const count = cat === "All" ? faqs.length : faqs.filter((f) => f.category === cat).length;
+					return (
+						<button
+							key={cat}
+							onClick={() => setActiveCategory(cat)}
+							className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+								active
+									? "bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 border-wise-ink dark:border-zinc-100"
+									: "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
+							}`}
+						>
+							{cat !== "All" && (
+								<span
+									className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+										active
+											? "bg-wise-canvas dark:bg-zinc-900"
+											: faqCategoryConfig[cat as FaqCategory].dot
+									}`}
+								/>
+							)}
+							{cat}
+							<span className={active ? "opacity-60" : "text-zinc-400"}>{count}</span>
+						</button>
+					);
+				})}
 			</div>
 
 			{loading && (
@@ -214,7 +225,7 @@ export function AllFaqsPage() {
 									<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
 										{cat}
 									</h2>
-									<span className="text-xs text-zinc-400">
+									<span className="text-xs text-zinc-400 dark:text-zinc-500">
 										({grouped[cat].length})
 									</span>
 								</div>
@@ -223,9 +234,7 @@ export function AllFaqsPage() {
 										<div
 											key={faq.id}
 											className={
-												deletingId === faq.id
-													? "opacity-50 pointer-events-none"
-													: ""
+												deletingId === faq.id ? "opacity-50 pointer-events-none" : ""
 											}
 										>
 											<FaqItem
@@ -243,6 +252,6 @@ export function AllFaqsPage() {
 					})}
 				</div>
 			)}
-		</div>
+		</PageShell>
 	);
 }

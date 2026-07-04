@@ -65,7 +65,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 					<div
 						className={`flex items-center rounded-xl border bg-white transition ${
 							searchFocus
-								? "border-wise-active dark:border-wise-mute"
+								? "border-dc-primary ring-2 ring-dc-primary/20"
 								: "border-wise-ink/20 dark:border-wise-mute"
 						} dark:bg-wise-ink`}
 					>
@@ -100,10 +100,10 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 					<button
 						type="button"
 						onClick={onToggleDarkMode}
-						className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-wise-ink/20 bg-wise-canvas text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral dark:border-wise-canvasSoft/30 dark:bg-wise-ink dark:text-white dark:hover:bg-[#1a1f14]"
+						className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-wise-ink/20 bg-wise-canvas text-wise-ink transition btn-gradient-hover dark:border-wise-canvasSoft/30 dark:bg-wise-ink dark:text-white"
 					>
 						<svg
-							className="w-6 h-6 text-wise-ink dark:text-wise-mute"
+							className="w-6 h-6 text-wise-ink dark:text-wise-mute group-hover:text-white transition-colors"
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
 							width="24"
@@ -123,15 +123,15 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 						<button
 							type="button"
 							onClick={() => setShowUserMenu(!showUserMenu)}
-							className="inline-flex items-center gap-2 rounded-full border border-wise-ink/20 bg-wise-canvas px-4 py-2 text-sm font-semibold text-wise-ink transition hover:bg-wise-active dark:border-wise-mute dark:bg-wise-body dark:text-white dark:hover:bg-[#1a1f14]"
+							className="group inline-flex items-center gap-2 rounded-full border border-wise-ink/20 bg-wise-canvas px-4 py-2 text-sm font-semibold text-wise-ink transition btn-gradient-hover dark:border-wise-mute dark:bg-wise-body dark:text-white"
 						>
 							<div
-								className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+								className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0"
 								style={{ backgroundColor: bgColor.bg, color: bgColor.text }}
 							>
 								{initials}
 							</div>
-							<span className="hidden sm:inline">{firstName}</span>
+							<span className="hidden sm:inline group-hover:text-white transition-colors">{firstName}</span>
 							<svg
 								className={`h-4 w-4 transition-transform ${showUserMenu ? "rotate-180" : ""}`}
 								fill="none"
@@ -152,7 +152,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 								<div className="border-b border-wise-ink/10 px-4 py-4 dark:border-wise-canvasSoft/20">
 									<div className="flex items-center gap-3 mb-1">
 										<div
-											className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+											className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
 											style={{
 												backgroundColor: bgColor.bg,
 												color: bgColor.text,
@@ -171,7 +171,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 									</div>
 								</div>
 								<div className="space-y-1 p-2">
-									<button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
+									<button onClick={() => { navigate("/profile/account"); setShowUserMenu(false); }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
 										<svg
 											className="h-4 w-4"
 											fill="none"

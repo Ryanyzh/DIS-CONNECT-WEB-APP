@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageShell from "../PageShell";
 import {
 	type Scholar,
 	type ScholarStatus,
@@ -24,7 +25,7 @@ function ScholarRow({ scholar, onClick }: { scholar: Scholar; onClick: () => voi
 		>
 			<td className="px-5 py-3.5">
 				<div className="flex items-center gap-3">
-					<div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+					<div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 						{getInitials(scholar.name)}
 					</div>
 					<div className="min-w-0">
@@ -116,24 +117,7 @@ export function ScholarProfilesPage() {
 	}, {});
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						Scholar Profiles
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						View and manage all scholarship recipients and their ticket history.
-					</p>
-				</div>
-				<div className="flex items-center gap-2 text-xs text-zinc-400">
-					<span className="font-semibold text-wise-ink dark:text-zinc-200 text-sm">
-						{MOCK_SCHOLARS.length}
-					</span>
-					scholars total
-				</div>
-			</div>
+		<PageShell description="View and manage all scholarship recipients and their ticket history.">
 
 			{/* Status filter pills */}
 			<div className="flex flex-wrap gap-2">
@@ -231,6 +215,6 @@ export function ScholarProfilesPage() {
 					</table>
 				)}
 			</div>
-		</div>
+		</PageShell>
 	);
 }

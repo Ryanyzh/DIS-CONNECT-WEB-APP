@@ -40,19 +40,19 @@ export interface Scholar {
 export const scholarStatusConfig: Record<ScholarStatus, { badge: string; dot: string }> = {
 	Active: {
 		badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
-		dot: "bg-emerald-500",
+		dot: "bg-emerald-500 dark:bg-emerald-400",
 	},
 	"On Leave": {
 		badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
-		dot: "bg-amber-500",
+		dot: "bg-amber-500 dark:bg-amber-400",
 	},
 	Graduated: {
 		badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
-		dot: "bg-blue-500",
+		dot: "bg-blue-500 dark:bg-blue-400",
 	},
 	Inactive: {
 		badge: "bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700",
-		dot: "bg-zinc-400",
+		dot: "bg-zinc-400 dark:bg-zinc-500",
 	},
 };
 
@@ -78,12 +78,12 @@ export const ticketStatusConfig: Record<TicketStatus, { badge: string }> = {
 };
 
 export const ticketCategoryConfig: Record<TicketCategory, string> = {
-	Reimbursement: "bg-blue-950/40 text-blue-300 border-blue-900/40",
-	Exchange: "bg-amber-950/40 text-amber-300 border-amber-900/40",
-	Policy: "bg-emerald-950/40 text-emerald-300 border-emerald-900/40",
-	Internship: "bg-rose-950/40 text-rose-300 border-rose-900/40",
-	Leave: "bg-cyan-950/40 text-cyan-300 border-cyan-900/40",
-	Scholarship: "bg-slate-950/40 text-slate-300 border-slate-900/40",
+	Reimbursement: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
+	Exchange: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
+	Policy: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
+	Internship: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-800",
+	Leave: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
+  Scholarship: "bg-slate-950/40 text-slate-300 border-slate-900/40",
 };
 
 export function getInitials(name: string) {

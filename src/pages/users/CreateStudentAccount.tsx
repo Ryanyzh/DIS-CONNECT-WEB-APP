@@ -27,7 +27,6 @@ export const programOptionsByFaculty: Record<string, string[]> = {
 		"Computer Engineering",
 		"Artificial Intelligence",
 	],
-
 	"College of Design & Engineering": [
 		"Architecture",
 		"Biomedical Engineering",
@@ -45,7 +44,6 @@ export const programOptionsByFaculty: Record<string, string[]> = {
 		"Mechanical Engineering",
 		"Robotics & Machine Intelligence",
 	],
-
 	"NUS Business School": [
 		"Business Administration",
 		"Accountancy",
@@ -57,7 +55,6 @@ export const programOptionsByFaculty: Record<string, string[]> = {
 		"Innovation & Entrepreneurship",
 		"Real Estate",
 	],
-
 	"College of Humanities & Sciences": [
 		"Data Science & Economics",
 		"Economics",
@@ -82,29 +79,27 @@ export const programOptionsByFaculty: Record<string, string[]> = {
 		"Malay Studies",
 		"Japanese Studies",
 	],
-
 	"Faculty of Law": ["Law"],
-
 	"Yong Loo Lin School of Medicine": ["Medicine"],
-
 	"Faculty of Dentistry": ["Dentistry"],
-
 	"Alice Lee Centre for Nursing Studies": ["Nursing"],
-
 	"Yong Siew Toh Conservatory of Music": ["Music"],
-
 	"School of Pharmacy": ["Pharmacy", "Pharmaceutical Science"],
-
 	"Saw Swee Hock School of Public Health": ["Public Health"],
-
 	"NUS College": ["NUS College"],
-
 	Other: ["Other"],
 };
 
 export const programOptions = Array.from(
 	new Set(Object.values(programOptionsByFaculty).flat())
 ).sort();
+
+const inputClass =
+	"w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3.5 py-2.5 text-sm text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
+const labelClass =
+	"block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wide";
+const sectionClass =
+	"text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4";
 
 export function CreateStudentAccountPage() {
 	const [fullName, setFullName] = useState("");
@@ -186,7 +181,10 @@ export function CreateStudentAccountPage() {
 				return;
 			}
 
-			showNotification("success", `Student account for ${fullName} has been created successfully.`);
+			showNotification(
+				"success",
+				`Student account for ${fullName} has been created successfully.`
+			);
 			resetForm();
 		} catch (error) {
 			console.error(error);
@@ -197,229 +195,207 @@ export function CreateStudentAccountPage() {
 	};
 
 	return (
-		<PageShell
-			title="Create Student Account"
-			description="Add a new student account to the system for user management and authentication."
-		>
-			<div className="rounded-wiseXl border border-wise-ink/10 bg-wise-canvas p-xl shadow-sm dark:border-wise-canvasSoft/20 dark:bg-[#151611]">
-				<form onSubmit={handleSubmit} className="space-y-6">
-					<div className="grid gap-6 md:grid-cols-2">
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Full name</span>
-							<input
-								value={fullName}
-								onChange={(event) => setFullName(event.target.value)}
-								placeholder="Enter student name"
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-							/>
-						</label>
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Email address</span>
-							<input
-								type="email"
-								value={email}
-								onChange={(event) => setEmail(event.target.value)}
-								placeholder="student@example.com"
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-							/>
-						</label>
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Password</span>
-							<div className="flex gap-2">
-								<div className="relative flex-1">
-									<input
-										type={showPassword ? "text" : "password"}
-										value={password}
-										onChange={(event) => setPassword(event.target.value)}
-										placeholder="Create a secure password"
-										className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 pr-12 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-									/>
+		<PageShell description="Add a new student account to the system for user management and authentication.">
+			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
+				<div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+					<h2 className="text-sm font-semibold text-wise-ink dark:text-zinc-100">
+						Student Details
+					</h2>
+				</div>
+
+				<form onSubmit={handleSubmit} className="p-6 space-y-8">
+					{/* Personal Information */}
+					<div>
+						<p className={sectionClass}>Personal Information</p>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div>
+								<label className={labelClass}>Full Name</label>
+								<input
+									value={fullName}
+									onChange={(e) => setFullName(e.target.value)}
+									placeholder="Enter student name"
+									className={inputClass}
+								/>
+							</div>
+							<div>
+								<label className={labelClass}>Email Address</label>
+								<input
+									type="email"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									placeholder="student@example.com"
+									className={inputClass}
+								/>
+							</div>
+							<div>
+								<label className={labelClass}>Password</label>
+								<div className="flex gap-2">
+									<div className="relative flex-1">
+										<input
+											type={showPassword ? "text" : "password"}
+											value={password}
+											onChange={(e) => setPassword(e.target.value)}
+											placeholder="Create a secure password"
+											className={`${inputClass} pr-10`}
+										/>
+										<button
+											type="button"
+											onClick={() => setShowPassword(!showPassword)}
+											className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+											title={showPassword ? "Hide password" : "Show password"}
+										>
+											{showPassword ? (
+												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+												</svg>
+											) : (
+												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+												</svg>
+											)}
+										</button>
+									</div>
 									<button
 										type="button"
-										onClick={() => setShowPassword(!showPassword)}
-										className="absolute right-3 top-1/2 -translate-y-1/2 text-wise-ink/60 hover:text-wise-ink dark:text-wise-canvas/60 dark:hover:text-wise-canvas transition"
-										title={showPassword ? "Hide password" : "Show password"}
+										onClick={generatePassword}
+										className="px-3.5 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors whitespace-nowrap"
 									>
-										{showPassword ? (
-											<svg
-												className="w-5 h-5"
-												aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg"
-												width="24"
-												height="24"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<path
-													stroke="currentColor"
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-												/>
-											</svg>
-										) : (
-											<svg
-												className="w-5 h-5"
-												aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg"
-												width="24"
-												height="24"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<path
-													stroke="currentColor"
-													stroke-width="2"
-													d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
-												/>
-												<path
-													stroke="currentColor"
-													stroke-width="2"
-													d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-												/>
-											</svg>
-										)}
+										Generate
 									</button>
 								</div>
-								<button
-									type="button"
-									onClick={generatePassword}
-									className="rounded-wiseMd border border-wise-ink/20 bg-wise-canvasSoft px-4 py-3 text-body-md font-medium text-wise-ink transition hover:bg-wise-ink/5 active:bg-wise-ink/10 dark:border-wise-mute dark:bg-wise-ink dark:text-wise-canvas dark:hover:bg-wise-ink/80"
-								>
-									Generate
-								</button>
 							</div>
-						</label>
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Phone number</span>
-							<input
-								type="tel"
-								value={phone}
-								onChange={(event) => setPhone(event.target.value)}
-								placeholder="+1 555 123 4567"
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-							/>
-						</label>
+							<div>
+								<label className={labelClass}>Phone Number</label>
+								<input
+									type="tel"
+									value={phone}
+									onChange={(e) => setPhone(e.target.value)}
+									placeholder="+65 9123 4567"
+									className={inputClass}
+								/>
+							</div>
+						</div>
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-2">
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Student ID</span>
-							<input
-								value={studentId}
-								onChange={(event) => setStudentId(event.target.value)}
-								placeholder="e.g. S1234567"
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-							/>
-						</label>
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Faculty</span>
-							<select
-								value={faculty}
-								onChange={(event) => {
-									setFaculty(event.target.value);
-									setProgram("");
-								}}
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 pr-10 appearance-none text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-wise-white"
-							>
-								<option value="">Select faculty</option>
-								{facultyOptions.map((option) => (
-									<option key={option} value={option}>
-										{option}
+					{/* Academic Information */}
+					<div>
+						<p className={sectionClass}>Academic Information</p>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div>
+								<label className={labelClass}>Student ID</label>
+								<input
+									value={studentId}
+									onChange={(e) => setStudentId(e.target.value)}
+									placeholder="e.g. A0123456B"
+									className={inputClass}
+								/>
+							</div>
+							<div>
+								<label className={labelClass}>Faculty</label>
+								<select
+									value={faculty}
+									onChange={(e) => {
+										setFaculty(e.target.value);
+										setProgram("");
+									}}
+									className={inputClass}
+								>
+									<option value="">Select faculty</option>
+									{facultyOptions.map((opt) => (
+										<option key={opt} value={opt}>
+											{opt}
+										</option>
+									))}
+								</select>
+							</div>
+							<div>
+								<label className={labelClass}>Programme</label>
+								<select
+									value={program}
+									onChange={(e) => setProgram(e.target.value)}
+									disabled={!faculty}
+									className={`${inputClass} disabled:opacity-50 disabled:cursor-not-allowed`}
+								>
+									<option value="">
+										{faculty ? "Select programme" : "Choose faculty first"}
 									</option>
-								))}
-							</select>
-						</label>
-
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Program</span>
-							<select
-								value={program}
-								onChange={(event) => setProgram(event.target.value)}
-								disabled={!faculty}
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 pr-10 appearance-none text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-wise-white disabled:cursor-not-allowed disabled:bg-wise-canvasSoft/50"
-							>
-								<option value="">
-									{faculty ? "Select program" : "Choose faculty first"}
-								</option>
-								{programOptionsForFaculty.map((option) => (
-									<option key={option} value={option}>
-										{option}
-									</option>
-								))}
-							</select>
-						</label>
-
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Year of study</span>
-							<select
-								value={yearOfStudy}
-								onChange={(event) => setYearOfStudy(event.target.value)}
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 pr-10 appearance-none text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-wise-white"
-							>
-								<option value="">Select year</option>
-								<option value="1">1st year</option>
-								<option value="2">2nd year</option>
-								<option value="3">3rd year</option>
-								<option value="4">4th year</option>
-								<option value="5">5th year+</option>
-							</select>
-						</label>
-
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Preferred contact method</span>
-							<select
-								value={preferredContact}
-								onChange={(event) => setPreferredContact(event.target.value)}
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 pr-10 appearance-none text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-wise-white"
-							>
-								<option value="">Select preferred contact</option>
-								<option value="email">Email</option>
-								<option value="phone">Phone</option>
-								<option value="sms">SMS</option>
-							</select>
-						</label>
-
-						<label className="space-y-2 text-body-md text-wise-ink dark:text-wise-canvas">
-							<span className="font-medium">Scholarship type</span>
-							<input
-								value={scholarshipType}
-								onChange={(event) => setScholarshipType(event.target.value)}
-								placeholder="e.g. ASEAN, MOE, PSC"
-								className="w-full rounded-wiseMd border border-wise-ink/20 bg-white px-4 py-3 text-body-md text-wise-ink outline-none transition focus:border-wise-green focus:ring-2 focus:ring-wise-green/20 dark:border-wise-mute dark:bg-wise-ink dark:text-white"
-							/>
-						</label>
+									{programOptionsForFaculty.map((opt) => (
+										<option key={opt} value={opt}>
+											{opt}
+										</option>
+									))}
+								</select>
+							</div>
+							<div>
+								<label className={labelClass}>Year of Study</label>
+								<select
+									value={yearOfStudy}
+									onChange={(e) => setYearOfStudy(e.target.value)}
+									className={inputClass}
+								>
+									<option value="">Select year</option>
+									<option value="1">1st year</option>
+									<option value="2">2nd year</option>
+									<option value="3">3rd year</option>
+									<option value="4">4th year</option>
+									<option value="5">5th year+</option>
+								</select>
+							</div>
+							<div>
+								<label className={labelClass}>Preferred Contact</label>
+								<select
+									value={preferredContact}
+									onChange={(e) => setPreferredContact(e.target.value)}
+									className={inputClass}
+								>
+									<option value="">Select contact method</option>
+									<option value="email">Email</option>
+									<option value="phone">Phone</option>
+									<option value="sms">SMS</option>
+								</select>
+							</div>
+							<div>
+								<label className={labelClass}>Scholarship Type</label>
+								<input
+									value={scholarshipType}
+									onChange={(e) => setScholarshipType(e.target.value)}
+									placeholder="e.g. ASEAN, MOE, PSC"
+									className={inputClass}
+								/>
+							</div>
+						</div>
 					</div>
 
-					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<p className="text-sm text-wise-body dark:text-wise-canvasSoft">
+					{/* Footer */}
+					<div className="flex items-center justify-between gap-4 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+						<p className="text-xs text-zinc-400 dark:text-zinc-500">
 							Student accounts can be managed by HR officers once created.
 						</p>
 						<button
 							type="submit"
 							disabled={submitting}
-							className="inline-flex items-center justify-center rounded-wisePill bg-wise-green px-6 py-3 text-body-md font-semibold text-wise-ink transition hover:bg-wise-active active:bg-wise-neutral disabled:cursor-not-allowed disabled:opacity-60"
+							className="flex-shrink-0 btn-gradient text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{submitting ? "Creating…" : "Create student account"}
 						</button>
 					</div>
-
-					{notification && (
-						<div
-							role="status"
-							aria-live="polite"
-							className={`fixed top-6 right-6 z-[999] w-[min(100%,24rem)] rounded-wiseMd border px-4 py-3 text-body-md shadow-xl shadow-black/10 transition-all duration-300 ${
-								notification.type === "success"
-									? "border-[#badbcc] bg-[#e6f8ec] text-[#0f5132]"
-									: "border-[#f5c2c7] bg-[#f8d7da] text-[#842029]"
-							} dark:border-[#264e38] dark:bg-[#122117] dark:text-[#c3f7cc]`}
-						>
-							{notification.text}
-						</div>
-					)}
 				</form>
 			</div>
+
+			{notification && (
+				<div
+					role="status"
+					aria-live="polite"
+					className={`fixed top-6 right-6 z-[999] w-[min(100%,24rem)] rounded-xl border px-4 py-3 text-sm shadow-xl shadow-black/10 ${
+						notification.type === "success"
+							? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
+							: "border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300"
+					}`}
+				>
+					{notification.text}
+				</div>
+			)}
 		</PageShell>
 	);
 }

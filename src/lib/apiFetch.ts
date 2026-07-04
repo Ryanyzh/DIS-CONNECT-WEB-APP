@@ -1,4 +1,4 @@
-import { getIdToken } from "./authRepository";
+import { getIdToken, signOut } from "./authRepository";
 
 // In dev: empty string — Vite proxy forwards /api/* to http://127.0.0.1:8000
 // In prod: Firebase Functions base URL — paths like /api/v1/... are appended to it
@@ -23,6 +23,7 @@ export async function apiFetch(input: RequestInfo, init?: RequestInit): Promise<
         const refreshedToken = await getIdToken(true);
         const retried = await withToken(url, init, refreshedToken);
         if (retried.status === 401) {
+            await signOut();
             window.location.href = "/login";
         }
         return retried;

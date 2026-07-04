@@ -9,6 +9,7 @@ import {
 	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
 import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import PageShell from "../PageShell";
 
 const EMPTY_FORM: ExchangePlacementFormData = {
 	type: "Exchange",
@@ -24,6 +25,15 @@ const EMPTY_FORM: ExchangePlacementFormData = {
 	supervisorName: "",
 	notes: "",
 };
+
+const inputClass =
+	"w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3.5 py-2.5 text-sm text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
+const selectClass =
+	"w-full appearance-none bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3.5 py-2.5 pr-9 text-sm text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
+const labelClass =
+	"block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wide";
+const sectionClass =
+	"text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4";
 
 export function ScholarExchangeFormPage() {
 	const { id } = useParams<{ id?: string }>();
@@ -59,7 +69,6 @@ export function ScholarExchangeFormPage() {
 				});
 			})
 			.catch(() => {
-				// Fallback to mock data when backend not ready
 				const mock = MOCK_PLACEMENTS.find((p) => p.id === id);
 				if (mock) {
 					setForm({
@@ -88,7 +97,7 @@ export function ScholarExchangeFormPage() {
 		(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
 			setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: { preventDefault(): void }) => {
 		e.preventDefault();
 		setError(null);
 		setSubmitting(true);
@@ -114,16 +123,11 @@ export function ScholarExchangeFormPage() {
 			if (!res.ok) throw new Error();
 			navigate("/scholars/exchange");
 		} catch {
-			// Navigate back anyway when backend is not ready
 			navigate("/scholars/exchange");
 		} finally {
 			setSubmitting(false);
 		}
 	};
-
-	const inputClass =
-		"w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
-	const labelClass = "block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1";
 
 	if (loading) {
 		return (
@@ -134,10 +138,17 @@ export function ScholarExchangeFormPage() {
 	}
 
 	return (
-		<div className="max-w-2xl mx-auto">
+		<PageShell
+			description={
+				isEditing
+					? "Update the placement details below and save your changes."
+					: "Record a new exchange or internship placement for a scholar."
+			}
+		>
+			{/* Back nav */}
 			<button
 				onClick={() => navigate("/scholars/exchange")}
-				className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 mb-6 transition-colors"
+				className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 transition-colors -mt-1"
 			>
 				<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -150,199 +161,223 @@ export function ScholarExchangeFormPage() {
 				Exchange & Internship Tracking
 			</button>
 
-			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-8 shadow-sm">
-				<h1 className="text-xl font-bold text-wise-ink dark:text-zinc-100 mb-6">
-					{isEditing ? "Edit Placement" : "Add Placement"}
-				</h1>
+			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
+				<div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+					<h2 className="text-sm font-semibold text-wise-ink dark:text-zinc-100">
+						{isEditing ? "Edit Placement" : "Placement Details"}
+					</h2>
+				</div>
 
-				<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-					{/* Type + Status */}
-					<div className="grid grid-cols-2 gap-4">
-						<div>
-							<label className={labelClass}>Type</label>
-							<select value={form.type} onChange={set("type")} className={inputClass}>
-								{(["Exchange", "Internship"] as PlacementType[]).map((t) => (
-									<option key={t} value={t}>
-										{t}
-									</option>
-								))}
-							</select>
-						</div>
-						<div>
-							<label className={labelClass}>Status</label>
-							<select
-								value={form.status}
-								onChange={set("status")}
-								className={inputClass}
-							>
-								{PLACEMENT_STATUSES.map((s: PlacementStatus) => (
-									<option key={s} value={s}>
-										{s}
-									</option>
-								))}
-							</select>
-						</div>
-					</div>
-
-					{/* Scholar */}
+				<form onSubmit={handleSubmit} className="p-6 space-y-8">
+					{/* Placement Info */}
 					<div>
-						<label className={labelClass}>Scholar</label>
-						<select
-							value={form.scholarId}
-							onChange={set("scholarId")}
-							required
-							className={inputClass}
-						>
-							<option value="">Select a scholar…</option>
-							{MOCK_SCHOLARS.map((s) => (
-								<option key={s.id} value={s.id}>
-									{s.name} — {s.studentId}
-								</option>
-							))}
-						</select>
-					</div>
-
-					{/* Host institution */}
-					<div>
-						<label className={labelClass}>
-							{form.type === "Exchange"
-								? "Host University"
-								: "Company / Organisation"}
-						</label>
-						<input
-							type="text"
-							value={form.hostInstitution}
-							onChange={set("hostInstitution")}
-							required
-							placeholder={
-								form.type === "Exchange"
-									? "e.g. ETH Zürich"
-									: "e.g. Google Singapore"
-							}
-							className={inputClass}
-						/>
-					</div>
-
-					{/* City + Country */}
-					<div className="grid grid-cols-2 gap-4">
-						<div>
-							<label className={labelClass}>City</label>
-							<input
-								type="text"
-								value={form.city}
-								onChange={set("city")}
-								required
-								placeholder="e.g. Zürich"
-								className={inputClass}
-							/>
-						</div>
-						<div>
-							<label className={labelClass}>Country</label>
-							<input
-								type="text"
-								value={form.country}
-								onChange={set("country")}
-								required
-								placeholder="e.g. Switzerland"
-								className={inputClass}
-							/>
-						</div>
-					</div>
-
-					{/* Dates */}
-					<div className="grid grid-cols-2 gap-4">
-						<div>
-							<label className={labelClass}>Start Date</label>
-							<input
-								type="date"
-								value={form.startDate}
-								onChange={set("startDate")}
-								required
-								className={inputClass}
-							/>
-						</div>
-						<div>
-							<label className={labelClass}>End Date</label>
-							<input
-								type="date"
-								value={form.endDate}
-								onChange={set("endDate")}
-								required
-								className={inputClass}
-							/>
-						</div>
-					</div>
-
-					{/* Type-specific fields */}
-					{form.type === "Exchange" ? (
-						<div>
-							<label className={labelClass}>Academic Credits</label>
-							<input
-								type="number"
-								min={0}
-								value={form.academicCredits}
-								onChange={set("academicCredits")}
-								placeholder="e.g. 20"
-								className={inputClass}
-							/>
-						</div>
-					) : (
-						<div className="grid grid-cols-2 gap-4">
+						<p className={sectionClass}>Placement Info</p>
+						<div className="grid gap-4 md:grid-cols-2">
 							<div>
-								<label className={labelClass}>Department</label>
+								<label className={labelClass}>Type</label>
+								<div className="relative">
+									<select value={form.type} onChange={set("type")} className={selectClass}>
+										{(["Exchange", "Internship"] as PlacementType[]).map((t) => (
+											<option key={t} value={t}>
+												{t}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
+							</div>
+							<div>
+								<label className={labelClass}>Status</label>
+								<div className="relative">
+									<select value={form.status} onChange={set("status")} className={selectClass}>
+										{PLACEMENT_STATUSES.map((s: PlacementStatus) => (
+											<option key={s} value={s}>
+												{s}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
+							</div>
+							<div className="md:col-span-2">
+								<label className={labelClass}>Scholar</label>
+								<div className="relative">
+									<select
+										value={form.scholarId}
+										onChange={set("scholarId")}
+										required
+										className={selectClass}
+									>
+										<option value="">Select a scholar…</option>
+										{MOCK_SCHOLARS.map((s) => (
+											<option key={s.id} value={s.id}>
+												{s.name} — {s.studentId}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Host Details */}
+					<div>
+						<p className={sectionClass}>Host Details</p>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div className="md:col-span-2">
+								<label className={labelClass}>
+									{form.type === "Exchange" ? "Host University" : "Company / Organisation"}
+								</label>
 								<input
 									type="text"
-									value={form.department}
-									onChange={set("department")}
-									placeholder="e.g. Cloud Infrastructure"
+									value={form.hostInstitution}
+									onChange={set("hostInstitution")}
+									required
+									placeholder={
+										form.type === "Exchange" ? "e.g. ETH Zürich" : "e.g. Google Singapore"
+									}
 									className={inputClass}
 								/>
 							</div>
 							<div>
-								<label className={labelClass}>Supervisor Name</label>
+								<label className={labelClass}>City</label>
 								<input
 									type="text"
-									value={form.supervisorName}
-									onChange={set("supervisorName")}
-									placeholder="e.g. Ms. Priya Menon"
+									value={form.city}
+									onChange={set("city")}
+									required
+									placeholder="e.g. Zürich"
 									className={inputClass}
 								/>
 							</div>
+							<div>
+								<label className={labelClass}>Country</label>
+								<input
+									type="text"
+									value={form.country}
+									onChange={set("country")}
+									required
+									placeholder="e.g. Switzerland"
+									className={inputClass}
+								/>
+							</div>
+						</div>
+					</div>
+
+					{/* Duration & Extras */}
+					<div>
+						<p className={sectionClass}>Duration & Details</p>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div>
+								<label className={labelClass}>Start Date</label>
+								<input
+									type="date"
+									value={form.startDate}
+									onChange={set("startDate")}
+									required
+									className={inputClass}
+								/>
+							</div>
+							<div>
+								<label className={labelClass}>End Date</label>
+								<input
+									type="date"
+									value={form.endDate}
+									onChange={set("endDate")}
+									required
+									className={inputClass}
+								/>
+							</div>
+
+							{form.type === "Exchange" ? (
+								<div>
+									<label className={labelClass}>Academic Credits</label>
+									<input
+										type="number"
+										min={0}
+										value={form.academicCredits}
+										onChange={set("academicCredits")}
+										placeholder="e.g. 20"
+										className={inputClass}
+									/>
+								</div>
+							) : (
+								<>
+									<div>
+										<label className={labelClass}>Department</label>
+										<input
+											type="text"
+											value={form.department}
+											onChange={set("department")}
+											placeholder="e.g. Cloud Infrastructure"
+											className={inputClass}
+										/>
+									</div>
+									<div>
+										<label className={labelClass}>Supervisor Name</label>
+										<input
+											type="text"
+											value={form.supervisorName}
+											onChange={set("supervisorName")}
+											placeholder="e.g. Ms. Priya Menon"
+											className={inputClass}
+										/>
+									</div>
+								</>
+							)}
+
+							<div className="md:col-span-2">
+								<label className={labelClass}>Notes (optional)</label>
+								<textarea
+									value={form.notes}
+									onChange={set("notes")}
+									rows={3}
+									placeholder="Any remarks or follow-up actions…"
+									className={`${inputClass} resize-none`}
+								/>
+							</div>
+						</div>
+					</div>
+
+					{error && (
+						<div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 text-xs bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-lg px-3 py-2.5">
+							<svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path
+									fillRule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+									clipRule="evenodd"
+								/>
+							</svg>
+							{error}
 						</div>
 					)}
 
-					{/* Notes */}
-					<div>
-						<label className={labelClass}>Notes (optional)</label>
-						<textarea
-							value={form.notes}
-							onChange={set("notes")}
-							rows={3}
-							placeholder="Any remarks or follow-up actions…"
-							className={`${inputClass} resize-none`}
-						/>
-					</div>
-
-					{error && <p className="text-rose-500 text-xs">{error}</p>}
-
-					<div className="flex gap-3 pt-1">
+					{/* Footer */}
+					<div className="flex gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
 						<button
 							type="submit"
 							disabled={submitting}
-							className="flex-1 bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 font-semibold rounded-lg py-2 text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+							className="flex-1 btn-gradient text-white font-semibold rounded-lg py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{submitting ? "Saving…" : isEditing ? "Save Changes" : "Add Placement"}
 						</button>
 						<button
 							type="button"
 							onClick={() => navigate("/scholars/exchange")}
-							className="px-4 py-2 text-sm text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-lg transition-colors"
+							className="px-4 py-2.5 text-sm font-medium text-zinc-500 hover:text-wise-ink dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-lg transition-colors"
 						>
 							Cancel
 						</button>
 					</div>
 				</form>
 			</div>
-		</div>
+		</PageShell>
 	);
 }

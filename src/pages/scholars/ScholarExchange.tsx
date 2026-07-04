@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageShell from "../PageShell";
 import { apiFetch } from "../../lib/apiFetch";
 import {
 	type ExchangePlacement,
@@ -29,10 +30,12 @@ function PlacementRow({
 	placement,
 	onEdit,
 	onDelete,
+	className,
 }: {
 	placement: ExchangePlacement;
 	onEdit: () => void;
 	onDelete: () => void;
+	className?: string;
 }) {
 	const statusCfg = placementStatusConfig[placement.status];
 	const typeCfg = placementTypeConfig[placement.type];
@@ -45,11 +48,11 @@ function PlacementRow({
 	})();
 
 	return (
-		<tr className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+		<tr className={`border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors${className ? ` ${className}` : ""}`}>
 			{/* Scholar */}
 			<td className="px-5 py-3.5">
 				<div className="flex items-center gap-3">
-					<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+					<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 						{getInitials(placement.scholarName)}
 					</div>
 					<div className="min-w-0">
@@ -233,32 +236,20 @@ export function ScholarExchangePage() {
 	};
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						Exchange & Internship Tracking
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						Track all scholar exchange placements and internship postings.
-					</p>
-				</div>
+		<PageShell
+			description="Track all scholar exchange placements and internship postings."
+			actions={
 				<button
 					onClick={() => navigate("/scholars/exchange/create")}
-					className="flex items-center gap-2 bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+					className="flex items-center gap-1.5 btn-gradient text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
 				>
-					<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M12 4v16m8-8H4"
-						/>
+					<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 					</svg>
 					Add Placement
 				</button>
-			</div>
+			}
+		>
 
 			{/* Stats */}
 			<div className="grid grid-cols-5 gap-4">
@@ -388,23 +379,18 @@ export function ScholarExchangePage() {
 						</thead>
 						<tbody>
 							{filtered.map((p) => (
-								<tr
+								<PlacementRow
 									key={p.id}
-									className={
-										deletingId === p.id ? "opacity-40 pointer-events-none" : ""
-									}
-								>
-									<PlacementRow
-										placement={p}
-										onEdit={() => navigate(`/scholars/exchange/${p.id}/edit`)}
-										onDelete={() => handleDelete(p)}
-									/>
-								</tr>
+									placement={p}
+									onEdit={() => navigate(`/scholars/exchange/${p.id}/edit`)}
+									onDelete={() => handleDelete(p)}
+									className={deletingId === p.id ? "opacity-40 pointer-events-none" : ""}
+								/>
 							))}
 						</tbody>
 					</table>
 				)}
 			</div>
-		</div>
+		</PageShell>
 	);
 }

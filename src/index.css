@@ -2,3 +2,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn-gradient {
+    background: linear-gradient(135deg, #9A32F8 0%, #6A2FF3 35%, #1D4BEB 70%, #247DF9 100%);
+    transition: filter 0.15s ease;
+  }
+  .btn-gradient:hover:not(:disabled) {
+    filter: brightness(1.12);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #9A32F8 0%, #6A2FF3 35%, #1D4BEB 70%, #247DF9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-gradient-hover {
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-gradient-hover:hover {
+    background: linear-gradient(135deg, #9A32F8 0%, #6A2FF3 35%, #1D4BEB 70%, #247DF9 100%);
+    border-color: transparent;
+    color: white;
+  }
+  .btn-gradient-hover:active {
+    filter: brightness(0.9);
+  }
+}

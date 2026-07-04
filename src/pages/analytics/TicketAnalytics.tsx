@@ -1,0 +1,998 @@
+import { useMemo } from "react";
+import PageShell from "../PageShell";
+import { useTickets } from "../../hooks/useTickets";
+import type { TicketProps, TicketStatus } from "../../components/TicketCard";
+
+// ── Mock fallback data ────────────────────────────────────────────────────────
+
+const daysAgo = (n: number) => {
+	const d = new Date();
+	d.setDate(d.getDate() - n);
+	return d.toISOString();
+};
+
+// const OFFICERS = [
+// 	{
+// 		id: "o1",
+// 		name: "Sarah Lim",
+// 		email: "sarah@hr.sg",
+// 		role: "hr",
+// 		initials: "SL",
+// 		department: "Scholar Relations",
+// 	},
+// 	{
+// 		id: "o2",
+// 		name: "James Tan",
+// 		email: "james@hr.sg",
+// 		role: "hr",
+// 		initials: "JT",
+// 		department: "Finance",
+// 	},
+// 	{
+// 		id: "o3",
+// 		name: "Priya Menon",
+// 		email: "priya@hr.sg",
+// 		role: "hr",
+// 		initials: "PM",
+// 		department: "Exchange & Internship",
+// 	},
+// ];
+
+// const MOCK_TICKETS: TicketProps[] = [
+// 	{
+// 		id: "1",
+// 		code: "TKT-001",
+// 		title: "ETH Zürich housing reimbursement claim",
+// 		category: "Reimbursement",
+// 		description: "",
+// 		priority: 5,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-5),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(28),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "2",
+// 		code: "TKT-002",
+// 		title: "Allowance disbursement delay – May",
+// 		category: "Finance",
+// 		description: "",
+// 		priority: 8,
+// 		status: "In Review",
+// 		deadline: daysAgo(-2),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(25),
+// 		isEscalated: false,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "3",
+// 		code: "TKT-003",
+// 		title: "Bond obligation terms clarification",
+// 		category: "Policy",
+// 		description: "",
+// 		priority: 3,
+// 		status: "Closed",
+// 		deadline: daysAgo(-14),
+// 		lastUpdated: daysAgo(5),
+// 		createdAt: daysAgo(30),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "4",
+// 		code: "TKT-004",
+// 		title: "Leave of absence documentation request",
+// 		category: "Leave",
+// 		description: "",
+// 		priority: 6,
+// 		status: "Waiting for Response",
+// 		deadline: daysAgo(3),
+// 		lastUpdated: daysAgo(2),
+// 		createdAt: daysAgo(20),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "5",
+// 		code: "TKT-005",
+// 		title: "Stipend suspension during leave period",
+// 		category: "Finance",
+// 		description: "",
+// 		priority: 9,
+// 		status: "Escalated",
+// 		deadline: daysAgo(-1),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(18),
+// 		isEscalated: true,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "6",
+// 		code: "TKT-006",
+// 		title: "Post-graduation bond service query",
+// 		category: "Policy",
+// 		description: "",
+// 		priority: 2,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-20),
+// 		lastUpdated: daysAgo(10),
+// 		createdAt: daysAgo(35),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "7",
+// 		code: "TKT-007",
+// 		title: "Google internship approval documentation",
+// 		category: "Internship",
+// 		description: "",
+// 		priority: 5,
+// 		status: "Open",
+// 		deadline: daysAgo(7),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(10),
+// 		isEscalated: false,
+// 		officer: undefined,
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "8",
+// 		code: "TKT-008",
+// 		title: "Amsterdam exchange credit transfer",
+// 		category: "Exchange",
+// 		description: "",
+// 		priority: 4,
+// 		status: "In Review",
+// 		deadline: daysAgo(10),
+// 		lastUpdated: daysAgo(2),
+// 		createdAt: daysAgo(14),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "9",
+// 		code: "TKT-009",
+// 		title: "Medical reimbursement abroad",
+// 		category: "Reimbursement",
+// 		description: "",
+// 		priority: 7,
+// 		status: "Waiting for Response",
+// 		deadline: daysAgo(4),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(12),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "10",
+// 		code: "TKT-010",
+// 		title: "Faculty exchange pre-approval",
+// 		category: "Exchange",
+// 		description: "",
+// 		priority: 3,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-7),
+// 		lastUpdated: daysAgo(8),
+// 		createdAt: daysAgo(22),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "11",
+// 		code: "TKT-011",
+// 		title: "Scholarship renewal inquiry",
+// 		category: "General Query",
+// 		description: "",
+// 		priority: 2,
+// 		status: "Closed",
+// 		deadline: daysAgo(-15),
+// 		lastUpdated: daysAgo(12),
+// 		createdAt: daysAgo(32),
+// 		isEscalated: false,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "12",
+// 		code: "TKT-012",
+// 		title: "NUS travel insurance claim",
+// 		category: "Reimbursement",
+// 		description: "",
+// 		priority: 6,
+// 		status: "Open",
+// 		deadline: daysAgo(5),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(6),
+// 		isEscalated: false,
+// 		officer: undefined,
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "13",
+// 		code: "TKT-013",
+// 		title: "Internship start date deferral request",
+// 		category: "Internship",
+// 		description: "",
+// 		priority: 8,
+// 		status: "Escalated",
+// 		deadline: daysAgo(1),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(8),
+// 		isEscalated: true,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "14",
+// 		code: "TKT-014",
+// 		title: "Dissertation leave approval",
+// 		category: "Leave",
+// 		description: "",
+// 		priority: 5,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-10),
+// 		lastUpdated: daysAgo(6),
+// 		createdAt: daysAgo(24),
+// 		isEscalated: false,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "15",
+// 		code: "TKT-015",
+// 		title: "Exchange GPA waiver policy",
+// 		category: "Policy",
+// 		description: "",
+// 		priority: 4,
+// 		status: "Open",
+// 		deadline: daysAgo(8),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(7),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "16",
+// 		code: "TKT-016",
+// 		title: "Monthly living allowance discrepancy",
+// 		category: "Finance",
+// 		description: "",
+// 		priority: 7,
+// 		status: "In Review",
+// 		deadline: daysAgo(2),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(5),
+// 		isEscalated: false,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "17",
+// 		code: "TKT-017",
+// 		title: "General enquiry on bond obligations",
+// 		category: "General Query",
+// 		description: "",
+// 		priority: 1,
+// 		status: "Closed",
+// 		deadline: daysAgo(-25),
+// 		lastUpdated: daysAgo(18),
+// 		createdAt: daysAgo(40),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "18",
+// 		code: "TKT-018",
+// 		title: "McKinsey internship documentation check",
+// 		category: "Internship",
+// 		description: "",
+// 		priority: 5,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-3),
+// 		lastUpdated: daysAgo(3),
+// 		createdAt: daysAgo(16),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "19",
+// 		code: "TKT-019",
+// 		title: "Compassionate leave for family emergency",
+// 		category: "Leave",
+// 		description: "",
+// 		priority: 9,
+// 		status: "Open",
+// 		deadline: daysAgo(1),
+// 		lastUpdated: daysAgo(0),
+// 		createdAt: daysAgo(3),
+// 		isEscalated: false,
+// 		officer: undefined,
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "20",
+// 		code: "TKT-020",
+// 		title: "Tuition fee payment schedule query",
+// 		category: "Finance",
+// 		description: "",
+// 		priority: 3,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-8),
+// 		lastUpdated: daysAgo(7),
+// 		createdAt: daysAgo(26),
+// 		isEscalated: false,
+// 		officer: OFFICERS[1],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "21",
+// 		code: "TKT-021",
+// 		title: "Flight reimbursement for exchange programme",
+// 		category: "Reimbursement",
+// 		description: "",
+// 		priority: 6,
+// 		status: "In Review",
+// 		deadline: daysAgo(6),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(9),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "22",
+// 		code: "TKT-022",
+// 		title: "Scholarship deferment policy clarification",
+// 		category: "Policy",
+// 		description: "",
+// 		priority: 2,
+// 		status: "Resolved",
+// 		deadline: daysAgo(-12),
+// 		lastUpdated: daysAgo(9),
+// 		createdAt: daysAgo(29),
+// 		isEscalated: false,
+// 		officer: OFFICERS[0],
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "23",
+// 		code: "TKT-023",
+// 		title: "General query: contact for bond waiver",
+// 		category: "General Query",
+// 		description: "",
+// 		priority: 1,
+// 		status: "Open",
+// 		deadline: daysAgo(14),
+// 		lastUpdated: daysAgo(2),
+// 		createdAt: daysAgo(4),
+// 		isEscalated: false,
+// 		officer: undefined,
+// 		attachments: [],
+// 	},
+// 	{
+// 		id: "24",
+// 		code: "TKT-024",
+// 		title: "Exchange host university visa support",
+// 		category: "Exchange",
+// 		description: "",
+// 		priority: 5,
+// 		status: "Waiting for Response",
+// 		deadline: daysAgo(3),
+// 		lastUpdated: daysAgo(1),
+// 		createdAt: daysAgo(11),
+// 		isEscalated: false,
+// 		officer: OFFICERS[2],
+// 		attachments: [],
+// 	},
+// ];
+
+// ── Colours ───────────────────────────────────────────────────────────────────
+
+const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
+	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
+	"In Review": {
+		label: "In Review",
+		bar: "bg-indigo-500",
+		text: "text-indigo-600 dark:text-indigo-400",
+	},
+	"Waiting for Response": {
+		label: "Waiting",
+		bar: "bg-amber-400",
+		text: "text-amber-600 dark:text-amber-400",
+	},
+	Resolved: {
+		label: "Resolved",
+		bar: "bg-emerald-500",
+		text: "text-emerald-600 dark:text-emerald-400",
+	},
+	Closed: { label: "Closed", bar: "bg-zinc-400", text: "text-zinc-500 dark:text-zinc-400" },
+	Escalated: { label: "Escalated", bar: "bg-rose-500", text: "text-rose-600 dark:text-rose-400" },
+};
+
+const CATEGORY_BAR: Record<string, string> = {
+	Reimbursement: "bg-blue-500",
+	Exchange: "bg-amber-500",
+	Policy: "bg-emerald-500",
+	Finance: "bg-rose-500",
+	"General Query": "bg-violet-500",
+	Leave: "bg-teal-500",
+	Internship: "bg-sky-500",
+};
+
+const CATEGORY_TEXT: Record<string, string> = {
+	Reimbursement: "text-blue-600 dark:text-blue-400",
+	Exchange: "text-amber-600 dark:text-amber-400",
+	Policy: "text-emerald-600 dark:text-emerald-400",
+	Finance: "text-rose-600 dark:text-rose-400",
+	"General Query": "text-violet-600 dark:text-violet-400",
+	Leave: "text-teal-600 dark:text-teal-400",
+	Internship: "text-sky-600 dark:text-sky-400",
+};
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function StatCard({
+	label,
+	value,
+	sub,
+	valueColor = "text-wise-ink dark:text-zinc-100",
+	icon,
+}: {
+	label: string;
+	value: number | string;
+	sub?: string;
+	valueColor?: string;
+	icon: React.ReactNode;
+}) {
+	return (
+		<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-5 py-4 shadow-sm flex items-start gap-4">
+			<div className="flex-shrink-0 mt-0.5 w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+				{icon}
+			</div>
+			<div className="min-w-0">
+				<p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide">
+					{label}
+				</p>
+				<p className={`mt-0.5 text-2xl font-bold leading-none ${valueColor}`}>{value}</p>
+				{sub && <p className="mt-1 text-xs text-zinc-400">{sub}</p>}
+			</div>
+		</div>
+	);
+}
+
+function SectionHeader({ children }: { children: React.ReactNode }) {
+	return (
+		<h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-4">
+			{children}
+		</h2>
+	);
+}
+
+function BarRow({
+	label,
+	count,
+	total,
+	barColor,
+	textColor,
+	badge,
+}: {
+	label: string;
+	count: number;
+	total: number;
+	barColor: string;
+	textColor: string;
+	badge?: React.ReactNode;
+}) {
+	const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+	return (
+		<div className="flex items-center gap-3">
+			<span className={`text-xs font-medium w-32 flex-shrink-0 truncate ${textColor}`}>
+				{label}
+			</span>
+			<div className="flex-1 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+				<div
+					className={`h-full rounded-full transition-all ${barColor}`}
+					style={{ width: `${pct}%` }}
+				/>
+			</div>
+			<div className="flex items-center gap-2 flex-shrink-0">
+				{badge}
+				<span className="text-xs text-zinc-500 dark:text-zinc-400 w-8 text-right">
+					{count}
+				</span>
+				<span className="text-xs text-zinc-300 dark:text-zinc-700 w-8 text-right">
+					{pct}%
+				</span>
+			</div>
+		</div>
+	);
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+
+export function TicketAnalyticsPage() {
+	const { tickets: liveTickets, loading } = useTickets();
+	const tickets: TicketProps[] = liveTickets.length > 0 ? liveTickets : MOCK_TICKETS;
+
+	const m = useMemo(() => {
+		const total = tickets.length;
+		const byStatus: Partial<Record<TicketStatus, number>> = {};
+		const byCategory: Record<string, number> = {};
+		const byOfficer: Record<string, { name: string; total: number; resolved: number }> = {};
+
+		let escalated = 0,
+			unassigned = 0,
+			resolved = 0,
+			active = 0;
+
+		// Last 14 days bucketed by date string
+		const today = new Date();
+		const dayBuckets: { label: string; date: string; count: number }[] = Array.from(
+			{ length: 14 },
+			(_, i) => {
+				const d = new Date(today);
+				d.setDate(d.getDate() - (13 - i));
+				return {
+					label: d.toLocaleDateString("en-SG", { day: "numeric", month: "short" }),
+					date: d.toISOString().substring(0, 10),
+					count: 0,
+				};
+			}
+		);
+
+		for (const t of tickets) {
+			byStatus[t.status] = (byStatus[t.status] ?? 0) + 1;
+			byCategory[t.category] = (byCategory[t.category] ?? 0) + 1;
+
+			if (t.isEscalated) escalated++;
+			if (!t.officer) unassigned++;
+			if (t.status === "Resolved" || t.status === "Closed") resolved++;
+			else active++;
+
+			if (t.officer) {
+				const key = t.officer.id;
+				if (!byOfficer[key])
+					byOfficer[key] = { name: t.officer.name, total: 0, resolved: 0 };
+				byOfficer[key].total++;
+				if (t.status === "Resolved" || t.status === "Closed") byOfficer[key].resolved++;
+			}
+
+			const ticketDay = t.createdAt.substring(0, 10);
+			const bucket = dayBuckets.find((b) => b.date === ticketDay);
+			if (bucket) bucket.count++;
+		}
+
+		const officers = Object.values(byOfficer).sort((a, b) => b.total - a.total);
+		const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+		const maxDayCount = Math.max(...dayBuckets.map((b) => b.count), 1);
+
+		// Priority grouping
+		const priorityGroups = { Low: 0, Medium: 0, High: 0 };
+		for (const t of tickets) {
+			if (t.priority >= 8) priorityGroups.High++;
+			else if (t.priority >= 4) priorityGroups.Medium++;
+			else priorityGroups.Low++;
+		}
+
+		return {
+			total,
+			active,
+			resolved,
+			escalated,
+			unassigned,
+			byStatus,
+			byCategory,
+			officers,
+			resolutionRate,
+			dayBuckets,
+			maxDayCount,
+			priorityGroups,
+		};
+	}, [tickets]);
+
+	const STATUSES: TicketStatus[] = [
+		"Open",
+		"In Review",
+		"Waiting for Response",
+		"Resolved",
+		"Closed",
+		"Escalated",
+	];
+
+	return (
+		<PageShell description="Explore ticket volume, resolution patterns, and team performance.">
+			{loading && liveTickets.length === 0 ? (
+				<div className="flex items-center justify-center py-24">
+					<span className="text-zinc-400 text-sm">Loading analytics…</span>
+				</div>
+			) : (
+				<div className="space-y-6">
+					{/* ── Stat cards ─────────────────────────────────────────── */}
+					<div className="grid grid-cols-5 gap-4">
+						<StatCard
+							label="Total Tickets"
+							value={m.total}
+							sub="all time"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Active"
+							value={m.active}
+							sub="unresolved"
+							valueColor="text-blue-600 dark:text-blue-400"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Resolved"
+							value={m.resolved}
+							sub={`${m.resolutionRate}% resolution rate`}
+							valueColor="text-emerald-600 dark:text-emerald-400"
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Escalated"
+							value={m.escalated}
+							sub="needs attention"
+							valueColor={
+								m.escalated > 0
+									? "text-rose-600 dark:text-rose-400"
+									: "text-wise-ink dark:text-zinc-100"
+							}
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									/>
+								</svg>
+							}
+						/>
+						<StatCard
+							label="Unassigned"
+							value={m.unassigned}
+							sub="no officer"
+							valueColor={
+								m.unassigned > 0
+									? "text-amber-600 dark:text-amber-400"
+									: "text-wise-ink dark:text-zinc-100"
+							}
+							icon={
+								<svg
+									className="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									/>
+								</svg>
+							}
+						/>
+					</div>
+					{/* ── Status overview stacked bar ──────────────────────── */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+						<SectionHeader>Status Overview</SectionHeader>
+
+						{/* Stacked bar */}
+						<div className="flex h-3 rounded-full overflow-hidden gap-px mb-4">
+							{STATUSES.map((s) => {
+								const count = m.byStatus[s] ?? 0;
+								const pct = m.total > 0 ? (count / m.total) * 100 : 0;
+								if (pct === 0) return null;
+								return (
+									<div
+										key={s}
+										title={`${s}: ${count}`}
+										className={`${STATUS_META[s].bar} transition-all`}
+										style={{ width: `${pct}%` }}
+									/>
+								);
+							})}
+						</div>
+
+						{/* Legend */}
+						<div className="grid grid-cols-3 gap-x-8 gap-y-3">
+							{STATUSES.map((s) => {
+								const count = m.byStatus[s] ?? 0;
+								const pct = m.total > 0 ? Math.round((count / m.total) * 100) : 0;
+								return (
+									<div
+										key={s}
+										className="flex items-center justify-between gap-2"
+									>
+										<div className="flex items-center gap-2 min-w-0">
+											<span
+												className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${STATUS_META[s].bar}`}
+											/>
+											<span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+												{STATUS_META[s].label}
+											</span>
+										</div>
+										<div className="flex items-center gap-1.5 flex-shrink-0">
+											<span
+												className={`text-xs font-semibold ${STATUS_META[s].text}`}
+											>
+												{count}
+											</span>
+											<span className="text-xs text-zinc-300 dark:text-zinc-700">
+												{pct}%
+											</span>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					</div>
+					{/* ── Category + Priority ──────────────────────────────── */}
+					<div className="grid grid-cols-5 gap-6">
+						{/* Category breakdown */}
+						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>By Category</SectionHeader>
+							<div className="space-y-3">
+								{Object.entries(m.byCategory)
+									.sort(([, a], [, b]) => b - a)
+									.map(([cat, count]) => (
+										<BarRow
+											key={cat}
+											label={cat}
+											count={count}
+											total={m.total}
+											barColor={CATEGORY_BAR[cat] ?? "bg-zinc-400"}
+											textColor={CATEGORY_TEXT[cat] ?? "text-zinc-500"}
+										/>
+									))}
+							</div>
+						</div>
+
+						{/* Priority distribution */}
+						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Priority Distribution</SectionHeader>
+							<div className="space-y-3 mb-6">
+								{(
+									[
+										{
+											key: "High",
+											color: "bg-rose-500",
+											text: "text-rose-600 dark:text-rose-400",
+										},
+										{
+											key: "Medium",
+											color: "bg-amber-400",
+											text: "text-amber-600 dark:text-amber-400",
+										},
+										{
+											key: "Low",
+											color: "bg-emerald-500",
+											text: "text-emerald-600 dark:text-emerald-400",
+										},
+									] as const
+								).map(({ key, color, text }) => (
+									<BarRow
+										key={key}
+										label={key}
+										count={m.priorityGroups[key]}
+										total={m.total}
+										barColor={color}
+										textColor={text}
+									/>
+								))}
+							</div>
+
+							{/* Resolution rate ring (CSS only) */}
+							<div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
+								<p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
+									Resolution Rate
+								</p>
+								<div className="flex items-center gap-4">
+									<div className="relative w-16 h-16 flex-shrink-0">
+										<svg
+											viewBox="0 0 36 36"
+											className="w-full h-full -rotate-90"
+										>
+											<circle
+												cx="18"
+												cy="18"
+												r="15.9"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="3"
+												className="text-zinc-100 dark:text-zinc-800"
+											/>
+											<circle
+												cx="18"
+												cy="18"
+												r="15.9"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="3"
+												strokeDasharray={`${m.resolutionRate} ${100 - m.resolutionRate}`}
+												strokeLinecap="round"
+												className="text-emerald-500"
+											/>
+										</svg>
+										<span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-wise-ink dark:text-zinc-100">
+											{m.resolutionRate}%
+										</span>
+									</div>
+									<div>
+										<p className="text-2xl font-bold text-wise-ink dark:text-zinc-100">
+											{m.resolved}
+										</p>
+										<p className="text-xs text-zinc-400 mt-0.5">
+											of {m.total} tickets resolved or closed
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					{/* ── Officer leaderboard + 14-day trend ──────────────── */}
+					<div className="grid grid-cols-5 gap-6">
+						{/* Officer leaderboard */}
+						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Officer Workload</SectionHeader>
+							{m.officers.length === 0 ? (
+								<p className="text-xs text-zinc-400 py-4 text-center">
+									No officers assigned yet.
+								</p>
+							) : (
+								<div className="space-y-4">
+									{m.officers.map((o, i) => {
+										const resolvedPct =
+											o.total > 0
+												? Math.round((o.resolved / o.total) * 100)
+												: 0;
+										return (
+											<div key={o.name}>
+												<div className="flex items-center gap-3 mb-1.5">
+													<span className="w-5 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 flex-shrink-0">
+														{i + 1}
+													</span>
+													<span className="text-sm font-medium text-wise-ink dark:text-zinc-100 flex-1 truncate">
+														{o.name}
+													</span>
+													<span className="text-xs text-zinc-400 flex-shrink-0">
+														{o.total} tickets
+													</span>
+												</div>
+												<div className="pl-8 flex items-center gap-2">
+													<div className="flex-1 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+														<div
+															className="h-full bg-emerald-500 rounded-full"
+															style={{ width: `${resolvedPct}%` }}
+														/>
+													</div>
+													<span className="text-[11px] text-zinc-400 w-12 text-right flex-shrink-0">
+														{resolvedPct}% resolved
+													</span>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							)}
+						</div>
+
+						{/* 14-day trend */}
+						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
+							<SectionHeader>Tickets Created — Last 14 Days</SectionHeader>
+							<div className="flex items-end gap-1.5 h-28">
+								{m.dayBuckets.map((day) => {
+									const heightPct =
+										day.count === 0
+											? 0
+											: Math.max(
+													8,
+													Math.round((day.count / m.maxDayCount) * 100)
+												);
+									return (
+										<div
+											key={day.date}
+											className="flex-1 flex flex-col items-center gap-1 group"
+											title={`${day.label}: ${day.count} ticket${day.count !== 1 ? "s" : ""}`}
+										>
+											<span className="text-[10px] text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+												{day.count}
+											</span>
+											<div className="w-full flex items-end justify-center flex-1">
+												<div
+													className="w-full rounded-t-sm bg-dc-primary/80 dark:bg-dc-primary/70 hover:bg-dc-primary transition-colors"
+													style={{
+														height:
+															day.count === 0
+																? "3px"
+																: `${heightPct}%`,
+													}}
+												/>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+							{/* X-axis labels — show every other day to avoid crowding */}
+							<div className="flex gap-1.5 mt-2">
+								{m.dayBuckets.map((day, i) => (
+									<div key={day.date} className="flex-1 text-center">
+										<span
+											className={`text-[9px] text-zinc-400 ${i % 2 !== 0 ? "opacity-0" : ""}`}
+										>
+											{day.label}
+										</span>
+									</div>
+								))}
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+		</PageShell>
+	);
+}

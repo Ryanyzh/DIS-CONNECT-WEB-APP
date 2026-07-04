@@ -3,52 +3,48 @@ import TicketCard, { type TicketProps } from "../../components/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 import { getCurrentUser } from "../../lib/authRepository";
 
-// each column of tickets will have a filter to get the relevant tickets
 const columns: {
 	title: string;
-	titleColor: string;
+	dot: string;
+	emptyMsg: string;
 	filterFunc: (ticket: TicketProps) => boolean;
-	bgColor: string;
 }[] = [
 	{
 		title: "Unassigned",
-		titleColor: "text-pink-400",
-		filterFunc: (ticket: TicketProps) =>
-			ticket.officer == undefined && ticket.status != "Closed",
-		bgColor: "bg-pink-400/1",
+		dot: "bg-red-500",
+		emptyMsg: "No unassigned tickets",
+		filterFunc: (t) => t.officer == undefined && t.status !== "Closed",
 	},
 	{
 		title: "In Review",
-		titleColor: "text-blue-400",
-		filterFunc: (ticket: TicketProps) => ticket.status == "In Review",
-		bgColor: "bg-blue-400/1",
+		dot: "bg-indigo-500",
+		emptyMsg: "No tickets in review",
+		filterFunc: (t) => t.status === "In Review",
 	},
 	{
 		title: "Waiting",
-		titleColor: "text-amber-400",
-		filterFunc: (ticket: TicketProps) => ticket.status == "Waiting for Response",
-		bgColor: "bg-amber-400/1",
+		dot: "bg-amber-400",
+		emptyMsg: "No tickets waiting",
+		filterFunc: (t) => t.status === "Waiting for Response",
 	},
 	{
 		title: "Resolved",
-		titleColor: "text-emerald-400",
-		filterFunc: (ticket: TicketProps) => ticket.status == "Resolved",
-		bgColor: "bg-emerald-400/1",
+		dot: "bg-emerald-500",
+		emptyMsg: "No resolved tickets",
+		filterFunc: (t) => t.status === "Resolved",
 	},
 	{
 		title: "Overdue",
-		titleColor: "text-rose-500",
-		filterFunc: (ticket: TicketProps) =>
-			new Date(ticket.deadline) < new Date() &&
-			ticket.status != "Resolved" &&
-			ticket.status != "Closed",
-		bgColor: "bg-rose-500/1",
+		dot: "bg-orange-500",
+		emptyMsg: "No overdue tickets",
+		filterFunc: (t) =>
+			new Date(t.deadline) < new Date() && t.status !== "Resolved" && t.status !== "Closed",
 	},
 	{
 		title: "Escalated",
-		titleColor: "text-rose-500",
-		filterFunc: (ticket: TicketProps) => ticket.isEscalated && ticket.status != "Resolved" && ticket.status != "Closed",
-		bgColor: "bg-rose-500/1",
+		dot: "bg-red-600",
+		emptyMsg: "No escalated tickets",
+		filterFunc: (t) => t.isEscalated && t.status !== "Resolved" && t.status !== "Closed",
 	},
 ];
 
@@ -57,30 +53,25 @@ export function OpenTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell title="Open Tickets" description="View and manage open tickets.">
-				<div className="bg-wise-canvas h-full w-full flex flex-col items-center justify-center">
-					<div className="flex flex-col items-center gap-3">
-						<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
-					</div>
+			<PageShell description="View and manage open tickets assigned to you, unassigned, or escalated.">
+				<div className="flex items-center justify-center h-48">
+					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
 			</PageShell>
 		);
 	}
 
 	return (
-		<PageShell
-			title="Open Tickets"
-			description="View and manage open tickets that are assigned to you, unassigned, or escalated."
-		>
-			<div className="bg-wise-canvas h-full max-h-[85vh] min-h-0 w-full flex flex-col">
-				<div className="grid grid-flow-col gap-2 justify-between h-full min-h-0 overflow-x-auto">
-					{columns.map(({ title, titleColor, filterFunc, bgColor }) => {
-						const filteredTickets: TicketProps[] = tickets
+		<PageShell description="View and manage open tickets assigned to you, unassigned, or escalated.">
+			<div className="h-[80vh] min-h-0 w-full">
+				<div className="flex gap-3 h-full min-h-0 overflow-x-auto pb-2">
+					{columns.map(({ title, dot, emptyMsg, filterFunc }) => {
+						const filtered = tickets
 							.filter(
-								(ticket) =>
-									ticket.officer?.id == getCurrentUser()?.uid ||
-									!ticket.officer ||
-									ticket.isEscalated
+								(t) =>
+									t.officer?.id === getCurrentUser()?.uid ||
+									!t.officer ||
+									t.isEscalated
 							)
 							.filter(filterFunc)
 							.toSorted((a, b) => b.priority - a.priority);
@@ -88,21 +79,41 @@ export function OpenTicketsPage() {
 						return (
 							<div
 								key={title}
-								className={`${bgColor} flex flex-1 flex-col border border-zinc-700/20 rounded-xl h-full min-h-0 w-full min-w-[15rem]`}
+								className="flex flex-col flex-shrink-0 w-[272px] rounded-xl border border-dc-border dark:border-zinc-800 bg-dc-elevated/40 dark:bg-white/[0.03] h-full min-h-0 overflow-hidden"
 							>
-								{/* Column Header */}
-								<div className={`${titleColor} p-3 font-semibold text-lg w-full`}>
-									{title} ({filteredTickets.length})
+								{/* Colored accent stripe */}
+								<div className={`h-0.5 flex-shrink-0 ${dot}`} />
+
+								{/* Column header */}
+								<div className="flex items-center justify-between px-3.5 py-2.5 border-b border-dc-border dark:border-zinc-800 flex-shrink-0">
+									<div className="flex items-center gap-2">
+										<div
+											className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`}
+										/>
+										<span className="text-sm font-semibold text-dc-text dark:text-white">
+											{title}
+										</span>
+									</div>
+									<span className="text-[11px] font-semibold bg-dc-border/60 dark:bg-zinc-800 text-dc-text-muted dark:text-zinc-400 px-2 py-0.5 rounded-full">
+										{filtered.length}
+									</span>
 								</div>
 
-								{/* Ticket cards */}
-								<div className="flex flex-1 flex-col gap-y-3 overflow-y-auto">
-									{filteredTickets.map((filteredTicket) => (
-										<TicketCard
-											key={filteredTicket.id}
-											ticket={filteredTicket}
-										/>
-									))}
+								{/* Cards — use view="card" for vertical kanban layout */}
+								<div className="flex flex-col gap-2 overflow-y-auto px-2.5 pt-2.5 pb-8 flex-1 min-h-0">
+									{filtered.length === 0 ? (
+										<div className="flex items-center justify-center h-16 mt-1 rounded-lg border border-dashed border-dc-border dark:border-zinc-700 text-xs text-dc-text-muted">
+											{emptyMsg}
+										</div>
+									) : (
+										filtered.map((ticket) => (
+											<TicketCard
+												key={ticket.id}
+												ticket={ticket}
+												view="card"
+											/>
+										))
+									)}
 								</div>
 							</div>
 						);

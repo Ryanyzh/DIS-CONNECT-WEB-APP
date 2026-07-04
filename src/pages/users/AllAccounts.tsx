@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../lib/apiFetch";
+import PageShell from "../PageShell";
 
 interface Student {
 	id: string;
@@ -123,58 +124,31 @@ export function AllAccountsPage() {
 	);
 
 	return (
-		<div className="space-y-6">
-			{/* Header */}
-			<div className="flex items-center justify-between border-b border-wise-ink/10 dark:border-zinc-700 pb-6">
-				<div>
-					<h1 className="mt-2 text-2xl font-semibold text-wise-ink dark:text-zinc-100">
-						All Accounts
-					</h1>
-					<p className="mt-1 text-sm text-wise-body dark:text-zinc-400">
-						Manage all student and HR officer accounts in the system.
-					</p>
-				</div>
-				<div className="flex items-center gap-2">
+		<PageShell
+			description="Manage all student and HR officer accounts in the system."
+			actions={
+				<>
 					<button
 						onClick={() => navigate("/users/create-student")}
-						className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-wise-ink dark:text-zinc-100 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+						className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-wise-ink dark:text-zinc-100 text-xs font-semibold px-3 py-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
 					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M12 4v16m8-8H4"
-							/>
+						<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 						</svg>
 						New Student
 					</button>
 					<button
 						onClick={() => navigate("/users/create-hr-officer")}
-						className="flex items-center gap-2 bg-wise-ink dark:bg-zinc-100 text-wise-canvas dark:text-zinc-900 text-sm font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+						className="flex items-center gap-2 btn-gradient text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
 					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M12 4v16m8-8H4"
-							/>
+						<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 						</svg>
 						New HR Officer
 					</button>
-				</div>
-			</div>
+				</>
+			}
+		>
 
 			{/* Stats */}
 			<div className="grid grid-cols-3 gap-4">
@@ -247,7 +221,7 @@ export function AllAccountsPage() {
 				{loading ? (
 					<div className="text-center py-16 text-zinc-400 text-sm">Loading accounts…</div>
 				) : error ? (
-					<div className="text-center py-16 text-red-500 text-sm">{error}</div>
+					<div className="text-center py-16 text-rose-500 dark:text-rose-400 text-sm">{error}</div>
 				) : activeTab === "students" ? (
 					<>
 						{filteredStudents.length === 0 ? (
@@ -286,7 +260,7 @@ export function AllAccountsPage() {
 										>
 											<td className="px-5 py-3.5">
 												<div className="flex items-center gap-3">
-													<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+													<div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 														{getInitials(student.fullName)}
 													</div>
 													<div className="min-w-0">
@@ -366,7 +340,7 @@ export function AllAccountsPage() {
 										>
 											<td className="px-5 py-3.5">
 												<div className="flex items-center gap-3">
-													<div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+													<div className="w-8 h-8 rounded-full bg-violet-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
 														{getInitials(officer.fullName)}
 													</div>
 													<div className="min-w-0">
@@ -406,6 +380,6 @@ export function AllAccountsPage() {
 					</>
 				)}
 			</div>
-		</div>
+		</PageShell>
 	);
 }

@@ -11,34 +11,51 @@ interface ActionsPanelProps {
 	onAction: (nextStatus: TicketStatus, metadata?: Record<string, any>) => Promise<void>;
 }
 
+interface ActionButtonProps {
+	onClick: () => void;
+	variant: "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral";
+	children: React.ReactNode;
+}
+
+const variantClasses: Record<ActionButtonProps["variant"], string> = {
+	primary:   "btn-gradient text-white",
+	secondary: "bg-dc-secondary hover:bg-dc-secondary-hover text-white",
+	success:   "bg-emerald-600 hover:bg-emerald-700 text-white",
+	warning:   "bg-amber-600 hover:bg-amber-700 text-white",
+	danger:    "bg-dc-error hover:bg-red-700 text-white",
+	info:      "bg-sky-600 hover:bg-sky-700 text-white",
+	neutral:   "bg-dc-text hover:bg-dc-text/80 dark:bg-dc-border-dark dark:hover:bg-dc-border-dark/80 text-white",
+};
+
+function ActionButton({ onClick, variant, children }: ActionButtonProps) {
+	return (
+		<button
+			onClick={onClick}
+			className={`w-full py-2 px-4 rounded-lg text-sm font-semibold transition-all ${variantClasses[variant]}`}
+		>
+			{children}
+		</button>
+	);
+}
+
 export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelProps) {
 	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
 
 	return (
-		<div className="w-full border-t rounded-lg rounded-t-none p-4 bg-wise-canvas flex flex-col gap-4 shadow-sm">
-			<span className="font-semibold">Actions</span>
+		<div className="w-full border-t border-dc-border dark:border-dc-border-dark p-4 flex flex-col gap-3">
+			<span className="text-sm font-semibold text-dc-text dark:text-white">Actions</span>
 
-			{currentStatus == "Open" && (
-				<div className="flex flex-col gap-4">
-					<button
-						onClick={() =>
-							onAction("In Review", {
-								action: "Assignment",
-								assigned_to: getCurrentUser()?.uid,
-							})
-						}
-						className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
+			{currentStatus === "Open" && (
+				<div className="flex flex-col gap-2.5">
+					<ActionButton
+						variant="neutral"
+						onClick={() => onAction("In Review", { action: "Assignment", assigned_to: getCurrentUser()?.uid })}
 					>
 						Claim Ticket
-					</button>
-
-					<button
-						onClick={() => setIsAssignModalOpen(true)}
-						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
-					>
+					</ActionButton>
+					<ActionButton variant="secondary" onClick={() => setIsAssignModalOpen(true)}>
 						Assign Ticket
-					</button>
-
+					</ActionButton>
 					<AssignOfficerModal
 						isOpen={isAssignModalOpen}
 						onClose={() => setIsAssignModalOpen(false)}
@@ -49,48 +66,27 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 				</div>
 			)}
 
-			{currentStatus == "In Review" && (
-				<div className="flex flex-col gap-4">
-					<button
-						onClick={() =>
-							onAction("Waiting for Response", { action: "Waiting for Response" })
-						}
-						className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-all"
-					>
+			{currentStatus === "In Review" && (
+				<div className="flex flex-col gap-2.5">
+					<ActionButton variant="primary" onClick={() => onAction("Waiting for Response", { action: "Waiting for Response" })}>
 						Request Info
-					</button>
-					<button
-						onClick={() => onAction("Resolved", { action: "Resolved" })}
-						className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-all"
-					>
+					</ActionButton>
+					<ActionButton variant="success" onClick={() => onAction("Resolved", { action: "Resolved" })}>
 						Resolve Ticket
-					</button>
-
+					</ActionButton>
 					{!ticket.isEscalated && (
-						<button
-							onClick={() => onAction("Escalated", { action: "Escalated" })}
-							className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
-						>
+						<ActionButton variant="danger" onClick={() => onAction("Escalated", { action: "Escalated" })}>
 							Escalate Ticket
-						</button>
+						</ActionButton>
 					)}
-
 					{ticket.isEscalated && (
-						<button
-							onClick={() => onAction("In Review", { action: "De-escalate" })}
-							className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-all"
-						>
+						<ActionButton variant="info" onClick={() => onAction("In Review", { action: "De-escalate" })}>
 							De-escalate
-						</button>
+						</ActionButton>
 					)}
-
-					<button
-						onClick={() => setIsAssignModalOpen(true)}
-						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
-					>
+					<ActionButton variant="secondary" onClick={() => setIsAssignModalOpen(true)}>
 						Reassign Ticket
-					</button>
-
+					</ActionButton>
 					<AssignOfficerModal
 						isOpen={isAssignModalOpen}
 						onClose={() => setIsAssignModalOpen(false)}
@@ -101,22 +97,14 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 				</div>
 			)}
 
-			{currentStatus == "Waiting for Response" && (
-				<div className="flex flex-col gap-4">
-					<button
-						onClick={() => onAction("In Review", { action: "In Review" })}
-						className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
-					>
+			{currentStatus === "Waiting for Response" && (
+				<div className="flex flex-col gap-2.5">
+					<ActionButton variant="warning" onClick={() => onAction("In Review", { action: "In Review" })}>
 						Resume Review
-					</button>
-
-					<button
-						onClick={() => setIsAssignModalOpen(true)}
-						className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all"
-					>
+					</ActionButton>
+					<ActionButton variant="secondary" onClick={() => setIsAssignModalOpen(true)}>
 						Reassign Ticket
-					</button>
-
+					</ActionButton>
 					<AssignOfficerModal
 						isOpen={isAssignModalOpen}
 						onClose={() => setIsAssignModalOpen(false)}
@@ -127,45 +115,31 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 				</div>
 			)}
 
-			{currentStatus == "Resolved" && (
-				<div className="flex flex-col gap-4">
-					<button
-						onClick={() => onAction("Closed", { action: "Closed" })}
-						className="w-full bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-700 transition-all"
-					>
+			{currentStatus === "Resolved" && (
+				<div className="flex flex-col gap-2.5">
+					<ActionButton variant="neutral" onClick={() => onAction("Closed", { action: "Closed" })}>
 						Close Ticket
-					</button>
-					<button
-						onClick={() => onAction("In Review", { action: "In Review" })}
-						className="w-full bg-amber-600 text-white py-2 px-4 rounded-lg hover:bg-amber-700 transition-all"
-					>
+					</ActionButton>
+					<ActionButton variant="warning" onClick={() => onAction("In Review", { action: "In Review" })}>
 						Resume Review
-					</button>
+					</ActionButton>
 				</div>
 			)}
 
-			{currentStatus == "Closed" && (
-				<p className="text-sm text-gray-400 italic text-center py-2 border border-dashed rounded-lg">
+			{currentStatus === "Closed" && (
+				<p className="text-xs text-dc-text-muted italic text-center py-3 border border-dashed border-dc-border dark:border-dc-border-dark rounded-lg">
 					This ticket has been closed. No actions available.
 				</p>
 			)}
 
-			{currentStatus == "Escalated" && (
-				<div className="flex flex-col gap-4">
-					<button
-						onClick={() => setIsAssignModalOpen(true)}
-						className="w-full bg-rose-600 text-white py-2 px-4 rounded-lg hover:bg-rose-700 transition-all"
-					>
+			{currentStatus === "Escalated" && (
+				<div className="flex flex-col gap-2.5">
+					<ActionButton variant="danger" onClick={() => setIsAssignModalOpen(true)}>
 						Reassign Ticket
-					</button>
-
-					<button
-						onClick={() => onAction("In Review", { action: "De-escalate" })}
-						className="w-full bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-700 transition-all"
-					>
+					</ActionButton>
+					<ActionButton variant="info" onClick={() => onAction("In Review", { action: "De-escalate" })}>
 						De-escalate
-					</button>
-
+					</ActionButton>
 					<AssignOfficerModal
 						isOpen={isAssignModalOpen}
 						onClose={() => setIsAssignModalOpen(false)}
