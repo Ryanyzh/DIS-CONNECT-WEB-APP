@@ -61,6 +61,22 @@ export function MyAccountPage() {
 	const [displayName, setDisplayName] = useState(user?.displayName ?? "");
 	const [savingProfile, setSavingProfile] = useState(false);
 
+	// ── Password form ─────────────────────────────────────────────────────────
+	const [currentPassword, setCurrentPassword] = useState("");
+	const [newPassword, setNewPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [showCurrent, setShowCurrent] = useState(false);
+	const [showNew, setShowNew] = useState(false);
+	const [savingPassword, setSavingPassword] = useState(false);
+
+	// ── Toast ─────────────────────────────────────────────────────────────────
+	const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+	const showToast = (type: "success" | "error", text: string) => {
+		setToast({ type, text });
+		window.setTimeout(() => setToast(null), 4000);
+	};
+
 	// ── Handlers ──────────────────────────────────────────────────────────────
 	const handleSaveProfile = async (e: { preventDefault(): void }) => {
 		e.preventDefault();
@@ -73,6 +89,40 @@ export function MyAccountPage() {
 			showToast("error", "Failed to update profile. Please try again.");
 		} finally {
 			setSavingProfile(false);
+		}
+	};
+
+	const handleChangePassword = async (e: { preventDefault(): void }) => {
+		e.preventDefault();
+		if (!auth.currentUser || !user?.email) return;
+
+		if (newPassword !== confirmPassword) {
+			showToast("error", "New passwords do not match.");
+			return;
+		}
+		if (newPassword.length < 8) {
+			showToast("error", "Password must be at least 8 characters.");
+			return;
+		}
+
+		setSavingPassword(true);
+		try {
+			const credential = EmailAuthProvider.credential(user.email, currentPassword);
+			await reauthenticateWithCredential(auth.currentUser, credential);
+			await updatePassword(auth.currentUser, newPassword);
+			setCurrentPassword("");
+			setNewPassword("");
+			setConfirmPassword("");
+			showToast("success", "Password changed successfully.");
+		} catch (err: unknown) {
+			const code = (err as { code?: string }).code;
+			if (code === "auth/wrong-password" || code === "auth/invalid-credential") {
+				showToast("error", "Current password is incorrect.");
+			} else {
+				showToast("error", "Failed to change password. Please try again.");
+			}
+		} finally {
+			setSavingPassword(false);
 		}
 	};
 
@@ -409,6 +459,21 @@ export function MyAccountPage() {
 					</div>
 				</div>
 			</div>
+
+			{/* Toast */}
+			{toast && (
+				<div
+					role="status"
+					aria-live="polite"
+					className={`fixed top-6 right-6 z-[999] w-[min(100%,24rem)] rounded-xl border px-4 py-3 text-sm shadow-xl shadow-black/10 ${
+						toast.type === "success"
+							? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
+							: "border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300"
+					}`}
+				>
+					{toast.text}
+				</div>
+			)}
 		</PageShell>
 	);
 }
