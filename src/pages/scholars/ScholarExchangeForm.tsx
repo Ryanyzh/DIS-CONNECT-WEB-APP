@@ -28,6 +28,8 @@ const EMPTY_FORM: ExchangePlacementFormData = {
 
 const inputClass =
 	"w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3.5 py-2.5 text-sm text-wise-ink dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
+const selectClass =
+	"w-full appearance-none bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3.5 py-2.5 pr-9 text-sm text-wise-ink dark:text-zinc-100 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors";
 const labelClass =
 	"block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wide";
 const sectionClass =
@@ -173,39 +175,54 @@ export function ScholarExchangeFormPage() {
 						<div className="grid gap-4 md:grid-cols-2">
 							<div>
 								<label className={labelClass}>Type</label>
-								<select value={form.type} onChange={set("type")} className={inputClass}>
-									{(["Exchange", "Internship"] as PlacementType[]).map((t) => (
-										<option key={t} value={t}>
-											{t}
-										</option>
-									))}
-								</select>
+								<div className="relative">
+									<select value={form.type} onChange={set("type")} className={selectClass}>
+										{(["Exchange", "Internship"] as PlacementType[]).map((t) => (
+											<option key={t} value={t}>
+												{t}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
 							</div>
 							<div>
 								<label className={labelClass}>Status</label>
-								<select value={form.status} onChange={set("status")} className={inputClass}>
-									{PLACEMENT_STATUSES.map((s: PlacementStatus) => (
-										<option key={s} value={s}>
-											{s}
-										</option>
-									))}
-								</select>
+								<div className="relative">
+									<select value={form.status} onChange={set("status")} className={selectClass}>
+										{PLACEMENT_STATUSES.map((s: PlacementStatus) => (
+											<option key={s} value={s}>
+												{s}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
 							</div>
 							<div className="md:col-span-2">
 								<label className={labelClass}>Scholar</label>
-								<select
-									value={form.scholarId}
-									onChange={set("scholarId")}
-									required
-									className={inputClass}
-								>
-									<option value="">Select a scholar…</option>
-									{MOCK_SCHOLARS.map((s) => (
-										<option key={s.id} value={s.id}>
-											{s.name} — {s.studentId}
-										</option>
-									))}
-								</select>
+								<div className="relative">
+									<select
+										value={form.scholarId}
+										onChange={set("scholarId")}
+										required
+										className={selectClass}
+									>
+										<option value="">Select a scholar…</option>
+										{MOCK_SCHOLARS.map((s) => (
+											<option key={s.id} value={s.id}>
+												{s.name} — {s.studentId}
+											</option>
+										))}
+									</select>
+									<svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									</svg>
+								</div>
 							</div>
 						</div>
 					</div>

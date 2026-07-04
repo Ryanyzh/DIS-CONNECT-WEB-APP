@@ -11,4 +11,11 @@
   .btn-gradient:hover:not(:disabled) {
     filter: brightness(1.12);
   }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #9A32F8 0%, #6A2FF3 35%, #1D4BEB 70%, #247DF9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }

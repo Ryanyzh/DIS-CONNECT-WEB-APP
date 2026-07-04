@@ -278,32 +278,42 @@ export function AllTicketsPage() {
 
 					<div className="h-4 w-px bg-dc-border dark:bg-zinc-700 flex-shrink-0" />
 
-					<select
-						value={statusFilter}
-						onChange={(e) => setStatusFilter(e.target.value)}
-						className="text-xs font-medium border border-dc-border dark:border-zinc-800 rounded-lg px-3 py-1.5 bg-dc-elevated dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
-					>
-						<option value="All">Status: All</option>
-						<option value="Open">Status: Open</option>
-						<option value="In Review">Status: In Review</option>
-						<option value="Waiting for Response">Status: Waiting for Response</option>
-						<option value="Resolved">Status: Resolved</option>
-						<option value="Closed">Status: Closed</option>
-						<option value="Escalated">Status: Escalated</option>
-					</select>
+					<div className="relative">
+						<select
+							value={statusFilter}
+							onChange={(e) => setStatusFilter(e.target.value)}
+							className="appearance-none text-xs font-medium border border-dc-border dark:border-zinc-700 rounded-lg pl-3 pr-8 py-1.5 bg-white dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
+						>
+							<option value="All">Status: All</option>
+							<option value="Open">Status: Open</option>
+							<option value="In Review">Status: In Review</option>
+							<option value="Waiting for Response">Status: Waiting for Response</option>
+							<option value="Resolved">Status: Resolved</option>
+							<option value="Closed">Status: Closed</option>
+							<option value="Escalated">Status: Escalated</option>
+						</select>
+						<svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+						</svg>
+					</div>
 
-					<select
-						value={categoryFilter}
-						onChange={(e) => setCategoryFilter(e.target.value)}
-						className="text-xs font-medium border border-dc-border dark:border-zinc-800 rounded-lg px-3 py-1.5 bg-dc-elevated dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
-					>
-						<option value="All">Category: All</option>
-						{categories.map((cat) => (
-							<option key={cat.category_id} value={cat.category_name}>
-								Category: {cat.category_name}
-							</option>
-						))}
-					</select>
+					<div className="relative">
+						<select
+							value={categoryFilter}
+							onChange={(e) => setCategoryFilter(e.target.value)}
+							className="appearance-none text-xs font-medium border border-dc-border dark:border-zinc-700 rounded-lg pl-3 pr-8 py-1.5 bg-white dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
+						>
+							<option value="All">Category: All</option>
+							{categories.map((cat) => (
+								<option key={cat.category_id} value={cat.category_name}>
+									Category: {cat.category_name}
+								</option>
+							))}
+						</select>
+						<svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+						</svg>
+					</div>
 
 					{/* Right side: count + view toggles */}
 					<div className="ml-auto flex items-center gap-3">
