@@ -64,7 +64,7 @@ export default function Sidebar() {
 	return (
 		<aside className="hidden w-full max-w-[280px] shrink-0 border-r border-wise-ink/10 dark:border-wise-canvasSoft/20 lg:flex lg:flex-col overflow-y-auto">
 			{/* Logo */}
-			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-4 py-2 flex items-center">
+			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-5 py-3.5 flex items-center">
 				<div className="flex items-center justify-center flex-shrink-0">
 					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-10 w-auto" />
 				</div>
