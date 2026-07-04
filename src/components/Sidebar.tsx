@@ -65,12 +65,12 @@ export default function Sidebar() {
 		<aside className="hidden w-full max-w-[280px] shrink-0 border-r border-wise-ink/10 dark:border-wise-canvasSoft/20 lg:flex lg:flex-col overflow-y-auto">
 			{/* Logo */}
 			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-4 py-2 flex items-center">
-				<div className="flex h-14 w-14 items-center justify-center flex-shrink-0">
-					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-14 w-14" />
+				<div className="flex items-center justify-center flex-shrink-0">
+					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-10 w-auto" />
 				</div>
 				<span
 					style={{ fontFamily: "'Poppins', sans-serif" }}
-					className="ml-1 text-2xl font-semibold tracking-tight text-wise-ink dark:text-wise-canvas"
+					className="ml-2 text-2xl font-semibold tracking-tight text-wise-ink dark:text-wise-canvas"
 				>
 					dis-connect
 				</span>
