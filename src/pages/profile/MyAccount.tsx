@@ -102,6 +102,30 @@ export function MyAccountPage() {
 							HR Officer
 						</span>
 					</div>
+					{/* Account metadata */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5 space-y-0">
+						<p className={sectionClass}>Account Info</p>
+						{[
+							{
+								label: "User ID",
+								value: user?.uid ? `${user.uid.slice(0, 8)}…` : "—",
+							},
+							{ label: "Joined", value: formatTs(user?.metadata.creationTime) },
+							{ label: "Last login", value: formatTs(user?.metadata.lastSignInTime) },
+						].map(({ label, value }) => (
+							<div
+								key={label}
+								className="flex items-start justify-between gap-3 py-2.5 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
+							>
+								<span className="text-xs text-zinc-400 dark:text-zinc-500 flex-shrink-0">
+									{label}
+								</span>
+								<span className="text-xs font-medium text-wise-ink dark:text-zinc-300 text-right truncate max-w-[140px]">
+									{value}
+								</span>
+							</div>
+						))}
+					</div>
 				</div>
 
 				{/* ── Right: Settings forms ──────────────────────────────── */}
@@ -154,6 +178,34 @@ export function MyAccountPage() {
 								</button>
 							</div>
 						</form>
+					</div>
+
+					{/* Danger zone */}
+					<div className="bg-white dark:bg-zinc-900 border border-rose-200 dark:border-rose-900/50 rounded-xl shadow-sm">
+						<div className="px-6 py-4 border-b border-rose-100 dark:border-rose-900/40">
+							<h2 className="text-sm font-semibold text-rose-600 dark:text-rose-400">
+								Danger Zone
+							</h2>
+							<p className="text-xs text-zinc-400 mt-0.5">
+								Irreversible actions — proceed with caution.
+							</p>
+						</div>
+						<div className="p-6 flex items-center justify-between gap-4">
+							<div>
+								<p className="text-sm font-medium text-wise-ink dark:text-zinc-100">
+									Delete account
+								</p>
+								<p className="text-xs text-zinc-400 mt-0.5">
+									Permanently remove your account and all associated data.
+								</p>
+							</div>
+							<button
+								type="button"
+								className="flex-shrink-0 text-sm font-semibold text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-800 rounded-lg px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+							>
+								Delete account
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
