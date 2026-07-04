@@ -171,7 +171,7 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 									</div>
 								</div>
 								<div className="space-y-1 p-2">
-									<button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
+									<button onClick={() => { navigate("/profile/account"); setShowUserMenu(false); }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-900 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800">
 										<svg
 											className="h-4 w-4"
 											fill="none"

@@ -65,7 +65,5 @@ export { CreateHrOfficerAccountPage } from "./users/CreateHrOfficerAccount";
 export { RolesAndPermissionsPage } from "./users/RolesAndPermissions";
 
 // Profile
-export const MyAccountPage = createPage(
-	"Update your profile, contact information, and preferences."
-);
+export { MyAccountPage } from "./profile/MyAccount";
 export const SecurityPage = createPage("Manage your password and account security settings.");
