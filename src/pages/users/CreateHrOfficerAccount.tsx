@@ -214,7 +214,7 @@ export function CreateHrOfficerAccountPage() {
 						<button
 							type="submit"
 							disabled={submitting}
-							className="flex-shrink-0 bg-dc-primary hover:bg-dc-primary-hover text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							className="flex-shrink-0 btn-gradient text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{submitting ? "Creating…" : "Create HR officer account"}
 						</button>

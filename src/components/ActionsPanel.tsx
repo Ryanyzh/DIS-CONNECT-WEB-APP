@@ -18,7 +18,7 @@ interface ActionButtonProps {
 }
 
 const variantClasses: Record<ActionButtonProps["variant"], string> = {
-	primary:   "bg-dc-primary hover:bg-dc-primary-hover text-white",
+	primary:   "btn-gradient text-white",
 	secondary: "bg-dc-secondary hover:bg-dc-secondary-hover text-white",
 	success:   "bg-emerald-600 hover:bg-emerald-700 text-white",
 	warning:   "bg-amber-600 hover:bg-amber-700 text-white",

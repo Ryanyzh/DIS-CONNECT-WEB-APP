@@ -347,7 +347,7 @@ export function ScholarExchangeFormPage() {
 						<button
 							type="submit"
 							disabled={submitting}
-							className="flex-1 bg-dc-primary hover:bg-dc-primary-hover text-white font-semibold rounded-lg py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							className="flex-1 btn-gradient text-white font-semibold rounded-lg py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{submitting ? "Saving…" : isEditing ? "Save Changes" : "Add Placement"}
 						</button>

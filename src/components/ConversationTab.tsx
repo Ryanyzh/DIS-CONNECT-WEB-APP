@@ -111,7 +111,7 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 				<button
 					type="submit"
 					disabled={!newMessage.trim() || sending}
-					className="bg-dc-primary hover:bg-dc-primary-hover disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
+					className="btn-gradient disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
 				>
 					{sending ? "Sending…" : "Send"}
 				</button>

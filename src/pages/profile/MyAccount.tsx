@@ -222,7 +222,7 @@ export function MyAccountPage() {
 								<button
 									type="submit"
 									disabled={savingProfile || !displayName.trim()}
-									className="bg-dc-primary hover:bg-dc-primary-hover text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									className="btn-gradient text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									{savingProfile ? "Saving…" : "Save changes"}
 								</button>
@@ -422,7 +422,7 @@ export function MyAccountPage() {
 										!confirmPassword ||
 										newPassword !== confirmPassword
 									}
-									className="bg-dc-primary hover:bg-dc-primary-hover text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									className="btn-gradient text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									{savingPassword ? "Updating…" : "Update password"}
 								</button>
