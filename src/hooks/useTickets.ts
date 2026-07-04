@@ -1,6 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
-import { type TicketProps } from "../components/TicketCard";
+import { type TicketProps, type TicketStatus } from "../components/TicketCard";
 import { apiFetch } from "../lib/apiFetch";
+
+const STATUS_ALIASES: Record<string, TicketStatus> = {
+	"Waiting for Response": "Waiting",
+};
+
+function normalizeStatus(raw: string): TicketStatus {
+	return (STATUS_ALIASES[raw] ?? raw) as TicketStatus;
+}
 
 export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 	const [tickets, setTickets] = useState<TicketProps[]>([]);
@@ -24,7 +32,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					category: ticket.category.category_name,
 					description: ticket.description,
 					priority: ticket.priority.level,
-					status: ticket.status.status_name,
+					status: normalizeStatus(ticket.status.status_name),
 					deadline: ticket.due_at,
 					lastUpdated: ticket.updated_at,
 					createdAt: ticket.created_at,

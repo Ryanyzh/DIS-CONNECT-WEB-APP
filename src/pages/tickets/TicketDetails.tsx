@@ -21,6 +21,13 @@ import { ConversationTab } from "../../components/ConversationTab";
 import { formatDate } from "../../types/Scholar";
 import { apiFetch } from "../../lib/apiFetch";
 
+const STATUS_ALIASES: Record<string, TicketStatus> = {
+	"Waiting for Response": "Waiting",
+};
+function normalizeStatus(raw: string): TicketStatus {
+	return (STATUS_ALIASES[raw] ?? raw) as TicketStatus;
+}
+
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
 const handleAttachmentPreview = async (filePath: string) => {
@@ -62,7 +69,7 @@ export function TicketDetailsPage() {
 				category: data.category?.category_name ?? "General Query",
 				description: data.description,
 				priority: data.priority?.level ?? 1,
-				status: data.status?.status_name ?? "Open",
+				status: normalizeStatus(data.status?.status_name ?? "Open"),
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,

@@ -38,7 +38,7 @@ const columns: {
 		dot: "bg-orange-500",
 		emptyMsg: "No overdue tickets",
 		filterFunc: (t) =>
-			new Date(t.deadline) < new Date() && t.status !== "Resolved" && t.status !== "Closed",
+			!!t.deadline && new Date(t.deadline) < new Date() && t.status !== "Resolved" && t.status !== "Closed",
 	},
 	{
 		title: "Escalated",

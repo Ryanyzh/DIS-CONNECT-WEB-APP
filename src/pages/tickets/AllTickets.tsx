@@ -23,6 +23,7 @@ function TableRow({ ticket, striped }: { ticket: TicketProps; striped: boolean }
 	const navigate = useNavigate();
 
 	const isOverdue =
+		!!ticket.deadline &&
 		new Date(ticket.deadline) < new Date() &&
 		ticket.status !== "Resolved" &&
 		ticket.status !== "Closed";
@@ -175,11 +176,26 @@ export function AllTicketsPage() {
 	const [perPage, setPerPage] = useState(10);
 
 	const stats = [
-		{ status: "Open" as TicketStatus,      count: tickets.filter((t) => t.status === "Open").length },
-		{ status: "In Review" as TicketStatus,  count: tickets.filter((t) => t.status === "In Review").length },
-		{ status: "Waiting" as TicketStatus,    count: tickets.filter((t) => t.status === "Waiting").length },
-		{ status: "Resolved" as TicketStatus,   count: tickets.filter((t) => t.status === "Resolved").length },
-		{ status: "Closed" as TicketStatus,     count: tickets.filter((t) => t.status === "Closed").length },
+		{
+			status: "Open" as TicketStatus,
+			count: tickets.filter((t) => t.status === "Open").length,
+		},
+		{
+			status: "In Review" as TicketStatus,
+			count: tickets.filter((t) => t.status === "In Review").length,
+		},
+		{
+			status: "Waiting" as TicketStatus,
+			count: tickets.filter((t) => t.status === "Waiting").length,
+		},
+		{
+			status: "Resolved" as TicketStatus,
+			count: tickets.filter((t) => t.status === "Resolved").length,
+		},
+		{
+			status: "Closed" as TicketStatus,
+			count: tickets.filter((t) => t.status === "Closed").length,
+		},
 	];
 
 	const filteredTickets = tickets
@@ -193,7 +209,9 @@ export function AllTicketsPage() {
 		.toSorted((a, b) => b.priority - a.priority);
 
 	// Reset to page 1 whenever filters, view, or per-page count changes
-	useEffect(() => { setCurrentPage(1); }, [statusFilter, categoryFilter, viewMode, perPage]);
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [statusFilter, categoryFilter, viewMode, perPage]);
 
 	const totalPages = Math.max(1, Math.ceil(filteredTickets.length / perPage));
 	const pageStart = (currentPage - 1) * perPage;
@@ -276,8 +294,18 @@ export function AllTicketsPage() {
 							<option value="Closed">Status: Closed</option>
 							<option value="Escalated">Status: Escalated</option>
 						</select>
-						<svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+						<svg
+							className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 
@@ -294,8 +322,18 @@ export function AllTicketsPage() {
 								</option>
 							))}
 						</select>
-						<svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+						<svg
+							className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 
@@ -377,17 +415,33 @@ export function AllTicketsPage() {
 									<thead>
 										<tr className="bg-dc-elevated dark:bg-zinc-800 border-b border-dc-border dark:border-zinc-800">
 											<th className="p-0 w-1" />
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Ticket</th>
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Category</th>
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Assignee</th>
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Due Date</th>
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Priority</th>
-											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">Status</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Ticket
+											</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Category
+											</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Assignee
+											</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Due Date
+											</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Priority
+											</th>
+											<th className="text-left px-4 py-2.5 text-[10px] font-semibold text-dc-text-muted uppercase tracking-widest whitespace-nowrap">
+												Status
+											</th>
 										</tr>
 									</thead>
 									<tbody className="divide-y divide-dc-border dark:divide-zinc-800 bg-dc-surface dark:bg-zinc-900">
 										{paginatedTickets.map((ticket, i) => (
-											<TableRow key={ticket.id} ticket={ticket} striped={i % 2 !== 0} />
+											<TableRow
+												key={ticket.id}
+												ticket={ticket}
+												striped={i % 2 !== 0}
+											/>
 										))}
 									</tbody>
 								</table>
@@ -401,7 +455,8 @@ export function AllTicketsPage() {
 								<span className="text-xs text-dc-text-muted">
 									Showing{" "}
 									<span className="font-semibold text-dc-text dark:text-white">
-										{pageStart + 1}–{Math.min(pageStart + perPage, filteredTickets.length)}
+										{pageStart + 1}–
+										{Math.min(pageStart + perPage, filteredTickets.length)}
 									</span>{" "}
 									of{" "}
 									<span className="font-semibold text-dc-text dark:text-white">
@@ -420,7 +475,9 @@ export function AllTicketsPage() {
 											className="text-xs font-medium border border-dc-border dark:border-zinc-700 rounded-lg px-2 py-1 bg-dc-elevated dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 transition-colors"
 										>
 											{[10, 15, 20, 25, 50].map((n) => (
-												<option key={n} value={n}>{n}</option>
+												<option key={n} value={n}>
+													{n}
+												</option>
 											))}
 										</select>
 										<span>per page</span>
@@ -431,24 +488,48 @@ export function AllTicketsPage() {
 									{/* Page navigation */}
 									<div className="flex items-center gap-1">
 										<button
-											onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+											onClick={() =>
+												setCurrentPage((p) => Math.max(1, p - 1))
+											}
 											disabled={currentPage === 1}
 											className="w-7 h-7 flex items-center justify-center rounded-lg border border-dc-border dark:border-zinc-700 text-dc-text-muted hover:bg-dc-elevated dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 										>
-											<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+											<svg
+												className="w-3.5 h-3.5"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth={2.5}
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M15 19l-7-7 7-7"
+												/>
 											</svg>
 										</button>
 										<span className="text-xs text-dc-text dark:text-white font-medium px-2">
 											{currentPage} / {totalPages}
 										</span>
 										<button
-											onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+											onClick={() =>
+												setCurrentPage((p) => Math.min(totalPages, p + 1))
+											}
 											disabled={currentPage === totalPages}
 											className="w-7 h-7 flex items-center justify-center rounded-lg border border-dc-border dark:border-zinc-700 text-dc-text-muted hover:bg-dc-elevated dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 										>
-											<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+											<svg
+												className="w-3.5 h-3.5"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth={2.5}
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M9 5l7 7-7 7"
+												/>
 											</svg>
 										</button>
 									</div>
