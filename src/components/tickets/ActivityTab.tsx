@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "../lib/apiFetch";
+import { apiFetch } from "../../lib/apiFetch";
 
 interface HistoryLog {
 	action_id: string;

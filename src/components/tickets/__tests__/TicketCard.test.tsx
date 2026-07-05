@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import TicketCard, { type TicketProps, type TicketStatus } from "../TicketCard";
 
 import "@testing-library/jest-dom/vitest";
-import { formatDate } from "../../types/Scholar";
+import { formatDate } from "../../../types/Scholar";
 
 declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}

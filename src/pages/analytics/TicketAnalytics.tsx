@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
-import type { TicketProps, TicketStatus } from "../../components/TicketCard";
+import type { TicketProps, TicketStatus } from "../../components/tickets/TicketCard";
 
 // ── Mock fallback data ────────────────────────────────────────────────────────
 

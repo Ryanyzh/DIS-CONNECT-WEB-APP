@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { apiFetch } from "../lib/apiFetch";
-import { type HrOfficer } from "../types/HrOfficer";
-import type { TicketProps, TicketStatus } from "./TicketCard";
+import { apiFetch } from "../../lib/apiFetch";
+import { type HrOfficer } from "../../types/HrOfficer";
+import type { TicketProps, TicketStatus } from "../TicketCard";
 
 interface AssignModalProps {
 	isOpen: boolean;

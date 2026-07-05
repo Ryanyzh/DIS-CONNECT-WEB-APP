@@ -10,7 +10,7 @@ import TicketCard, {
 	priorityLabels,
 	priorityStyles,
 	LIST_GRID_COLS,
-} from "../../components/TicketCard";
+} from "../../components/tickets/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 import { useCategories } from "../../hooks/useCategories";
 import { formatDate } from "../../types/Scholar";

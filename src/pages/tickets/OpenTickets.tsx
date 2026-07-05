@@ -1,5 +1,5 @@
 import PageShell from "../PageShell";
-import TicketCard, { type TicketProps } from "../../components/TicketCard";
+import TicketCard, { type TicketProps } from "../../components/tickets/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 import { getCurrentUser } from "../../lib/authRepository";
 

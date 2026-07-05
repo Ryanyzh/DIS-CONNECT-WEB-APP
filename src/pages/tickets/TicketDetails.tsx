@@ -7,17 +7,17 @@ import {
 	priorityStyles,
 	priorityLabels,
 	type TicketStatus,
-} from "../../components/TicketCard";
+} from "../../components/tickets/TicketCard";
 import type { TicketAttachment } from "../../types/TicketAttachment";
 import { useState, useEffect, useCallback } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "../../lib/firebase";
-import { ActionsPanel } from "../../components/ActionsPanel";
-import { TicketInfoPanel } from "../../components/TicketInfoPanel";
+import { ActionsPanel } from "../../components/tickets/ActionsPanel";
+import { TicketInfoPanel } from "../../components/tickets/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
 import { useStatuses } from "../../hooks/useStatuses";
-import { ActivityTab } from "../../components/ActivityTab";
-import { ConversationTab } from "../../components/ConversationTab";
+import { ActivityTab } from "../../components/tickets/ActivityTab";
+import { ConversationTab } from "../../components/tickets/ConversationTab";
 import { formatDate } from "../../types/Scholar";
 import { apiFetch } from "../../lib/apiFetch";
 

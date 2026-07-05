@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import type { TicketAttachment } from "../types/TicketAttachment";
-import { apiFetch } from "../lib/apiFetch";
+import type { TicketAttachment } from "../../types/TicketAttachment";
+import { apiFetch } from "../../lib/apiFetch";
 import { getDatabase, ref as rtdbRef, onValue } from "firebase/database";
-import { app } from "../lib/firebase";
+import { app } from "../../lib/firebase";
 
 interface Message {
 	message_id: string;

@@ -1,7 +1,7 @@
-import type { HrOfficer } from "../types/HrOfficer";
+import type { HrOfficer } from "../../types/HrOfficer";
 import { useNavigate } from "react-router-dom";
-import type { TicketAttachment } from "../types/TicketAttachment";
-import { formatDate, type Scholar } from "../types/Scholar";
+import type { TicketAttachment } from "../../types/TicketAttachment";
+import { formatDate, type Scholar } from "../../types/Scholar";
 
 export type TicketStatus =
 	| "Open"

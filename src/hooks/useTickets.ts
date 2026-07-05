@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { type TicketProps, type TicketStatus } from "../components/TicketCard";
+import { type TicketProps, type TicketStatus } from "../components/tickets/TicketCard";
 import { apiFetch } from "../lib/apiFetch";
 
 const STATUS_ALIASES: Record<string, TicketStatus> = {
