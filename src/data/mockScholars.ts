@@ -101,7 +101,7 @@ export const MOCK_SCHOLARS: Scholar[] = [
                 id: "GEN-2024-012",
                 title: "Leave of absence documentation request",
                 category: "General Query",
-                status: "Waiting for Response",
+                status: "Waiting",
                 priority: 3,
                 createdAt: "2024-06-01",
                 lastUpdated: "2024-06-05",
