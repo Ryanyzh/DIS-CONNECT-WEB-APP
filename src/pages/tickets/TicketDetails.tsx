@@ -74,6 +74,7 @@ export function TicketDetailsPage() {
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
 				isEscalated: data.is_escalated,
+				resolvedAt: data.resolved_at,
 				scholar: data.scholar
 					? {
 							...data.scholar,

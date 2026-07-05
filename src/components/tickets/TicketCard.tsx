@@ -34,6 +34,7 @@ export interface TicketProps {
 	lastUpdated: string;
 	createdAt: string;
 	isEscalated: boolean;
+	resolvedAt: string | null;
 	scholar?: Scholar;
 	officer?: HrOfficer;
 	attachments: TicketAttachment[];

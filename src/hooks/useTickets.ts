@@ -37,6 +37,7 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					lastUpdated: ticket.updated_at,
 					createdAt: ticket.created_at,
 					isEscalated: ticket.is_escalated,
+					resolvedAt: ticket.resolved_at,
 					scholar: {
 						...ticket.scholar,
 						studentId: ticket.scholar.student_id,
