@@ -403,7 +403,7 @@ const daysAgo = (n: number) => {
 
 // ── Colours ───────────────────────────────────────────────────────────────────
 
-const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
+export const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
 	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
 	"In Review": {
 		label: "In Review",

@@ -37,7 +37,6 @@ export function LoginPage() {
 		setIsLoading(true);
 		try {
 			await signInAsHr(email, password);
-			console.log(from);
 			navigate(from, { replace: true });
 		} catch (err) {
 			if (err instanceof AccessDeniedError) {
