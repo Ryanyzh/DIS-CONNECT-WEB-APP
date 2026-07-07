@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
-import { type TicketStatus } from "../../components/tickets/TicketCard";
+import { type TicketCategory, type TicketStatus } from "../../components/tickets/TicketCard";
 import SlaKpiCards from "../../components/analytics/SlaKpiCards";
 import { apiFetch } from "../../lib/apiFetch";
 import type { TicketHistoryLog } from "../../types/TicketHistoryLog";
@@ -93,13 +93,33 @@ export function SlaAnalyticsPage() {
 			Closed: 0,
 		};
 
-		for (const ticket of tickets) {
-			const isResolved =
-				(ticket.status === "Resolved" || ticket.status === "Closed") && ticket.resolvedAt;
+		// initialise category to stats mapping for SLA performance by category component
+		const categoryMetricsMap: Record<
+			TicketCategory,
+			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
+		> = {};
 
-			const isOverdue = ticket.deadline
+		for (const ticket of tickets) {
+			const isResolved: boolean =
+				(ticket.status === "Resolved" || ticket.status === "Closed") &&
+				ticket.resolvedAt != null;
+
+			const isOverdue: boolean = ticket.deadline
 				? new Date(ticket.deadline) < now && !isResolved
 				: false;
+
+			// SLA PERFORMANCE BY CATEGORY DATA
+			if (!categoryMetricsMap[ticket.category]) {
+				// If category doesn't exist in the category metrics map, then initialise it
+				categoryMetricsMap[ticket.category] = {
+					total: 0,
+					breached: 0,
+					resolved: 0,
+					totalResolutionTime: 0,
+				};
+			}
+			// Increment total count of tickets for this category
+			categoryMetricsMap[ticket.category].total++;
 
 			// Calculate active breaches (needs intervention)
 			// unresolved AND (escalated OR overdue)
@@ -129,10 +149,11 @@ export function SlaAnalyticsPage() {
 
 			if (hasBeenBreached) {
 				historicalBreachCount++;
+				categoryMetricsMap[ticket.category].breached++;
 			}
 
 			// Calculate At Risk tickets (Within 2 hrs of deadline, unresolved)
-			if (ticket.deadline && ticket.status !== "Resolved" && ticket.status !== "Closed") {
+			if (ticket.deadline && !isResolved) {
 				const timeUntilDeadline = new Date(ticket.deadline).getTime() - now.getTime();
 				if (timeUntilDeadline > 0 && timeUntilDeadline <= TWO_HOURS_IN_MS) {
 					atRiskCount++;
@@ -140,13 +161,19 @@ export function SlaAnalyticsPage() {
 			}
 
 			// Compute Resolution Time Totals
-			if ((ticket.status === "Resolved" || ticket.status === "Closed") && ticket.resolvedAt) {
+			if (isResolved) {
 				resolvedCount++;
+				categoryMetricsMap[ticket.category].resolved++;
+
 				const createdTime = new Date(ticket.createdAt).getTime();
-				const resolvedTime = new Date(ticket.resolvedAt).getTime();
+				const resolvedTime = new Date(ticket.resolvedAt!).getTime();
+
 				cumulativeResolutionTimeMs += resolvedTime - createdTime;
+				categoryMetricsMap[ticket.category].totalResolutionTime +=
+					resolvedTime - createdTime;
 			}
 
+			// Compute time in status and first response time
 			const historyList = ticketsHistory[ticket.id];
 			if (!historyList || historyList.length === 0) {
 				// If ticket has no history that means it's been open the whole time
@@ -201,7 +228,7 @@ export function SlaAnalyticsPage() {
 
 		// Final Aggregations
 
-		// SLA KPI Cards
+		// SLA KPI CARDS CALCULATIONS
 		const breachRate = total > 0 ? Math.round((historicalBreachCount / total) * 100) : 0;
 
 		let avgResolutionText = "N/A";
@@ -218,9 +245,9 @@ export function SlaAnalyticsPage() {
 			avgFirstResponseText = `${avgHours} hrs`;
 		}
 
-		// Time in status calculations
+		// TIME IN STATUS COMPONENT CALCULATIONS
 		const avgTimeInStatus: Record<string, string> = {};
-		// Calculate the  total time sum, excluding Closed status and guarding against NaN
+		// Calculate the total time sum, excluding Closed status and guarding against NaN
 		const totalTimeAll = Object.entries(totalTimeInStatus).reduce(
 			(accumulator, [statusName, duration]) => {
 				// Skip calculating time for Closed completely
@@ -251,6 +278,32 @@ export function SlaAnalyticsPage() {
 			}
 		});
 
+		// CATEGORY METRICS COMPONENT CALCULATIONS
+		const rankedCategories = Object.entries(categoryMetricsMap)
+			.map(([category, data]) => {
+				const breachRate =
+					data.total > 0 ? Math.round((data.breached / data.total) * 100) : 0;
+
+				let avgResolutionDays = 0;
+				let avgResolutionText = "N/A";
+				if (data.resolved > 0) {
+					const avgMs = data.totalResolutionTime / data.resolved;
+					avgResolutionDays = avgMs / (1000 * 60 * 60 * 24);
+					avgResolutionText = `${avgResolutionDays.toFixed(1)} days`;
+				}
+
+				return {
+					category,
+					total: data.total,
+					breached: data.breached,
+					breachRate,
+					avgResolutionDays,
+					avgResolutionText,
+				};
+			})
+			// Rank by highest breach rate first
+			.sort((a, b) => b.breachRate - a.breachRate);
+
 		return {
 			breachRate,
 			atRiskCount,
@@ -260,6 +313,7 @@ export function SlaAnalyticsPage() {
 			totalTimeInStatus,
 			avgTimeInStatus,
 			totalTimeAll,
+			rankedCategories,
 		};
 	}, [tickets, ticketsHistory]);
 
@@ -278,7 +332,7 @@ export function SlaAnalyticsPage() {
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
 						<div className="flex items-center justify-between mb-4">
 							<div>
-								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+								<p className="font-semibold text-zinc-900 dark:text-zinc-100">
 									Time-in-Status Overview
 								</p>
 								<p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -287,7 +341,7 @@ export function SlaAnalyticsPage() {
 								</p>
 							</div>
 							{loadingHistory && (
-								<span className="text-xs text-indigo-500 dark:text-indigo-400 animate-pulse font-medium">
+								<span className="text-xs text-indigo-500 dark:text-indigo-400 animate-pulse">
 									Calculating status durations...
 								</span>
 							)}
@@ -352,6 +406,75 @@ export function SlaAnalyticsPage() {
 									</div>
 								);
 							})}
+						</div>
+					</div>
+
+					{/* SLA Performance by Category component */}
+					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+						<div>
+							<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+								SLA Performance by Category
+							</p>
+							<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+								Categories ranked by breach rate.
+							</p>
+						</div>
+
+						<div className="space-y-5">
+							{slaMetrics.rankedCategories.length === 0 ? (
+								<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+									No categories detected.
+								</p>
+							) : (
+								slaMetrics.rankedCategories.map((item) => (
+									<div key={item.category} className="space-y-1.5">
+										{/* Category Row Information */}
+										<div className="flex items-center justify-between text-xs">
+											<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
+												{item.category}
+												<span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
+													({item.total} ticket
+													{item.total > 1 ? "s" : ""})
+												</span>
+											</span>
+
+											<div className="flex items-center gap-4 text-right flex-shrink-0">
+												<span className="text-zinc-500 dark:text-zinc-400">
+													Avg Resolution Time:{" "}
+													<span className="text-zinc-700 dark:text-zinc-300">
+														{item.avgResolutionText}
+													</span>
+												</span>
+												<span
+													className={
+														item.breachRate > 0
+															? "text-rose-600 dark:text-rose-400 font-semibold"
+															: "text-emerald-600 dark:text-emerald-400 font-semibold"
+													}
+												>
+													{item.breachRate}% Breach Rate
+												</span>
+											</div>
+										</div>
+
+										{/* Breach rate bar */}
+										<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+											<div
+												className={`h-full rounded-full transition-all duration-500 ${
+													item.breachRate > 40
+														? "bg-rose-500"
+														: item.breachRate > 15
+															? "bg-amber-500"
+															: "bg-emerald-500"
+												}`}
+												style={{
+													width: `${item.breachRate}%`,
+												}} // width of coloured bar represents breach rate %
+											/>
+										</div>
+									</div>
+								))
+							)}
 						</div>
 					</div>
 				</div>
