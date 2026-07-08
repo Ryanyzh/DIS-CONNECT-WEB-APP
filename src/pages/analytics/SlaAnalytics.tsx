@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
-import { type TicketCategory, type TicketStatus } from "../../components/tickets/TicketCard";
+import {
+	priorityLabels,
+	priorityStyles,
+	type TicketCategory,
+	type TicketStatus,
+} from "../../components/tickets/TicketCard";
 import SlaKpiCards from "../../components/analytics/SlaKpiCards";
 import { apiFetch } from "../../lib/apiFetch";
 import type { TicketHistoryLog } from "../../types/TicketHistoryLog";
@@ -99,6 +104,12 @@ export function SlaAnalyticsPage() {
 			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
 		> = {};
 
+		// initialise priority to stats mapping for SLA performance by priority component
+		const priorityMetricsMap: Record<
+			number,
+			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
+		> = {};
+
 		for (const ticket of tickets) {
 			const isResolved: boolean =
 				(ticket.status === "Resolved" || ticket.status === "Closed") &&
@@ -147,9 +158,23 @@ export function SlaAnalyticsPage() {
 				}
 			}
 
+			// SLA PERFORMANCE BY PRIORITY DATA
+			if (!priorityMetricsMap[ticket.priority]) {
+				// if the priority metrics map doesn't have this priority, initialise it
+				priorityMetricsMap[ticket.priority] = {
+					total: 0,
+					breached: 0,
+					resolved: 0,
+					totalResolutionTime: 0,
+				};
+			}
+			// Increment total count of tickets for this priority
+			priorityMetricsMap[ticket.priority].total++;
+
 			if (hasBeenBreached) {
 				historicalBreachCount++;
 				categoryMetricsMap[ticket.category].breached++;
+				priorityMetricsMap[ticket.priority].breached++;
 			}
 
 			// Calculate At Risk tickets (Within 2 hrs of deadline, unresolved)
@@ -164,12 +189,15 @@ export function SlaAnalyticsPage() {
 			if (isResolved) {
 				resolvedCount++;
 				categoryMetricsMap[ticket.category].resolved++;
+				priorityMetricsMap[ticket.priority].resolved++;
 
 				const createdTime = new Date(ticket.createdAt).getTime();
 				const resolvedTime = new Date(ticket.resolvedAt!).getTime();
 
 				cumulativeResolutionTimeMs += resolvedTime - createdTime;
 				categoryMetricsMap[ticket.category].totalResolutionTime +=
+					resolvedTime - createdTime;
+				priorityMetricsMap[ticket.priority].totalResolutionTime +=
 					resolvedTime - createdTime;
 			}
 
@@ -304,6 +332,32 @@ export function SlaAnalyticsPage() {
 			// Rank by highest breach rate first
 			.sort((a, b) => b.breachRate - a.breachRate);
 
+		// PRIORITY METRICS COMPONENT CALCULATIONS
+		const rankedPriorities = Object.entries(priorityMetricsMap)
+			.map(([priority, data]) => {
+				const breachRate =
+					data.total > 0 ? Math.round((data.breached / data.total) * 100) : 0;
+
+				let avgResolutionDays = 0;
+				let avgResolutionText = "N/A";
+				if (data.resolved > 0) {
+					const avgMs = data.totalResolutionTime / data.resolved;
+					avgResolutionDays = avgMs / (1000 * 60 * 60 * 24);
+					avgResolutionText = `${avgResolutionDays.toFixed(1)} days`;
+				}
+
+				return {
+					priority, // is a string
+					total: data.total,
+					breached: data.breached,
+					breachRate,
+					avgResolutionDays,
+					avgResolutionText,
+				};
+			})
+			// Rank by highest breach rate first
+			.sort((a, b) => b.breachRate - a.breachRate);
+
 		return {
 			breachRate,
 			atRiskCount,
@@ -314,6 +368,7 @@ export function SlaAnalyticsPage() {
 			avgTimeInStatus,
 			totalTimeAll,
 			rankedCategories,
+			rankedPriorities,
 		};
 	}, [tickets, ticketsHistory]);
 
@@ -409,72 +464,167 @@ export function SlaAnalyticsPage() {
 						</div>
 					</div>
 
-					{/* SLA Performance by Category component */}
-					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
-						<div>
-							<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-								SLA Performance by Category
-							</p>
-							<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
-								Categories ranked by breach rate.
-							</p>
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						{/* SLA Performance by Category component */}
+						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+							<div>
+								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+									SLA Performance by Category
+								</p>
+								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+									Categories ranked by breach rate.
+								</p>
+							</div>
+
+							<div className="space-y-5">
+								{slaMetrics.rankedCategories.length === 0 ? (
+									<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+										No categories detected.
+									</p>
+								) : (
+									slaMetrics.rankedCategories.map((item) => {
+										const categoryStyles: Record<string, string> = {
+											Reimbursement: "text-blue-700 dark:text-blue-300",
+											Exchange: "text-amber-700 dark:text-amber-300",
+											Policy: "text-emerald-700 dark:text-emerald-300",
+											Scholarship: "text-violet-700 dark:text-violet-300",
+											Leave: "text-teal-700 dark:text-teal-300",
+											Internship: "text-sky-700 dark:text-sky-300",
+										};
+
+										return (
+											<div key={item.category} className="space-y-1.5">
+												{/* Category Row Information */}
+												<div className="flex items-center justify-between text-xs">
+													<span
+														className={`${categoryStyles[item.category]}`}
+													>
+														{item.category}
+														<span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
+															({item.total} ticket
+															{item.total > 1 ? "s" : ""})
+														</span>
+													</span>
+
+													<div className="flex items-center gap-4 text-right flex-shrink-0">
+														<span className="text-zinc-500 dark:text-zinc-400">
+															Avg Resolution Time:{" "}
+															<span className="text-zinc-700 dark:text-zinc-300">
+																{item.avgResolutionText}
+															</span>
+														</span>
+														<span
+															className={
+																item.breachRate > 0
+																	? "text-rose-600 dark:text-rose-400 font-semibold"
+																	: "text-emerald-600 dark:text-emerald-400 font-semibold"
+															}
+														>
+															{item.breachRate}% Breach Rate
+														</span>
+													</div>
+												</div>
+
+												{/* Breach rate bar */}
+												<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+													<div
+														className={`h-full rounded-full transition-all duration-500 ${
+															item.breachRate > 40
+																? "bg-rose-500"
+																: item.breachRate > 15
+																	? "bg-amber-500"
+																	: "bg-emerald-500"
+														}`}
+														style={{
+															width: `${item.breachRate}%`,
+														}} // width of coloured bar represents breach rate %
+													/>
+												</div>
+											</div>
+										);
+									})
+								)}
+							</div>
 						</div>
 
-						<div className="space-y-5">
-							{slaMetrics.rankedCategories.length === 0 ? (
-								<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
-									No categories detected.
+						{/* SLA Performance by Priority component */}
+						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+							<div>
+								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+									SLA Performance by Priority
 								</p>
-							) : (
-								slaMetrics.rankedCategories.map((item) => (
-									<div key={item.category} className="space-y-1.5">
-										{/* Category Row Information */}
-										<div className="flex items-center justify-between text-xs">
-											<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
-												{item.category}
-												<span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
-													({item.total} ticket
-													{item.total > 1 ? "s" : ""})
-												</span>
-											</span>
+								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+									Priority tiers ranked by breach rate.
+								</p>
 
-											<div className="flex items-center gap-4 text-right flex-shrink-0">
-												<span className="text-zinc-500 dark:text-zinc-400">
-													Avg Resolution Time:{" "}
-													<span className="text-zinc-700 dark:text-zinc-300">
-														{item.avgResolutionText}
-													</span>
-												</span>
-												<span
-													className={
-														item.breachRate > 0
-															? "text-rose-600 dark:text-rose-400 font-semibold"
-															: "text-emerald-600 dark:text-emerald-400 font-semibold"
-													}
-												>
-													{item.breachRate}% Breach Rate
-												</span>
-											</div>
-										</div>
+								<div className="space-y-5">
+									{slaMetrics.rankedPriorities.length === 0 ? (
+										<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+											No priorities detected.
+										</p>
+									) : (
+										slaMetrics.rankedPriorities.map((item) => {
+											const priorityStyles: Record<number, string> = {
+												1: "text-green-700 dark:text-green-400",
+												2: "text-amber-700 dark:text-amber-400",
+												3: "text-red-700 dark:text-red-400",
+												4: "text-violet-700 dark:text-violet-400",
+											};
 
-										{/* Breach rate bar */}
-										<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-											<div
-												className={`h-full rounded-full transition-all duration-500 ${
-													item.breachRate > 40
-														? "bg-rose-500"
-														: item.breachRate > 15
-															? "bg-amber-500"
-															: "bg-emerald-500"
-												}`}
-												style={{
-													width: `${item.breachRate}%`,
-												}} // width of coloured bar represents breach rate %
-											/>
-										</div>
-									</div>
-								))
-							)}
+											return (
+												<div key={item.priority} className="space-y-1.5">
+													{/* Priority Row Information */}
+													<div className="flex items-center justify-between text-xs">
+														<span
+															className={`${priorityStyles[Number(item.priority)]}`}
+														>
+															{priorityLabels[Number(item.priority)]}
+															<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
+																({item.total} ticket
+																{item.total > 1 ? "s" : ""})
+															</span>
+														</span>
+
+														<div className="flex items-center gap-4 text-right flex-shrink-0">
+															<span className="text-zinc-500 dark:text-zinc-400">
+																Avg Resolution Time:{" "}
+																<span className="text-zinc-700 dark:text-zinc-300 font-medium">
+																	{item.avgResolutionText}
+																</span>
+															</span>
+															<span
+																className={
+																	item.breachRate > 0
+																		? "text-rose-600 dark:text-rose-400 font-semibold"
+																		: "text-emerald-600 dark:text-emerald-400 font-semibold"
+																}
+															>
+																{item.breachRate}% Breach Rate
+															</span>
+														</div>
+													</div>
+
+													{/* Breach rate bar */}
+													<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+														<div
+															className={`h-full rounded-full transition-all duration-500 ${
+																item.breachRate > 40
+																	? "bg-rose-500"
+																	: item.breachRate > 15
+																		? "bg-amber-500"
+																		: "bg-emerald-500"
+															}`}
+															style={{
+																width: `${item.breachRate}%`,
+															}} // width of coloured bar represents breach rate %
+														/>
+													</div>
+												</div>
+											);
+										})
+									)}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
