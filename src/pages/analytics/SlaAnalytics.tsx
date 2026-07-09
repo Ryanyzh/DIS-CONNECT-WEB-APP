@@ -110,6 +110,12 @@ export function SlaAnalyticsPage() {
 			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
 		> = {};
 
+		// Initialize officer metrics mapping for officer SLA compliance component
+		const officerMetricsMap: Record<
+			string,
+			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
+		> = {};
+
 		for (const ticket of tickets) {
 			const isResolved: boolean =
 				(ticket.status === "Resolved" || ticket.status === "Closed") &&
@@ -118,19 +124,6 @@ export function SlaAnalyticsPage() {
 			const isOverdue: boolean = ticket.deadline
 				? new Date(ticket.deadline) < now && !isResolved
 				: false;
-
-			// SLA PERFORMANCE BY CATEGORY DATA
-			if (!categoryMetricsMap[ticket.category]) {
-				// If category doesn't exist in the category metrics map, then initialise it
-				categoryMetricsMap[ticket.category] = {
-					total: 0,
-					breached: 0,
-					resolved: 0,
-					totalResolutionTime: 0,
-				};
-			}
-			// Increment total count of tickets for this category
-			categoryMetricsMap[ticket.category].total++;
 
 			// Calculate active breaches (needs intervention)
 			// unresolved AND (escalated OR overdue)
@@ -158,6 +151,19 @@ export function SlaAnalyticsPage() {
 				}
 			}
 
+			// SLA PERFORMANCE BY CATEGORY DATA
+			if (!categoryMetricsMap[ticket.category]) {
+				// If category doesn't exist in the category metrics map, then initialise it
+				categoryMetricsMap[ticket.category] = {
+					total: 0,
+					breached: 0,
+					resolved: 0,
+					totalResolutionTime: 0,
+				};
+			}
+			// Increment total count of tickets for this category
+			categoryMetricsMap[ticket.category].total++;
+
 			// SLA PERFORMANCE BY PRIORITY DATA
 			if (!priorityMetricsMap[ticket.priority]) {
 				// if the priority metrics map doesn't have this priority, initialise it
@@ -171,10 +177,24 @@ export function SlaAnalyticsPage() {
 			// Increment total count of tickets for this priority
 			priorityMetricsMap[ticket.priority].total++;
 
+			// OFFICER SLA COMPLIANCE DATA
+			const officerName = ticket.officer?.name || "Unassigned";
+			if (!officerMetricsMap[officerName]) {
+				// if the officer metrics map doesn't have this officer, initialise it
+				officerMetricsMap[officerName] = {
+					total: 0,
+					breached: 0,
+					resolved: 0,
+					totalResolutionTime: 0,
+				};
+			}
+			officerMetricsMap[officerName].total++;
+
 			if (hasBeenBreached) {
 				historicalBreachCount++;
 				categoryMetricsMap[ticket.category].breached++;
 				priorityMetricsMap[ticket.priority].breached++;
+				officerMetricsMap[officerName].breached++;
 			}
 
 			// Calculate At Risk tickets (Within 2 hrs of deadline, unresolved)
@@ -190,6 +210,7 @@ export function SlaAnalyticsPage() {
 				resolvedCount++;
 				categoryMetricsMap[ticket.category].resolved++;
 				priorityMetricsMap[ticket.priority].resolved++;
+				officerMetricsMap[officerName].resolved++;
 
 				const createdTime = new Date(ticket.createdAt).getTime();
 				const resolvedTime = new Date(ticket.resolvedAt!).getTime();
@@ -199,6 +220,7 @@ export function SlaAnalyticsPage() {
 					resolvedTime - createdTime;
 				priorityMetricsMap[ticket.priority].totalResolutionTime +=
 					resolvedTime - createdTime;
+				officerMetricsMap[officerName].totalResolutionTime += resolvedTime - createdTime;
 			}
 
 			// Compute time in status and first response time
@@ -323,6 +345,7 @@ export function SlaAnalyticsPage() {
 				return {
 					category,
 					total: data.total,
+					resolved: data.resolved,
 					breached: data.breached,
 					breachRate,
 					avgResolutionDays,
@@ -349,6 +372,7 @@ export function SlaAnalyticsPage() {
 				return {
 					priority, // is a string
 					total: data.total,
+					resolved: data.resolved,
 					breached: data.breached,
 					breachRate,
 					avgResolutionDays,
@@ -357,6 +381,36 @@ export function SlaAnalyticsPage() {
 			})
 			// Rank by highest breach rate first
 			.sort((a, b) => b.breachRate - a.breachRate);
+
+		// OFFICER SLA COMPLIANCE CALCULATIONS
+		const rankedOfficers = Object.entries(officerMetricsMap)
+			.map(([name, data]) => {
+				// Calculate SLA compliance rate (100% minus breach rate)
+				const breachRate =
+					data.total > 0 ? Math.round((data.breached / data.total) * 100) : 0;
+				const complianceRate = 100 - breachRate;
+
+				let avgResolutionDays = 0;
+				let avgResolutionText = "N/A";
+				if (data.resolved > 0) {
+					const avgMs = data.totalResolutionTime / data.resolved;
+					avgResolutionDays = avgMs / (1000 * 60 * 60 * 24);
+					avgResolutionText = `${avgResolutionDays.toFixed(1)}d`;
+				}
+
+				return {
+					name,
+					total: data.total,
+					resolved: data.resolved,
+					breached: data.breached,
+					complianceRate,
+					avgResolutionText,
+				};
+			})
+			// Filter out any unassigned
+			.filter((officer) => officer.name !== "Unassigned")
+			// Rank by highest SLA compliance rate first
+			.sort((a, b) => b.complianceRate - a.complianceRate);
 
 		return {
 			breachRate,
@@ -369,6 +423,7 @@ export function SlaAnalyticsPage() {
 			totalTimeAll,
 			rankedCategories,
 			rankedPriorities,
+			rankedOfficers,
 		};
 	}, [tickets, ticketsHistory]);
 
@@ -464,7 +519,7 @@ export function SlaAnalyticsPage() {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4">
 						{/* SLA Performance by Category component */}
 						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
 							<div>
@@ -501,8 +556,7 @@ export function SlaAnalyticsPage() {
 													>
 														{item.category}
 														<span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
-															({item.total} ticket
-															{item.total > 1 ? "s" : ""})
+															({item.total} ticket{item.total > 1 ? "s" : ""}, {item.resolved} resolved)
 														</span>
 													</span>
 
@@ -580,8 +634,7 @@ export function SlaAnalyticsPage() {
 														>
 															{priorityLabels[Number(item.priority)]}
 															<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
-																({item.total} ticket
-																{item.total > 1 ? "s" : ""})
+																({item.total} ticket{item.total > 1 ? "s" : ""}, {item.resolved} resolved)
 															</span>
 														</span>
 
@@ -624,6 +677,86 @@ export function SlaAnalyticsPage() {
 										})
 									)}
 								</div>
+							</div>
+						</div>
+
+						{/* Officer SLA Compliance Rates */}
+						<div className="mt-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+							<div>
+								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+									Officer SLA Compliance Rates
+								</p>
+								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+									Officers ranked by their individual SLA compliance rate.
+								</p>
+							</div>
+
+							<div className="space-y-5">
+								{slaMetrics.rankedOfficers.length === 0 ? (
+									<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+										No officer workload records found.
+									</p>
+								) : (
+									slaMetrics.rankedOfficers.map((officer, index) => {
+										// For displaying officer rank number in terms of SLA compliance
+										const rankNumber = index + 1;
+
+										return (
+											<div key={officer.name} className="space-y-1.5">
+												{/* Officer Row Header Data */}
+												<div className="flex items-center justify-between text-xs">
+													<div className="flex items-center gap-2 min-w-0">
+														<span className="font-mono text-zinc-400 dark:text-zinc-500 font-bold w-4">
+															#{rankNumber}
+														</span>
+														<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
+															{officer.name}
+															<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
+																({officer.total} ticket{officer.total > 1 ? "s" : ""}, {officer.resolved} resolved)
+															</span>
+														</span>
+													</div>
+
+													<div className="flex items-center gap-4 text-right flex-shrink-0">
+														<span className="text-zinc-500 dark:text-zinc-400">
+															Avg Resolution Time:{" "}
+															<span className="text-zinc-700 dark:text-zinc-300">
+																{officer.avgResolutionText}
+															</span>
+														</span>
+														<span
+															className={
+																officer.complianceRate >= 80
+																	? "text-emerald-600 dark:text-emerald-400 font-semibold"
+																	: officer.complianceRate >= 50
+																		? "text-amber-600 dark:text-amber-400 font-semibold"
+																		: "text-rose-600 dark:text-rose-400 font-semibold"
+															}
+														>
+															{officer.complianceRate}% SLA Met
+														</span>
+													</div>
+												</div>
+
+												{/* Compliance visual tracking bar */}
+												<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+													<div
+														className={`h-full rounded-full transition-all duration-500 ${
+															officer.complianceRate >= 80
+																? "bg-emerald-500"
+																: officer.complianceRate >= 50
+																	? "bg-amber-500"
+																	: "bg-rose-500"
+														}`}
+														style={{
+															width: `${officer.complianceRate}%`,
+														}} // width of bar represents officer SLA compliance rate %
+													/>
+												</div>
+											</div>
+										);
+									})
+								)}
 							</div>
 						</div>
 					</div>
