@@ -11,6 +11,7 @@ import SlaKpiCards from "../../components/analytics/SlaKpiCards";
 import { apiFetch } from "../../lib/apiFetch";
 import type { TicketHistoryLog } from "../../types/TicketHistoryLog";
 import { STATUS_META } from "./TicketAnalytics";
+import { formatDate } from "../../types/Scholar";
 
 // Map action type to status change
 const ACTION_TO_STATUS_MAP: Record<string, string> = {
@@ -116,6 +117,28 @@ export function SlaAnalyticsPage() {
 			{ total: number; breached: number; resolved: number; totalResolutionTime: number }
 		> = {};
 
+		// Generate an array of the last 14 days for SLA breaches over time component
+		const trendDays = Array.from({ length: 14 }, (_, i) => {
+			const d = new Date();
+			d.setDate(d.getDate() - i);
+			return d;
+		}).reverse(); // Chronological order (oldest to newest)
+
+		const breachTrendMap: Record<string, { count: number; displayLabel: string }> = {};
+
+		trendDays.forEach((day) => {
+			// Date string key (YYYY-MM-DD) for easy lookup in the breachTrendMap (e.g., "2026-07-11")
+			const dateStringKey = day.toISOString().split("T")[0];
+
+			// Formatted date for display
+			const displayLabel = formatDate(day.toISOString());
+
+			breachTrendMap[dateStringKey] = {
+				count: 0,
+				displayLabel: displayLabel,
+			};
+		});
+
 		for (const ticket of tickets) {
 			const isResolved: boolean =
 				(ticket.status === "Resolved" || ticket.status === "Closed") &&
@@ -195,6 +218,32 @@ export function SlaAnalyticsPage() {
 				categoryMetricsMap[ticket.category].breached++;
 				priorityMetricsMap[ticket.priority].breached++;
 				officerMetricsMap[officerName].breached++;
+
+				let breachDate: Date;
+				// Ticket was escalated
+				if (ticket.isEscalated && ticket.escalatedAt) {
+					if (ticket.deadline) {
+						// If ticket had a deadline, then set the breach date to whichever is earlier, escalation or deadline
+						breachDate =
+							new Date(ticket.deadline).getTime() >
+							new Date(ticket.escalatedAt).getTime()
+								? new Date(ticket.escalatedAt)
+								: new Date(ticket.deadline);
+					} else {
+						// Ticket did not have a deadline, breach date is the escalation
+						breachDate = new Date(ticket.escalatedAt);
+					}
+				} else {
+					// Ticket was not escalated, breach date will be the deadline
+					// Since the ticket was breached but not escalated it will definitely have a deadline
+					breachDate = new Date(ticket.deadline!);
+				}
+
+				const breachDateKey = breachDate.toISOString().split("T")[0];
+
+				if (breachTrendMap[breachDateKey] !== undefined) {
+					breachTrendMap[breachDateKey].count++;
+				}
 			}
 
 			// Calculate At Risk tickets (Within 2 hrs of deadline, unresolved)
@@ -412,6 +461,19 @@ export function SlaAnalyticsPage() {
 			// Rank by highest SLA compliance rate first
 			.sort((a, b) => b.complianceRate - a.complianceRate);
 
+		// SLA BREACHES OVER TIME COMPONENT
+		// Gather breach trend data into array
+		const breachTrendData = Object.entries(breachTrendMap).map(([dateKey, data]) => {
+			return {
+				dateString: dateKey,
+				label: data.displayLabel,
+				count: data.count,
+			};
+		});
+
+		// Find highest point to properly calculate proportional CSS heights on the chart
+		const maxBreachesInWindow = Math.max(...breachTrendData.map((data) => data.count), 1);
+
 		return {
 			breachRate,
 			atRiskCount,
@@ -424,6 +486,8 @@ export function SlaAnalyticsPage() {
 			rankedCategories,
 			rankedPriorities,
 			rankedOfficers,
+			breachTrendData,
+			maxBreachesInWindow,
 		};
 	}, [tickets, ticketsHistory]);
 
@@ -523,7 +587,7 @@ export function SlaAnalyticsPage() {
 						{/* SLA Performance by Category component */}
 						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
 							<div>
-								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+								<p className="font-semibold text-zinc-900 dark:text-zinc-100">
 									SLA Performance by Category
 								</p>
 								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
@@ -556,7 +620,9 @@ export function SlaAnalyticsPage() {
 													>
 														{item.category}
 														<span className="ml-1.5 text-zinc-400 dark:text-zinc-500">
-															({item.total} ticket{item.total > 1 ? "s" : ""}, {item.resolved} resolved)
+															({item.total} ticket
+															{item.total > 1 ? "s" : ""},{" "}
+															{item.resolved} resolved)
 														</span>
 													</span>
 
@@ -604,7 +670,7 @@ export function SlaAnalyticsPage() {
 						{/* SLA Performance by Priority component */}
 						<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm flex flex-col justify-between">
 							<div>
-								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+								<p className="font-semibold text-zinc-900 dark:text-zinc-100">
 									SLA Performance by Priority
 								</p>
 								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
@@ -634,14 +700,16 @@ export function SlaAnalyticsPage() {
 														>
 															{priorityLabels[Number(item.priority)]}
 															<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
-																({item.total} ticket{item.total > 1 ? "s" : ""}, {item.resolved} resolved)
+																({item.total} ticket
+																{item.total > 1 ? "s" : ""},{" "}
+																{item.resolved} resolved)
 															</span>
 														</span>
 
 														<div className="flex items-center gap-4 text-right flex-shrink-0">
 															<span className="text-zinc-500 dark:text-zinc-400">
 																Avg Resolution Time:{" "}
-																<span className="text-zinc-700 dark:text-zinc-300 font-medium">
+																<span className="text-zinc-700 dark:text-zinc-300">
 																	{item.avgResolutionText}
 																</span>
 															</span>
@@ -679,85 +747,134 @@ export function SlaAnalyticsPage() {
 								</div>
 							</div>
 						</div>
+					</div>
 
-						{/* Officer SLA Compliance Rates */}
-						<div className="mt-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
-							<div>
-								<p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-									Officer SLA Compliance Rates
+					{/* Officer SLA Compliance Rates */}
+					<div className="mt-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+						<div>
+							<p className="font-semibold text-zinc-900 dark:text-zinc-100">
+								Officer SLA Compliance Rates
+							</p>
+							<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+								Officers ranked by their individual SLA compliance rate.
+							</p>
+						</div>
+
+						<div className="space-y-5">
+							{slaMetrics.rankedOfficers.length === 0 ? (
+								<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+									No officer workload records found.
 								</p>
-								<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
-									Officers ranked by their individual SLA compliance rate.
-								</p>
-							</div>
+							) : (
+								slaMetrics.rankedOfficers.map((officer, index) => {
+									// For displaying officer rank number in terms of SLA compliance
+									const rankNumber = index + 1;
 
-							<div className="space-y-5">
-								{slaMetrics.rankedOfficers.length === 0 ? (
-									<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
-										No officer workload records found.
-									</p>
-								) : (
-									slaMetrics.rankedOfficers.map((officer, index) => {
-										// For displaying officer rank number in terms of SLA compliance
-										const rankNumber = index + 1;
-
-										return (
-											<div key={officer.name} className="space-y-1.5">
-												{/* Officer Row Header Data */}
-												<div className="flex items-center justify-between text-xs">
-													<div className="flex items-center gap-2 min-w-0">
-														<span className="font-mono text-zinc-400 dark:text-zinc-500 font-bold w-4">
-															#{rankNumber}
+									return (
+										<div key={officer.name} className="space-y-1.5">
+											{/* Officer Row Header Data */}
+											<div className="flex items-center justify-between text-xs">
+												<div className="flex items-center gap-2 min-w-0">
+													<span className="font-mono text-zinc-400 dark:text-zinc-500 font-bold w-4">
+														#{rankNumber}
+													</span>
+													<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
+														{officer.name}
+														<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
+															({officer.total} ticket
+															{officer.total > 1 ? "s" : ""},{" "}
+															{officer.resolved} resolved)
 														</span>
-														<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
-															{officer.name}
-															<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
-																({officer.total} ticket{officer.total > 1 ? "s" : ""}, {officer.resolved} resolved)
-															</span>
-														</span>
-													</div>
-
-													<div className="flex items-center gap-4 text-right flex-shrink-0">
-														<span className="text-zinc-500 dark:text-zinc-400">
-															Avg Resolution Time:{" "}
-															<span className="text-zinc-700 dark:text-zinc-300">
-																{officer.avgResolutionText}
-															</span>
-														</span>
-														<span
-															className={
-																officer.complianceRate >= 80
-																	? "text-emerald-600 dark:text-emerald-400 font-semibold"
-																	: officer.complianceRate >= 50
-																		? "text-amber-600 dark:text-amber-400 font-semibold"
-																		: "text-rose-600 dark:text-rose-400 font-semibold"
-															}
-														>
-															{officer.complianceRate}% SLA Met
-														</span>
-													</div>
+													</span>
 												</div>
 
-												{/* Compliance visual tracking bar */}
-												<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-													<div
-														className={`h-full rounded-full transition-all duration-500 ${
+												<div className="flex items-center gap-4 text-right flex-shrink-0">
+													<span className="text-zinc-500 dark:text-zinc-400">
+														Avg Resolution Time:{" "}
+														<span className="text-zinc-700 dark:text-zinc-300">
+															{officer.avgResolutionText}
+														</span>
+													</span>
+													<span
+														className={
 															officer.complianceRate >= 80
-																? "bg-emerald-500"
+																? "text-emerald-600 dark:text-emerald-400 font-semibold"
 																: officer.complianceRate >= 50
-																	? "bg-amber-500"
-																	: "bg-rose-500"
-														}`}
-														style={{
-															width: `${officer.complianceRate}%`,
-														}} // width of bar represents officer SLA compliance rate %
-													/>
+																	? "text-amber-600 dark:text-amber-400 font-semibold"
+																	: "text-rose-600 dark:text-rose-400 font-semibold"
+														}
+													>
+														{officer.complianceRate}% SLA Met
+													</span>
 												</div>
 											</div>
-										);
-									})
-								)}
-							</div>
+
+											{/* Compliance visual tracking bar */}
+											<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+												<div
+													className={`h-full rounded-full transition-all duration-500 ${
+														officer.complianceRate >= 80
+															? "bg-emerald-500"
+															: officer.complianceRate >= 50
+																? "bg-amber-500"
+																: "bg-rose-500"
+													}`}
+													style={{
+														width: `${officer.complianceRate}%`,
+													}} // width of bar represents officer SLA compliance rate %
+												/>
+											</div>
+										</div>
+									);
+								})
+							)}
+						</div>
+					</div>
+
+					{/* SLA Breaches Over Time Trend Chart */}
+					<div className="mt-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+						<div className="mb-6">
+							<p className="font-semibold text-zinc-900 dark:text-zinc-100">
+								SLA Breaches Over Time
+							</p>
+							<p className="text-xs text-zinc-500 dark:text-zinc-400">
+								Daily volume of SLA breaches over the last 14 days.
+							</p>
+						</div>
+
+						{/* Chart Container */}
+						<div className="h-48 w-full flex items-end gap-2 sm:gap-4 pt-4">
+							{slaMetrics.breachTrendData.map((dayData) => {
+								const barHeightPercent =
+									(dayData.count / slaMetrics.maxBreachesInWindow) * 100;
+
+								return (
+									<div
+										key={dayData.dateString}
+										className="flex-1 flex flex-col items-center group h-full justify-end relative"
+									>
+										{/* Hover Tooltip */}
+										<div className="absolute -top-6 bg-zinc-900 dark:bg-zinc-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 font-mono shadow-sm">
+											{dayData.count} breach{dayData.count > 1 ? "es" : ""}
+										</div>
+
+										{/* Coloured Bar */}
+										<div
+											className={`w-full rounded-t transition-all duration-500 min-h-[4px] ${
+												dayData.count > 0
+													? "bg-rose-500 dark:bg-rose-600 group-hover:bg-rose-400"
+													: "bg-zinc-100 dark:bg-zinc-800/40"
+											}`}
+											style={{ height: `${barHeightPercent}%` }}
+										/>
+
+										{/* X-Axis Date Labels */}
+										<span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 transform -rotate-45 lg:rotate-0 origin-top-left whitespace-nowrap">
+											{dayData.label}
+										</span>
+									</div>
+								);
+							})}
 						</div>
 					</div>
 				</div>

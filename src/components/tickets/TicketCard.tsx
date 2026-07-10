@@ -28,6 +28,7 @@ export interface TicketProps {
 	lastUpdated: string;
 	createdAt: string;
 	isEscalated: boolean;
+	escalatedAt: string | null;
 	resolvedAt: string | null;
 	scholar?: Scholar;
 	officer?: HrOfficer;
