@@ -3,7 +3,6 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import {
 	priorityLabels,
-	priorityStyles,
 	type TicketCategory,
 	type TicketStatus,
 } from "../../components/tickets/TicketCard";
@@ -139,6 +138,13 @@ export function SlaAnalyticsPage() {
 			};
 		});
 
+		// SLA BREACH RECOVERY COMPONENT
+		// Initalise recovery metrics map to map from category to recovery data
+		const recoveryMetricsMap: Record<
+			string,
+			{ totalBreached: number; resolvedBreached: number; totalOvertimeMs: number }
+		> = {};
+
 		for (const ticket of tickets) {
 			const isResolved: boolean =
 				(ticket.status === "Resolved" || ticket.status === "Closed") &&
@@ -219,6 +225,7 @@ export function SlaAnalyticsPage() {
 				priorityMetricsMap[ticket.priority].breached++;
 				officerMetricsMap[officerName].breached++;
 
+				// SLA BREACHES OVER TIME COMPONENT
 				let breachDate: Date;
 				// Ticket was escalated
 				if (ticket.isEscalated && ticket.escalatedAt) {
@@ -243,6 +250,25 @@ export function SlaAnalyticsPage() {
 
 				if (breachTrendMap[breachDateKey] !== undefined) {
 					breachTrendMap[breachDateKey].count++;
+				}
+
+				// SLA BREACH RECOVERY COMPONENT
+				if (!recoveryMetricsMap[ticket.category]) {
+					recoveryMetricsMap[ticket.category] = {
+						totalBreached: 0,
+						resolvedBreached: 0,
+						totalOvertimeMs: 0,
+					};
+				}
+				recoveryMetricsMap[ticket.category].totalBreached++;
+
+				if (isResolved) {
+					// If the ticket ended up being resolved, increment resolvedBreached
+					recoveryMetricsMap[ticket.category].resolvedBreached++;
+
+					// Calculate resolution time after breach
+					const overtime = new Date(ticket.resolvedAt!).getTime() - breachDate.getTime();
+					recoveryMetricsMap[ticket.category].totalOvertimeMs += Math.max(0, overtime);
 				}
 			}
 
@@ -474,6 +500,35 @@ export function SlaAnalyticsPage() {
 		// Find highest point to properly calculate proportional CSS heights on the chart
 		const maxBreachesInWindow = Math.max(...breachTrendData.map((data) => data.count), 1);
 
+		// SLA BREACH RECOVERY COMPONENT
+		const rankedRecovery = Object.entries(recoveryMetricsMap)
+			.map(([category, data]) => {
+				const recoveryRate =
+					data.totalBreached > 0
+						? Math.round((data.resolvedBreached / data.totalBreached) * 100)
+						: 0;
+
+				let avgOvertimeText = "N/A";
+				if (data.resolvedBreached > 0) {
+					const avgMs = data.totalOvertimeMs / data.resolvedBreached;
+					const avgHours = avgMs / (1000 * 60 * 60);
+
+					avgOvertimeText =
+						avgHours >= 24
+							? `${(avgHours / 24).toFixed(1)} days overdue`
+							: `${Math.round(avgHours)} hrs overdue`;
+				}
+
+				return {
+					category,
+					totalBreached: data.totalBreached,
+					backlogOpen: data.totalBreached - data.resolvedBreached,
+					recoveryRate,
+					avgOvertimeText,
+				};
+			})
+			.sort((a, b) => b.backlogOpen - a.backlogOpen); // categories from largest to smallest backlogs
+
 		return {
 			breachRate,
 			atRiskCount,
@@ -488,6 +543,7 @@ export function SlaAnalyticsPage() {
 			rankedOfficers,
 			breachTrendData,
 			maxBreachesInWindow,
+			rankedRecovery,
 		};
 	}, [tickets, ticketsHistory]);
 
@@ -827,6 +883,91 @@ export function SlaAnalyticsPage() {
 										</div>
 									);
 								})
+							)}
+						</div>
+					</div>
+
+					{/* SLA Breach Recovery Stats */}
+					<div className="mt-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+						<div>
+							<p className="font-semibold text-zinc-900 dark:text-zinc-100">
+								SLA Breach Recovery Metrics
+							</p>
+							<p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6">
+								Tracks how efficiently tickets are resolved after a breach has already occurred.
+							</p>
+						</div>
+
+						<div className="space-y-5">
+							{!slaMetrics.rankedRecovery ||
+							slaMetrics.rankedRecovery.length === 0 ? (
+								<p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-4">
+									No breach recovery records available.
+								</p>
+							) : (
+								slaMetrics.rankedRecovery.map((item) => (
+									<div key={item.category} className="space-y-1.5">
+										{/* Row Header Information */}
+										<div className="flex items-center justify-between text-xs">
+											<span className="text-zinc-800 dark:text-zinc-200 font-semibold truncate">
+												{item.category}
+												<span className="ml-1.5 text-zinc-400 dark:text-zinc-500 font-normal">
+													({item.totalBreached} breached)
+												</span>
+											</span>
+
+											<div className="flex items-center gap-4 text-right flex-shrink-0">
+												{/* Backlog Alert counter */}
+												{item.backlogOpen > 0 ? (
+													<span className="text-rose-500 bg-rose-50 dark:bg-rose-950/30 px-1.5 py-0.5 rounded text-[11px]">
+														Active Backlog: {item.backlogOpen}
+													</span>
+												) : (
+													<span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded text-[11px]">
+														Cleared
+													</span>
+												)}
+
+												{/* Average Overtime Stat */}
+												<span className="text-zinc-500 dark:text-zinc-400">
+													Avg Overtime:{" "}
+													<span className="text-zinc-700 dark:text-zinc-300 font-semibold font-mono">
+														{item.avgOvertimeText}
+													</span>
+												</span>
+
+												{/* Recovery Success Percentage */}
+												<span
+													className={
+														item.recoveryRate >= 80
+															? "text-emerald-600 dark:text-emerald-400 font-semibold"
+															: item.recoveryRate >= 50
+																? "text-amber-600 dark:text-amber-400 font-semibold"
+																: "text-rose-600 dark:text-rose-400 font-semibold"
+													}
+												>
+													{item.recoveryRate}% Recovered
+												</span>
+											</div>
+										</div>
+
+										{/* Recovery Tracker Bar */}
+										<div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+											<div
+												className={`h-full rounded-full transition-all duration-500 ${
+													item.recoveryRate >= 80
+														? "bg-emerald-500"
+														: item.recoveryRate >= 50
+															? "bg-amber-500"
+															: "bg-rose-500"
+												}`}
+												style={{
+													width: `${item.recoveryRate}%`,
+												}}
+											/>
+										</div>
+									</div>
+								))
 							)}
 						</div>
 					</div>
