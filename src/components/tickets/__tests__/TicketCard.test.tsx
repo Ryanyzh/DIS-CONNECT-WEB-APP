@@ -36,6 +36,7 @@ describe("TicketCard Unit Tests", () => {
 		lastUpdated: "2026-06-26T17:38:25.145519+00:00",
 		createdAt: "2026-06-26T17:27:41.633798+00:00",
 		isEscalated: false,
+		escalatedAt: null,
 		resolvedAt: null,
 		attachments: [],
 		officer: {
