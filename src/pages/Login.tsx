@@ -22,8 +22,9 @@ function friendlyError(code: string): string {
 export function LoginPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const from =
+	const rawFrom =
 		(location.state as { from?: { pathname: string } })?.from?.pathname ?? "/tickets/all";
+	const from = (rawFrom === "/logout" || rawFrom === "/login") ? "/tickets/all" : rawFrom;
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);

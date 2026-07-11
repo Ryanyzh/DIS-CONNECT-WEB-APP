@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import TicketCard, { type TicketProps, type TicketStatus } from "../TicketCard";
 
 import "@testing-library/jest-dom/vitest";
-import { formatDate } from "../../types/Scholar";
+import { formatDate } from "../../../types/Scholar";
 
 declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}
@@ -36,6 +36,8 @@ describe("TicketCard Unit Tests", () => {
 		lastUpdated: "2026-06-26T17:38:25.145519+00:00",
 		createdAt: "2026-06-26T17:27:41.633798+00:00",
 		isEscalated: false,
+		escalatedAt: null,
+		resolvedAt: null,
 		attachments: [],
 		officer: {
 			id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",

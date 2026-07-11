@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { apiFetch } from "../lib/apiFetch";
-import { type HrOfficer } from "../types/HrOfficer";
+import { apiFetch } from "../../lib/apiFetch";
+import { type HrOfficer } from "../../types/HrOfficer";
 import type { TicketProps, TicketStatus } from "./TicketCard";
 
 interface AssignModalProps {

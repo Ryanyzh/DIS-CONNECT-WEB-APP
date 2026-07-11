@@ -1,4 +1,4 @@
-import type { TicketStatus, TicketCategory } from "../components/TicketCard";
+import type { TicketStatus, TicketCategory } from "../components/tickets/TicketCard";
 
 export type ScholarStatus = "Active" | "On Leave" | "Graduated" | "Inactive";
 

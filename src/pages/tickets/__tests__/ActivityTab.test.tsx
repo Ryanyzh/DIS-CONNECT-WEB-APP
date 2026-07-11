@@ -3,7 +3,7 @@ import { apiFetch } from "../../../lib/apiFetch";
 import { render, screen, waitFor } from "@testing-library/react";
 
 import "@testing-library/jest-dom/vitest";
-import { ActivityTab } from "../../../components/ActivityTab";
+import { ActivityTab } from "../../../components/tickets/ActivityTab";
 
 declare module "vitest" {
 	interface Assertion<T = any> extends jest.Matchers<void, T> {}

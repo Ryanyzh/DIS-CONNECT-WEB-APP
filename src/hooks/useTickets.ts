@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { type TicketProps, type TicketStatus } from "../components/TicketCard";
+import { type TicketProps, type TicketStatus } from "../components/tickets/TicketCard";
 import { apiFetch } from "../lib/apiFetch";
 
 const STATUS_ALIASES: Record<string, TicketStatus> = {
@@ -37,6 +37,8 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					lastUpdated: ticket.updated_at,
 					createdAt: ticket.created_at,
 					isEscalated: ticket.is_escalated,
+					escalatedAt: ticket.escalated_at,
+					resolvedAt: ticket.resolved_at,
 					scholar: {
 						...ticket.scholar,
 						studentId: ticket.scholar.student_id,
