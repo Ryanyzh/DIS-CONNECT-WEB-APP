@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { apiFetch } from "../../lib/apiFetch";
-import { type HrOfficer } from "../../types/HrOfficer";
+import { useState } from "react";
 import type { TicketProps, TicketStatus } from "./TicketCard";
+import { useOfficers } from "../../hooks/useOfficers";
 
 interface AssignModalProps {
 	isOpen: boolean;
@@ -18,41 +17,8 @@ export function AssignOfficerModal({
 	nextStatus,
 	onAction,
 }: AssignModalProps) {
-	const [officers, setOfficers] = useState<HrOfficer[]>([]);
-	const [officersLoading, setLoading] = useState<boolean>(true);
+	const { officers, loading: officersLoading } = useOfficers();
 	const [assigning, setAssigning] = useState<boolean>(false);
-
-	async function fetchOfficers() {
-		try {
-			setLoading(true);
-			const response = await apiFetch("/api/v1/users/");
-
-			if (!response.ok) {
-				throw new Error(`Error fetching officers: ${response.status}`);
-			}
-
-			const data = await response.json();
-			const formattedOfficers: HrOfficer[] = data
-				.filter((user: any) => user.role == "hr")
-				.map((user: any) => ({
-					id: user.user_id,
-					name: user.full_name,
-					email: user.email,
-				}));
-
-			setOfficers(formattedOfficers);
-		} catch (error) {
-			console.error("Failed to fetch officers: ", error);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	useEffect(() => {
-		if (!isOpen) return;
-
-		fetchOfficers();
-	}, [isOpen]);
 
 	async function selectOfficer(officerId: string) {
 		try {
@@ -61,9 +27,8 @@ export function AssignOfficerModal({
 			if (!ticket.isEscalated) {
 				await onAction(nextStatus, { action: "Assignment", assigned_to: officerId });
 			} else {
-                await onAction(nextStatus, { action: "Assignment", escalated_to: officerId });
-            }
-
+				await onAction(nextStatus, { action: "Assignment", escalated_to: officerId });
+			}
 
 			onClose();
 		} catch (error) {
