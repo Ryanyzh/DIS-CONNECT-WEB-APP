@@ -16,6 +16,12 @@ vi.mock("../../../hooks/useRole", () => ({
 	useRole: mockUseRole,
 }));
 
+// mock useOfficers hook
+const mockUseOfficers = vi.hoisted(() => vi.fn());
+vi.mock("../../../hooks/useOfficers", () => ({
+	useOfficers: mockUseOfficers,
+}));
+
 // mock firebase
 vi.mock("../../../lib/firebase", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("../../../lib/firebase")>();
@@ -112,10 +118,111 @@ describe("TicketDetailsPage System Test", () => {
 		},
 	};
 
+	const mockUsers = [
+		{
+			created_at: "2026-06-27T19:22:01.200828+00:00",
+			is_active: true,
+			updated_at: "2026-06-27T19:22:01.200829+00:00",
+			user_id: "Gmf6ccPwS2NOw1q0J7TmR9GEGZp2",
+			last_login_at: "2026-06-27T19:32:34.510607+00:00",
+			email: "chloe.lee@u.nus.edu",
+			avatar_url: null,
+			full_name: "Chloe Lee",
+			phone: "+65 9456 7890",
+			role: "scholar",
+			preferred_contact: "email",
+			scholarship_type: "PSC",
+			scholar_id: "Gmf6ccPwS2NOw1q0J7TmR9GEGZp2",
+			year_of_study: 2,
+			faculty: "NUS Business School",
+			program: "Accountancy",
+			student_id: "A4567890B",
+		},
+		{
+			created_at: "2026-06-20T08:55:00.583687+00:00",
+			is_active: true,
+			updated_at: "2026-06-20T08:55:00.583687+00:00",
+			user_id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
+			last_login_at: "2026-07-01T19:38:26.460079+00:00",
+			email: "daniel.wong@scholarhr.edu.sg",
+			full_name: "Daniel Wong",
+			avatar_url: null,
+			phone: "+65 9234 5678",
+			role: "hr",
+			hr_id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
+			designation: "HR Officer",
+			employee_id: "HR-2049",
+			department_id: "DPT-01",
+		},
+		{
+			created_at: "2026-06-20T09:00:56.738680+00:00",
+			updated_at: "2026-06-20T09:00:56.738681+00:00",
+			is_active: true,
+			last_login_at: null,
+			user_id: "RBQvtvCGm2PIbuMO2oL87hognGk2",
+			email: "jason.lee@scholarhr.edu.sg",
+			avatar_url: null,
+			full_name: "Jason Lee",
+			phone: "+65 9456 7890",
+			role: "hr",
+			hr_id: "RBQvtvCGm2PIbuMO2oL87hognGk2",
+			designation: "Assistant HR Manager",
+			employee_id: "HR-2051",
+			department_id: "DPT-02",
+		},
+		{
+			created_at: "2026-05-24T17:29:40.259383+00:00",
+			is_active: true,
+			updated_at: "2026-05-24T17:29:40.259384+00:00",
+			user_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
+			last_login_at: "2026-06-28T19:07:33.038939+00:00",
+			email: "ryan.tan@u.nus.edu",
+			avatar_url: null,
+			full_name: "Ryan Tan",
+			phone: "+65 9123 4567",
+			role: "scholar",
+			preferred_contact: "phone",
+			scholar_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
+			year_of_study: 2,
+			faculty: "College of Design & Engineering",
+			student_id: "A1234567N",
+			program: "Chemical Engineering",
+		},
+		{
+			created_at: "2026-06-20T09:02:18.381959+00:00",
+			is_active: true,
+			updated_at: "2026-06-20T09:02:18.381959+00:00",
+			user_id: "yUyM8PdgOzcPTvIfSPuEt8HOmm83",
+			last_login_at: "2026-07-02T13:39:08.613782+00:00",
+			email: "nicholas.chua@scholarhr.edu.sg",
+			full_name: "Nicholas Chua",
+			avatar_url: null,
+			phone: "+65 9678 9012",
+			role: "hr",
+			hr_id: "yUyM8PdgOzcPTvIfSPuEt8HOmm83",
+			designation: "Senior HR Manager",
+			employee_id: "HR-2053",
+			department_id: "DPT-03",
+		},
+	];
+
 	beforeEach(() => {
 		mockUseRole.mockReturnValue({
 			role: "hr",
 			roleLoading: false,
+		});
+
+		mockUseOfficers.mockReturnValue({
+			officers: mockUsers
+				.filter((user: any) => user.role === "hr")
+				.map((user: any) => ({
+					id: user.user_id,
+					name: user.full_name,
+					email: user.email,
+				})),
+			loading: false,
+			error: null,
+			refetch: vi.fn(),
 		});
 
 		vi.spyOn(globalThis, "fetch").mockImplementation((url) => {
@@ -238,7 +345,9 @@ describe("TicketDetailsPage System Test", () => {
 			expect(requestBtn).toHaveClass("btn-gradient text-white");
 			expect(resolveBtn).toHaveClass("bg-emerald-600 hover:bg-emerald-700 text-white");
 			expect(escalateBtn).toHaveClass("bg-dc-error hover:bg-red-700 text-white");
-			expect(reassignBtn).toHaveClass("bg-dc-secondary hover:bg-dc-secondary-hover text-white");
+			expect(reassignBtn).toHaveClass(
+				"bg-dc-secondary hover:bg-dc-secondary-hover text-white"
+			);
 		});
 	});
 
@@ -378,93 +487,6 @@ describe("TicketDetailsPage System Test", () => {
 
 			// Mock the user endpoint to list users
 			if (urlString.includes("/api/v1/users/")) {
-				const mockUsers = [
-					{
-						created_at: "2026-06-27T19:22:01.200828+00:00",
-						is_active: true,
-						updated_at: "2026-06-27T19:22:01.200829+00:00",
-						user_id: "Gmf6ccPwS2NOw1q0J7TmR9GEGZp2",
-						last_login_at: "2026-06-27T19:32:34.510607+00:00",
-						email: "chloe.lee@u.nus.edu",
-						avatar_url: null,
-						full_name: "Chloe Lee",
-						phone: "+65 9456 7890",
-						role: "scholar",
-						preferred_contact: "email",
-						scholarship_type: "PSC",
-						scholar_id: "Gmf6ccPwS2NOw1q0J7TmR9GEGZp2",
-						year_of_study: 2,
-						faculty: "NUS Business School",
-						program: "Accountancy",
-						student_id: "A4567890B",
-					},
-					{
-						created_at: "2026-06-20T08:55:00.583687+00:00",
-						is_active: true,
-						updated_at: "2026-06-20T08:55:00.583687+00:00",
-						user_id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
-						last_login_at: "2026-07-01T19:38:26.460079+00:00",
-						email: "daniel.wong@scholarhr.edu.sg",
-						full_name: "Daniel Wong",
-						avatar_url: null,
-						phone: "+65 9234 5678",
-						role: "hr",
-						hr_id: "Gr1OeIhIQZcfZt880yNwqNEBurJ2",
-						designation: "HR Officer",
-						employee_id: "HR-2049",
-						department_id: "DPT-01",
-					},
-					{
-						created_at: "2026-06-20T09:00:56.738680+00:00",
-						updated_at: "2026-06-20T09:00:56.738681+00:00",
-						is_active: true,
-						last_login_at: null,
-						user_id: "RBQvtvCGm2PIbuMO2oL87hognGk2",
-						email: "jason.lee@scholarhr.edu.sg",
-						avatar_url: null,
-						full_name: "Jason Lee",
-						phone: "+65 9456 7890",
-						role: "hr",
-						hr_id: "RBQvtvCGm2PIbuMO2oL87hognGk2",
-						designation: "Assistant HR Manager",
-						employee_id: "HR-2051",
-						department_id: "DPT-02",
-					},
-					{
-						created_at: "2026-05-24T17:29:40.259383+00:00",
-						is_active: true,
-						updated_at: "2026-05-24T17:29:40.259384+00:00",
-						user_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
-						last_login_at: "2026-06-28T19:07:33.038939+00:00",
-						email: "ryan.tan@u.nus.edu",
-						avatar_url: null,
-						full_name: "Ryan Tan",
-						phone: "+65 9123 4567",
-						role: "scholar",
-						preferred_contact: "phone",
-						scholar_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
-						year_of_study: 2,
-						faculty: "College of Design & Engineering",
-						student_id: "A1234567N",
-						program: "Chemical Engineering",
-					},
-					{
-						created_at: "2026-06-20T09:02:18.381959+00:00",
-						is_active: true,
-						updated_at: "2026-06-20T09:02:18.381959+00:00",
-						user_id: "yUyM8PdgOzcPTvIfSPuEt8HOmm83",
-						last_login_at: "2026-07-02T13:39:08.613782+00:00",
-						email: "nicholas.chua@scholarhr.edu.sg",
-						full_name: "Nicholas Chua",
-						avatar_url: null,
-						phone: "+65 9678 9012",
-						role: "hr",
-						hr_id: "yUyM8PdgOzcPTvIfSPuEt8HOmm83",
-						designation: "Senior HR Manager",
-						employee_id: "HR-2053",
-						department_id: "DPT-03",
-					},
-				];
 				return Response.json(mockUsers, { status: 200 });
 			}
 
