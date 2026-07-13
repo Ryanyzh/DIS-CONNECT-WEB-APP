@@ -22,6 +22,12 @@ vi.mock("../../../hooks/useOfficers", () => ({
 	useOfficers: mockUseOfficers,
 }));
 
+// mock useStatuses hook
+const mockUseStatuses = vi.hoisted(() => vi.fn());
+vi.mock("../../../hooks/useStatuses", () => ({
+	useStatuses: mockUseStatuses,
+}));
+
 // mock firebase
 vi.mock("../../../lib/firebase", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("../../../lib/firebase")>();
@@ -225,38 +231,9 @@ describe("TicketDetailsPage System Test", () => {
 			refetch: vi.fn(),
 		});
 
-		vi.spyOn(globalThis, "fetch").mockImplementation((url) => {
-			const urlString = url.toString();
+		mockUseStatuses.mockReturnValue(statusIdMap);
 
-			if (urlString.includes("/api/v1/tickets/statuses")) {
-				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
-					status_id: id,
-					status_name: name,
-				}));
-
-				return Promise.resolve(Response.json(mockStatusesResponse, { status: 200 }));
-			}
-
-			if (urlString.includes("XDRno5f0JAbAsOfV8WzbvQYxn253")) {
-				return Promise.resolve(
-					Response.json(
-						{
-							created_at: "2026-05-24T17:29:40.259379+00:00",
-							is_active: true,
-							updated_at: "2026-06-16T15:59:40.321086+00:00",
-							user_id: "XDRno5f0JAbAsOfV8WzbvQYxn253",
-							last_login_at: "2026-06-16T15:59:40.321086+00:00",
-							email: "ryan.tan@u.nus.edu",
-							avatar_url: null,
-							full_name: "Ryan Tan",
-							phone: "+65 9123 4567",
-							role: "scholar",
-						},
-						{ status: 200 }
-					)
-				);
-			}
-
+		vi.spyOn(globalThis, "fetch").mockImplementation(() => {
 			return Promise.resolve(Response.json(mockTicketDetails, { status: 200 }));
 		});
 	});
@@ -352,7 +329,7 @@ describe("TicketDetailsPage System Test", () => {
 	});
 
 	it("hides the action panel when user is a scholar", async () => {
-		// 1. Swap the hook to return a basic scholar session context
+		// Swap the hook to return a scholar role instead of hr role
 		mockUseRole.mockReturnValue({
 			role: "scholar",
 			roleLoading: false,
@@ -429,18 +406,6 @@ describe("TicketDetailsPage System Test", () => {
 				return new Response(null, { status: 403 });
 			}
 
-			// Return the correct status maps so "Escalated" status name can be resolved to a status id
-			if (urlString.includes("/tickets/statuses")) {
-				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
-					status_id: id,
-					status_name: name,
-				}));
-				return new Response(JSON.stringify(mockStatusesResponse), {
-					status: 200,
-					headers: { "Content-Type": "application/json" },
-				});
-			}
-
 			// Return mock ticket details
 			return new Response(JSON.stringify(mockTicketDetails), {
 				status: 200,
@@ -485,29 +450,12 @@ describe("TicketDetailsPage System Test", () => {
 		const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(async (url, options) => {
 			const urlString = url.toString();
 
-			// Mock the user endpoint to list users
-			if (urlString.includes("/api/v1/users/")) {
-				return Response.json(mockUsers, { status: 200 });
-			}
-
 			// Mock the endpoint for updating ticket status
 			if (
 				urlString.includes("/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218/status") &&
 				options?.method === "PATCH"
 			) {
 				return Response.json({ success: true }, { status: 200 });
-			}
-
-			// Return the correct status maps so "Escalated" status name can be resolved to a status id
-			if (urlString.includes("/tickets/statuses")) {
-				const mockStatusesResponse = Object.entries(statusIdMap).map(([name, id]) => ({
-					status_id: id,
-					status_name: name,
-				}));
-				return new Response(JSON.stringify(mockStatusesResponse), {
-					status: 200,
-					headers: { "Content-Type": "application/json" },
-				});
 			}
 
 			// Return mock ticket details
