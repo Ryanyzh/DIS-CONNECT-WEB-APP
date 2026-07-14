@@ -9,7 +9,7 @@ import {
 	type TicketStatus,
 } from "../../components/tickets/TicketCard";
 import type { TicketAttachment } from "../../types/TicketAttachment";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "../../lib/firebase";
 import { ActionsPanel } from "../../components/tickets/ActionsPanel";
@@ -55,6 +55,15 @@ export function TicketDetailsPage() {
 
 	const [isScholarPanelOpen, setIsScholarPanelOpen] = useState<boolean>(false);
 	const [isScholarPanelHovered, setIsScholarPanelHovered] = useState<boolean>(false);
+	// Timer for hovering to display scholar panel
+	const hoverTimeoutRef = useRef<number | null>(null);
+
+	// Clean up the hover timer when the page unmounts
+	useEffect(() => {
+		return () => {
+			if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+		};
+	}, []);
 
 	const [showErrorPopup, setShowErrorPopup] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -223,11 +232,43 @@ export function TicketDetailsPage() {
 								key={label}
 								onClick={
 									isScholar
-										? () => setIsScholarPanelOpen(!isScholarPanelOpen)
+										? () => {
+												// If user clicks, then clear hover timers and set scholar panel to open/close permanently
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+												setIsScholarPanelHovered(false);
+												setIsScholarPanelOpen(!isScholarPanelOpen);
+											}
 										: undefined
 								}
-								onMouseEnter={isScholar ? () => setIsScholarPanelHovered(true) : undefined}
-								onMouseLeave={isScholar ? () => setIsScholarPanelHovered(false) : undefined}
+								onMouseEnter={
+									isScholar
+										? () => {
+												// Clear any existing timers
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+
+												// Wait 400ms before setting that scholar panel is hovered (only if panel is not already open)
+												if (!isScholarPanelOpen) {
+													hoverTimeoutRef.current = setTimeout(() => {
+														setIsScholarPanelHovered(true);
+													}, 400);
+												}
+											}
+										: undefined
+								}
+								onMouseLeave={
+									isScholar
+										? () => {
+												// Clear any existing timers
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+
+												// Since the user's mouse is off the button, set that the scholar panel is not hovered
+												setIsScholarPanelHovered(false);
+											}
+										: undefined
+								}
 								className={`flex-1 flex flex-col items-center py-3 transition-colors ${isScholar ? `cursor-pointer select-none group ${isShowingScholar ? "bg-dc-primary/5 dark:bg-dc-primary/10" : "hover:bg-dc-elevated/40 dark:hover:bg-zinc-800/40"}` : ""}`}
 								role={isScholar ? "button" : undefined}
 							>
@@ -238,7 +279,7 @@ export function TicketDetailsPage() {
 									{isScholar && (
 										<span
 											className={`flex items-center text-sm text-dc-text-muted group-hover:text-dc-primary transition-colors ${
-												isShowingScholar ? "scale-x-[-1]" : ""
+												isScholarPanelOpen ? "scale-x-[-1]" : ""
 											} transform duration-200`}
 										>
 											&rsaquo;
@@ -290,18 +331,18 @@ export function TicketDetailsPage() {
 					{activeTab === "Details" && (
 						<div className="flex flex-col gap-5">
 							<div>
-								<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-2">
+								<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-2">
 									Description
-								</h2>
+								</span>
 								<p className="text-sm text-dc-text dark:text-white leading-relaxed">
 									{ticket.description}
 								</p>
 							</div>
 							<div className="flex flex-row gap-12">
 								<div>
-									<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1">
+									<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1 mr-2">
 										Category
-									</h2>
+									</span>
 									<span
 										className={`text-xs px-2 py-0.5 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
 									>
@@ -309,9 +350,9 @@ export function TicketDetailsPage() {
 									</span>
 								</div>
 								<div>
-									<h2 className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1">
+									<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1 mr-2">
 										Due Date
-									</h2>
+									</span>
 									<span className="text-sm text-dc-text dark:text-white">
 										{formatDate(ticket.deadline) || "—"}
 									</span>
@@ -359,18 +400,32 @@ export function TicketDetailsPage() {
 				</div>
 			</div>
 
-			<div className="h-full flex flex-row gap-4 items-stretch shrink-0 transition-all duration-300">
-				{(isScholarPanelOpen || isScholarPanelHovered) && (
-					<ScholarInfoPanel
-						ticket={ticket}
-						onClose={() => {
-							setIsScholarPanelOpen(false);
-							setIsScholarPanelHovered(false);
-						}}
-					/>
+			<div className={`relative h-full flex flex-row items-stretch shrink-0`}>
+				{/* Hover Preview (Absolute Overlay - Floating) */}
+				{!isScholarPanelOpen && isScholarPanelHovered && (
+					<div className="absolute right-full mr-4 top-0 h-full z-50 drop-shadow-2xl">
+						<ScholarInfoPanel
+							ticket={ticket}
+							isOpen={true}
+							onClose={() => setIsScholarPanelHovered(false)}
+						/>
+					</div>
 				)}
 
-				{/* Info + actions + scholar info sidebar */}
+				{/* Clicked State (Permanently open, shifts information) */}
+				<div
+					className={`h-full flex items-stretch transition-all duration-300 ease-in-out ${
+						isScholarPanelOpen ? "w-full max-w-[20vw] mr-4" : "w-0 mr-0 overflow-hidden"
+					}`}
+				>
+					<ScholarInfoPanel
+						ticket={ticket}
+						isOpen={isScholarPanelOpen}
+						onClose={() => setIsScholarPanelOpen(false)}
+					/>
+				</div>
+
+				{/* Info + actions sidebar */}
 				<div className="h-full flex flex-col border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden bg-dc-surface dark:bg-dc-surface-dark shadow-dc-sm min-w-[14rem] max-w-[18rem]">
 					<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 					{role === "hr" && (

@@ -3,15 +3,22 @@ import type { TicketProps } from "./TicketCard";
 interface ScholarInfoPanelProps {
 	ticket: TicketProps;
 	onClose: () => void;
+	isOpen: boolean;
 }
 
-export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
+export function ScholarInfoPanel({ ticket, onClose, isOpen }: ScholarInfoPanelProps) {
 	if (!ticket.scholar) return null;
 
 	return (
-		<div className="h-full w-full max-w-[20vw] flex flex-col border border-dc-border dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-950 shadow-dc-sm animate-fade-in shrink-0">
+		<div
+			className={`h-full flex flex-col border border-dc-border dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-dc-sm overflow-hidden shrink-0 transition-all duration-300 ease-in-out ${
+				isOpen
+					? "w-full max-w-[20vw] opacity-100 border-l"
+					: "w-0 opacity-0 border-l-0 pointer-events-none"
+			}`}
+		>
 			{/* Panel Header */}
-			<div className="p-4 border-b border-dc-border dark:border-zinc-850 flex justify-between items-center bg-dc-elevated/30 dark:bg-zinc-900/40">
+			<div className="p-4 border-b border-dc-border dark:border-zinc-200 flex justify-between items-center bg-dc-elevated/30 dark:bg-zinc-900/40 min-w-[20vw]">
 				<div>
 					<span className="text-[10px] font-bold text-dc-text-muted tracking-wider block">
 						Scholar Info
@@ -29,13 +36,13 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 			</div>
 
 			{/* Panel Details Body */}
-			<div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-xs">
+			<div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 text-xs min-w-[20vw]">
 				{/* Academic Overview */}
 				<div className="flex flex-col gap-1.5">
 					<span className="text-[10px] font-bold text-dc-text-muted tracking-wider">
 						Academic Profile
 					</span>
-					<div className="bg-dc-surface dark:bg-zinc-900/30 p-3 rounded-xl border border-dc-border dark:border-zinc-850 space-y-2">
+					<div className="bg-dc-surface dark:bg-zinc-900/30 p-3 rounded-xl border border-dc-border dark:border-zinc-200 space-y-2">
 						<div>
 							<span className="text-dc-text-muted block">Student ID</span>
 							<span className="font-semibold text-dc-text dark:text-white">
@@ -68,7 +75,7 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 					<span className="text-[10px] font-bold text-dc-text-muted tracking-wider">
 						Scholarship Admin Info
 					</span>
-					<div className="bg-dc-surface dark:bg-zinc-900/30 p-3 rounded-xl border border-dc-border dark:border-zinc-850 space-y-2">
+					<div className="bg-dc-surface dark:bg-zinc-900/30 p-3 rounded-xl border border-dc-border dark:border-zinc-200 space-y-2">
 						<div>
 							<span className="text-dc-text-muted block">Scholarship Type</span>
 							<span className="font-semibold text-dc-primary">
@@ -96,7 +103,7 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 						Contact Information
 					</span>
 					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-850 bg-dc-elevated/40 hover:bg-dc-elevated dark:hover:bg-zinc-900 transition-all">
+						<div className="cursor-pointer flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-200 bg-dc-elevated/40 dark:bg-zinc-900/30 hover:bg-dc-elevated dark:hover:bg-zinc-600/30 transition-all text-dc-text dark:text-white">
 							<svg
 								viewBox="0 0 24 24"
 								fill="none"
@@ -113,13 +120,13 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 								<line x1="15" y1="13" x2="18" y2="13" />
 							</svg>
 							Preferred Contact:
-							<span className="truncate text-dc-text-muted hover:text-dc-text dark:hover:text-white">
+							<span className="truncate text-dc-text-muted">
 								{ticket.scholar.preferredContact || "-"}
 							</span>
 						</div>
 						<a
 							href={`mailto:${ticket.scholar.email}`}
-							className="flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-850 bg-dc-elevated/40 hover:bg-dc-elevated dark:hover:bg-zinc-900 transition-all"
+							className="flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-200 bg-dc-elevated/40 dark:bg-zinc-900/30 hover:bg-dc-elevated dark:hover:bg-zinc-600/30 transition-all text-dc-text dark:text-white"
 						>
 							<svg
 								viewBox="0 0 24 24"
@@ -141,7 +148,7 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 						{ticket.scholar.phone && (
 							<a
 								href={`tel:${ticket.scholar.phone}`}
-								className="flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-850 bg-dc-elevated/40 hover:bg-dc-elevated dark:hover:bg-zinc-900 transition-all"
+								className="flex items-center gap-1 p-2 rounded-lg border border-dc-border dark:border-zinc-200 bg-dc-elevated/40 dark:bg-zinc-900/30 hover:bg-dc-elevated dark:hover:bg-zinc-600/30 transition-all text-dc-text dark:text-white"
 							>
 								<svg
 									viewBox="0 0 24 24"
@@ -155,7 +162,7 @@ export function ScholarInfoPanel({ ticket, onClose }: ScholarInfoPanelProps) {
 									<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
 								</svg>
 								Phone No.:
-								<span className="truncate text-dc-text-muted">
+								<span className="truncate text-dc-text-muted hover:text-dc-text dark:hover:text-white">
 									{ticket.scholar.phone}
 								</span>
 							</a>
