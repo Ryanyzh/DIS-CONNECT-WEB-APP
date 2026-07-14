@@ -54,6 +54,7 @@ export function TicketDetailsPage() {
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
 
 	const [isScholarPanelOpen, setIsScholarPanelOpen] = useState<boolean>(false);
+	const [isScholarPanelHovered, setIsScholarPanelHovered] = useState<boolean>(false);
 
 	const [showErrorPopup, setShowErrorPopup] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<string>("");
@@ -215,6 +216,7 @@ export function TicketDetailsPage() {
 						{ value: ticket.officer?.name ?? "Unassigned", label: "Officer" },
 					].map(({ value, label }) => {
 						const isScholar = label === "Scholar";
+						const isShowingScholar = isScholarPanelOpen || isScholarPanelHovered;
 
 						return (
 							<div
@@ -224,17 +226,19 @@ export function TicketDetailsPage() {
 										? () => setIsScholarPanelOpen(!isScholarPanelOpen)
 										: undefined
 								}
-								className={`flex-1 flex flex-col items-center py-3 transition-colors ${isScholar ? `cursor-pointer select-none group ${isScholarPanelOpen ? "bg-dc-primary/5 dark:bg-dc-primary/10" : "hover:bg-dc-elevated/40 dark:hover:bg-zinc-800/40"}` : ""}`}
+								onMouseEnter={isScholar ? () => setIsScholarPanelHovered(true) : undefined}
+								onMouseLeave={isScholar ? () => setIsScholarPanelHovered(false) : undefined}
+								className={`flex-1 flex flex-col items-center py-3 transition-colors ${isScholar ? `cursor-pointer select-none group ${isShowingScholar ? "bg-dc-primary/5 dark:bg-dc-primary/10" : "hover:bg-dc-elevated/40 dark:hover:bg-zinc-800/40"}` : ""}`}
 								role={isScholar ? "button" : undefined}
 							>
 								<span
-									className={`text-sm font-semibold flex items-center gap-1.5 transition-colors ${isScholar && isScholarPanelOpen ? "text-dc-primary" : "text-dc-text dark:text-white"}`}
+									className={`text-sm font-semibold flex items-center gap-1.5 transition-colors ${isScholar && isShowingScholar ? "text-dc-primary" : "text-dc-text dark:text-white"}`}
 								>
 									{value}
 									{isScholar && (
 										<span
 											className={`flex items-center text-sm text-dc-text-muted group-hover:text-dc-primary transition-colors ${
-												isScholarPanelOpen ? "scale-x-[-1]" : ""
+												isShowingScholar ? "scale-x-[-1]" : ""
 											} transform duration-200`}
 										>
 											&rsaquo;
@@ -242,7 +246,7 @@ export function TicketDetailsPage() {
 									)}
 								</span>
 								<span
-									className={`text-xs mt-0.5 transition-colors ${isScholar && isScholarPanelOpen ? "text-dc-primary/85" : "text-dc-text-muted"}`}
+									className={`text-xs mt-0.5 transition-colors ${isScholar && isShowingScholar ? "text-dc-primary/85" : "text-dc-text-muted"}`}
 								>
 									{label}
 								</span>
@@ -356,10 +360,13 @@ export function TicketDetailsPage() {
 			</div>
 
 			<div className="h-full flex flex-row gap-4 items-stretch shrink-0 transition-all duration-300">
-				{isScholarPanelOpen && (
+				{(isScholarPanelOpen || isScholarPanelHovered) && (
 					<ScholarInfoPanel
 						ticket={ticket}
-						onClose={() => setIsScholarPanelOpen(false)}
+						onClose={() => {
+							setIsScholarPanelOpen(false);
+							setIsScholarPanelHovered(false);
+						}}
 					/>
 				)}
 
