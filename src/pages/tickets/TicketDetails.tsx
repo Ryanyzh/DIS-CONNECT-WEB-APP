@@ -400,10 +400,10 @@ export function TicketDetailsPage() {
 				</div>
 			</div>
 
-			<div className={`relative h-full flex flex-row items-stretch shrink-0`}>
-				{/* Hover Preview (Absolute Overlay - Floating) */}
+			<div className="h-full flex flex-row items-stretch shrink-0 relative">
+				{/* Scholar info hover preview (Absolute overlay, floats above other content) */}
 				{!isScholarPanelOpen && isScholarPanelHovered && (
-					<div className="absolute right-full mr-4 top-0 h-full z-50 drop-shadow-2xl">
+					<div className="absolute right-full mr-4 top-0 bottom-0 h-full z-50 drop-shadow-2xl">
 						<ScholarInfoPanel
 							ticket={ticket}
 							isOpen={true}
@@ -412,21 +412,25 @@ export function TicketDetailsPage() {
 					</div>
 				)}
 
-				{/* Clicked State (Permanently open, shifts information) */}
+				{/* Scholar info clicked state (opens right-to-left, pushes content) */}
 				<div
-					className={`h-full flex items-stretch transition-all duration-300 ease-in-out ${
-						isScholarPanelOpen ? "w-full max-w-[20vw] mr-4" : "w-0 mr-0 overflow-hidden"
+					className={`h-full flex justify-start items-stretch transition-all duration-300 ease-in-out ${
+						isScholarPanelOpen
+							? "w-[20vw] mr-4 opacity-100"
+							: "w-0 mr-0 opacity-0 overflow-hidden"
 					}`}
 				>
-					<ScholarInfoPanel
-						ticket={ticket}
-						isOpen={isScholarPanelOpen}
-						onClose={() => setIsScholarPanelOpen(false)}
-					/>
+					<div className="h-full shrink-0">
+						<ScholarInfoPanel
+							ticket={ticket}
+							isOpen={isScholarPanelOpen}
+							onClose={() => setIsScholarPanelOpen(false)}
+						/>
+					</div>
 				</div>
 
-				{/* Info + actions sidebar */}
-				<div className="h-full flex flex-col border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden bg-dc-surface dark:bg-dc-surface-dark shadow-dc-sm min-w-[14rem] max-w-[18rem]">
+				{/* Ticket Info + Actions Sidebar */}
+				<div className="h-full flex flex-col border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden bg-dc-surface dark:bg-dc-surface-dark shadow-dc-sm min-w-[14rem] max-w-[18rem] shrink-0">
 					<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
 					{role === "hr" && (
 						<ActionsPanel
@@ -441,7 +445,7 @@ export function TicketDetailsPage() {
 			{/* Error popup for non-assigned officers */}
 			{showErrorPopup && (
 				<div className="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-red-600 text-white px-5 py-3 rounded-lg shadow-xl animate-fade-in-up border border-red-700">
-					<div className="flex flex-col text-sm font-medium">{errorMessage}</div>
+					<div className="flex flex-col text-sm">{errorMessage}</div>
 
 					{/* Manual Close Button */}
 					<button
