@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { TicketDetailsPage } from "../TicketDetails";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -257,7 +257,8 @@ describe("TicketDetailsPage System Test", () => {
 		expect(ticketCode[0]).toBeInTheDocument();
 
 		// Scholar name
-		expect(screen.getByText("Ryan Tan")).toBeInTheDocument();
+		const scholarButton = await screen.findByRole("button", { name: /Ryan Tan/i });
+		expect(scholarButton).toBeInTheDocument();
 
 		// Ticket description
 		expect(
@@ -432,7 +433,11 @@ describe("TicketDetailsPage System Test", () => {
 		expect(errorPopup).toBeInTheDocument();
 
 		// Find and click the close button
-		const closeButton = screen.queryByRole("button", { name: /×/ }) || screen.getByText("×");
+		const popupContainer = errorPopup.closest(".fixed");
+		expect(popupContainer).not.toBeNull();
+		const closeButton = within(popupContainer as HTMLElement).getByRole("button", {
+			name: /×/,
+		});
 		fireEvent.click(closeButton);
 
 		// Verify that the error popup is gone after clicking close button
@@ -521,5 +526,58 @@ describe("TicketDetailsPage System Test", () => {
 		expect(assignmentRequest![1]?.body).toContain("yUyM8PdgOzcPTvIfSPuEt8HOmm83");
 
 		fetchSpy.mockRestore();
+	});
+
+	it("displays scholar info when scholar button is clicked, or hovered after a delay", async () => {
+		render(
+			<MemoryRouter initialEntries={["/tickets/64e57d1e-e7ce-4aa9-a163-b4604559c218"]}>
+				<Routes>
+					<Route path="/tickets/:ticketId" element={<TicketDetailsPage />} />
+				</Routes>
+			</MemoryRouter>
+		);
+
+		// Find the scholar button
+		const scholarButton = await screen.findByRole("button", { name: /Ryan Tan/i });
+		expect(scholarButton).toBeInTheDocument();
+
+		// Find the permanent clicked state panel wrapper container (should be opacity-0 and w-0 before clicking)
+		const permanentPanelContainer = screen.getByText("Scholar Info").closest(".transition-all");
+		expect(permanentPanelContainer).toHaveClass("opacity-0");
+		expect(permanentPanelContainer).toHaveClass("w-0");
+
+		// Enable fake timers for hover
+		vi.useFakeTimers();
+
+		// Test hover behaviour (with 400ms delay)
+		fireEvent.mouseEnter(scholarButton);
+
+		// Fast-forward 400ms inside act() to execute the update
+		act(() => {
+			vi.advanceTimersByTime(400);
+		});
+
+		// Hover overlay should be rendered, should now have 2 instances of the text in DOM
+		expect(screen.getAllByText("Scholar Info")).toHaveLength(2);
+
+		// Mouse leaves, should update and hover overlay should disappear
+		act(() => {
+			fireEvent.mouseLeave(scholarButton);
+		});
+		expect(screen.getAllByText("Scholar Info")).toHaveLength(1);
+
+		// Test Click Behavior (permanently open)
+		// Click should update to open the scholar info panel instantly
+		act(() => {
+			fireEvent.click(scholarButton);
+		});
+
+		// Assert that the clicked permanent panel container is now active (should have opacity-100 now)
+		expect(permanentPanelContainer).toHaveClass("opacity-100");
+		expect(permanentPanelContainer).not.toHaveClass("opacity-0");
+		expect(permanentPanelContainer).not.toHaveClass("w-0");
+
+		// Clean up and restore real timers
+		vi.useRealTimers();
 	});
 });
