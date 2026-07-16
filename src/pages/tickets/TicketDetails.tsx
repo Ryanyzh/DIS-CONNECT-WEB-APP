@@ -193,9 +193,9 @@ export function TicketDetailsPage() {
 
 				{/* Title and status */}
 				<div className="flex flex-row items-start gap-3 justify-between">
-					<h1 className="text-xl font-bold text-dc-text dark:text-white leading-snug">
+					<span className="text-xl font-bold text-dc-text dark:text-white leading-snug">
 						{ticket.title}
-					</h1>
+					</span>
 					<span
 						className={`shrink-0 text-sm font-semibold px-2.5 py-1 rounded-md ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}
 					>
