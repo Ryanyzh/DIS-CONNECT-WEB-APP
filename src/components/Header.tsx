@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { InboxDropdown } from "./users/InboxDropdown";
 
 interface HeaderProps {
 	darkMode: boolean;
@@ -119,6 +120,10 @@ export default function Header({ onToggleDarkMode }: HeaderProps) {
 						</svg>
 					</button>
 
+					{/* Inbox Dropdown */}
+					<InboxDropdown />
+
+					{/* Profile / Account Dropdown */}
 					<div className="relative" ref={userMenuRef}>
 						<button
 							type="button"
