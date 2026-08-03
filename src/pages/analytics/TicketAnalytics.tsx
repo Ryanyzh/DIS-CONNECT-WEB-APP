@@ -5,11 +5,11 @@ import type { TicketProps, TicketStatus } from "../../components/tickets/TicketC
 
 // ── Mock fallback data ────────────────────────────────────────────────────────
 
-const daysAgo = (n: number) => {
-	const d = new Date();
-	d.setDate(d.getDate() - n);
-	return d.toISOString();
-};
+// const daysAgo = (n: number) => {
+// 	const d = new Date();
+// 	d.setDate(d.getDate() - n);
+// 	return d.toISOString();
+// };
 
 // const OFFICERS = [
 // 	{
