@@ -18,7 +18,7 @@ interface Message {
 export function ConversationTab({ ticketId }: { ticketId: string | undefined }) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [newMessage, setNewMessage] = useState<string>("");
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 	const [sending, setSending] = useState<boolean>(false);
 
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -113,17 +113,27 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 		};
 	};
 
+	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			const newFiles = Array.from(e.target.files);
+			setSelectedFiles((prev) => [...prev, ...newFiles]);
+		}
+		// Reset input value
+		if (fileInputRef.current) fileInputRef.current.value = "";
+	};
+
+	const removeFile = (idxRemove: number) => {
+		setSelectedFiles((prev) => prev.filter((_, idx) => idx !== idxRemove));
+	};
+
 	const sendMessage = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if ((!newMessage.trim() && !selectedFile) || sending) return;
+		if ((!newMessage.trim() && selectedFiles.length === 0) || sending) return;
 		try {
 			setSending(true);
-			let attachmentsPayload: TicketAttachment[] = [];
-
-			if (selectedFile) {
-				const uploadedAttachment = await uploadFileToStorage(selectedFile);
-				attachmentsPayload.push(uploadedAttachment);
-			}
+			const attachmentsPayload: TicketAttachment[] = await Promise.all(
+				selectedFiles.map((file) => uploadFileToStorage(file))
+			);
 
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`, {
 				method: "POST",
@@ -137,8 +147,7 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 			if (!response.ok) throw new Error(`Failed to send message ${response.status}`);
 
 			setNewMessage("");
-			setSelectedFile(null);
-			if (fileInputRef.current) fileInputRef.current.value = "";
+			setSelectedFiles([]);
 
 			await fetchMessages();
 		} catch (error) {
@@ -231,20 +240,24 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 				onSubmit={sendMessage}
 				className="flex flex-col pt-3 border-t border-dc-border dark:border-dc-border-dark mt-2 gap-2"
 			>
-				{/* Attachment Preview Badge */}
-				{selectedFile && (
-					<div className="flex items-center gap-2 px-3 py-1 bg-dc-elevated dark:bg-dc-elevated-dark border border-dc-border dark:border-dc-border-dark rounded-lg w-fit text-xs text-dc-text dark:text-white">
-						<span className="truncate max-w-[200px]">{selectedFile.name}</span>
-						<button
-							type="button"
-							onClick={() => {
-								setSelectedFile(null);
-								if (fileInputRef.current) fileInputRef.current.value = "";
-							}}
-							className="text-dc-text-muted hover:text-red-500 font-bold ml-1"
-						>
-							&times;
-						</button>
+				{/* Attachment Preview Badges */}
+				{selectedFiles.length > 0 && (
+					<div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto p-1">
+						{selectedFiles.map((file, index) => (
+							<div
+								key={`${file.name}-${index}`}
+								className="flex items-center gap-2 px-3 py-1 bg-dc-elevated dark:bg-dc-elevated-dark border border-dc-border dark:border-dc-border-dark rounded-lg text-xs text-dc-text dark:text-white"
+							>
+								<span className="truncate max-w-[150px]">{file.name}</span>
+								<button
+									type="button"
+									onClick={() => removeFile(index)}
+									className="text-dc-text-muted hover:text-red-500 font-bold ml-1 transition-colors"
+								>
+									&times;
+								</button>
+							</div>
+						))}
 					</div>
 				)}
 
@@ -252,13 +265,10 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 					{/* Hidden file input */}
 					<input
 						type="file"
+						multiple
 						ref={fileInputRef}
 						className="hidden"
-						onChange={(e) => {
-							if (e.target.files && e.target.files[0]) {
-								setSelectedFile(e.target.files[0]);
-							}
-						}}
+						onChange={handleFileSelect}
 					/>
 
 					<div className="flex flex-1 gap-2 justify-between border border-dc-border dark:border-dc-border-dark rounded-lg bg-dc-surface dark:bg-dc-surface-dark">
@@ -278,7 +288,7 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 							onClick={() => fileInputRef.current?.click()}
 							disabled={sending}
 							className="mx-2 text-dc-text-muted text-xl hover:text-dc-primary rounded-lg transition-colors"
-							title="Attach a file"
+							title="Attach files"
 						>
 							+
 						</button>
@@ -287,7 +297,7 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 					{/* Send button */}
 					<button
 						type="submit"
-						disabled={(!newMessage.trim() && !selectedFile) || sending}
+						disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending}
 						className="btn-gradient disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
 					>
 						{sending ? "Sending…" : "Send"}
