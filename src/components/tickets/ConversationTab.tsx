@@ -3,6 +3,7 @@ import type { TicketAttachment } from "../../types/TicketAttachment";
 import { apiFetch } from "../../lib/apiFetch";
 import { getDatabase, ref as rtdbRef, onValue } from "firebase/database";
 import { app } from "../../lib/firebase";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 interface Message {
 	message_id: string;
@@ -17,8 +18,10 @@ interface Message {
 export function ConversationTab({ ticketId }: { ticketId: string | undefined }) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [newMessage, setNewMessage] = useState<string>("");
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [sending, setSending] = useState<boolean>(false);
 
+	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
 	async function fetchMessages() {
@@ -91,18 +94,52 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 		);
 	}
 
+	const uploadFileToStorage = async (file: File): Promise<TicketAttachment> => {
+		const storage = getStorage(app);
+		const fileId = crypto.randomUUID();
+		const filePath = `tickets/${ticketId}/chat/${fileId}_${file.name}`;
+		const fileStorageRef = storageRef(storage, filePath);
+
+		await uploadBytes(fileStorageRef, file);
+		const fileUrl = await getDownloadURL(fileStorageRef);
+
+		return {
+			attachment_id: fileId,
+			file_name: file.name,
+			file_path: fileUrl,
+			file_type: file.type,
+			file_size: file.size,
+			uploaded_at: new Date().toISOString(),
+		};
+	};
+
 	const sendMessage = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!newMessage.trim() || sending) return;
+		if ((!newMessage.trim() && !selectedFile) || sending) return;
 		try {
 			setSending(true);
+			let attachmentsPayload: TicketAttachment[] = [];
+
+			if (selectedFile) {
+				const uploadedAttachment = await uploadFileToStorage(selectedFile);
+				attachmentsPayload.push(uploadedAttachment);
+			}
+
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/messages`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ message_text: newMessage }),
+				body: JSON.stringify({
+					message_text: newMessage,
+					attachments: attachmentsPayload,
+				}),
 			});
+
 			if (!response.ok) throw new Error(`Failed to send message ${response.status}`);
+
 			setNewMessage("");
+			setSelectedFile(null);
+			if (fileInputRef.current) fileInputRef.current.value = "";
+
 			await fetchMessages();
 		} catch (error) {
 			console.error("Error sending message: ", error);
@@ -133,7 +170,53 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 										: "rounded-tr-none bg-dc-primary text-white"
 								}`}
 							>
-								{message.message_text}
+								{/* Message text */}
+								{message.message_text && <p>{message.message_text}</p>}
+
+								{/* File attachments */}
+								{message.attachments && message.attachments.length > 0 && (
+									<div className="mt-2 flex flex-col gap-2">
+										{message.attachments.map((attachment) => {
+											const isImage =
+												attachment.file_type.startsWith("image/");
+											return (
+												<div
+													key={
+														attachment.attachment_id ||
+														attachment.file_path
+													}
+												>
+													{isImage ? (
+														<a
+															href={attachment.file_path}
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															<img
+																src={attachment.file_path}
+																alt={attachment.file_name}
+																className="max-w-full max-h-48 rounded-lg object-cover border border-black/10 dark:border-white/10 hover:opacity-90 transition-opacity"
+															/>
+														</a>
+													) : (
+														<a
+															href={attachment.file_path}
+															target="_blank"
+															rel="noopener noreferrer"
+															className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs underline transition-colors ${
+																isScholar
+																	? "bg-dc-surface dark:bg-dc-surface-dark text-dc-primary"
+																	: "bg-white/20 text-white hover:bg-white/30"
+															}`}
+														>
+															{attachment.file_name}
+														</a>
+													)}
+												</div>
+											);
+										})}
+									</div>
+								)}
 							</div>
 							<span className="text-xs text-dc-text-muted mt-1 mx-1 tracking-wide">
 								{message.sender_name} · {message.created_at.toLocaleString("en-SG")}
@@ -146,23 +229,70 @@ export function ConversationTab({ ticketId }: { ticketId: string | undefined }) 
 			{/* Send form */}
 			<form
 				onSubmit={sendMessage}
-				className="flex gap-2 items-center pt-3 border-t border-dc-border dark:border-dc-border-dark mt-2"
+				className="flex flex-col pt-3 border-t border-dc-border dark:border-dc-border-dark mt-2 gap-2"
 			>
-				<input
-					type="text"
-					value={newMessage}
-					onChange={(e) => setNewMessage(e.target.value)}
-					placeholder="Type a message..."
-					className="flex-1 text-sm border border-dc-border dark:border-dc-border-dark rounded-lg px-4 py-2 bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white placeholder:text-dc-text-muted focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
-					disabled={sending}
-				/>
-				<button
-					type="submit"
-					disabled={!newMessage.trim() || sending}
-					className="btn-gradient disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
-				>
-					{sending ? "Sending…" : "Send"}
-				</button>
+				{/* Attachment Preview Badge */}
+				{selectedFile && (
+					<div className="flex items-center gap-2 px-3 py-1 bg-dc-elevated dark:bg-dc-elevated-dark border border-dc-border dark:border-dc-border-dark rounded-lg w-fit text-xs text-dc-text dark:text-white">
+						<span className="truncate max-w-[200px]">{selectedFile.name}</span>
+						<button
+							type="button"
+							onClick={() => {
+								setSelectedFile(null);
+								if (fileInputRef.current) fileInputRef.current.value = "";
+							}}
+							className="text-dc-text-muted hover:text-red-500 font-bold ml-1"
+						>
+							&times;
+						</button>
+					</div>
+				)}
+
+				<div className="flex gap-2 items-center">
+					{/* Hidden file input */}
+					<input
+						type="file"
+						ref={fileInputRef}
+						className="hidden"
+						onChange={(e) => {
+							if (e.target.files && e.target.files[0]) {
+								setSelectedFile(e.target.files[0]);
+							}
+						}}
+					/>
+
+					<div className="flex flex-1 gap-2 justify-between border border-dc-border dark:border-dc-border-dark rounded-lg bg-dc-surface dark:bg-dc-surface-dark">
+						{/* Text input */}
+						<input
+							type="text"
+							value={newMessage}
+							onChange={(e) => setNewMessage(e.target.value)}
+							placeholder="Type a message..."
+							className="flex-1 text-sm mx-4 py-2 bg-dc-surface dark:bg-dc-surface-dark text-dc-text dark:text-white placeholder:text-dc-text-muted focus:outline-none transition-colors"
+							disabled={sending}
+						/>
+
+						{/* Attach button */}
+						<button
+							type="button"
+							onClick={() => fileInputRef.current?.click()}
+							disabled={sending}
+							className="mx-2 text-dc-text-muted text-xl hover:text-dc-primary rounded-lg transition-colors"
+							title="Attach a file"
+						>
+							+
+						</button>
+					</div>
+
+					{/* Send button */}
+					<button
+						type="submit"
+						disabled={(!newMessage.trim() && !selectedFile) || sending}
+						className="btn-gradient disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0"
+					>
+						{sending ? "Sending…" : "Send"}
+					</button>
+				</div>
 			</form>
 		</div>
 	);
