@@ -104,8 +104,7 @@ export const priorityStyles: Record<number, string> = {
 };
 
 // ─── List view ────────────────────────────────────────────────────────────────
-// Uses a CSS grid with fixed column widths so every row aligns perfectly
-// regardless of missing values. Empty cells render a "—" placeholder.
+// Uses a CSS grid with fixed column widths so every row aligns properly even with missing values
 
 function ListCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
@@ -121,12 +120,12 @@ function ListCard({ ticket }: TicketCardProps) {
 			onClick={() => navigate(`/tickets/${ticket.id}`)}
 			className="group bg-dc-surface dark:bg-zinc-900 rounded-xl border border-dc-border dark:border-zinc-800 shadow-dc-sm hover:shadow-dc-md hover:border-dc-primary/40 dark:hover:border-dc-primary/60 transition-all cursor-pointer flex items-stretch overflow-hidden"
 		>
-			{/* Status stripe — always rendered, gives instant color cue */}
+			{/* Status stripe — displays colour corresponding to ticket status */}
 			<div
 				className={`w-1 flex-shrink-0 ${ticket.isEscalated ? "bg-red-500" : statusStripeStyles[ticket.status]}`}
 			/>
 
-			{/* Fixed-width grid — columns never shift when values are absent */}
+			{/* Fixed-width grid */}
 			<div
 				className="grid items-center gap-x-3 px-4 py-3 w-full min-w-0"
 				style={{ gridTemplateColumns: LIST_GRID_COLS }}
@@ -141,7 +140,7 @@ function ListCard({ ticket }: TicketCardProps) {
 					</span>
 				</div>
 
-				{/* Col 2 – Category pill */}
+				{/* Col 2 – Category */}
 				<div>
 					<span
 						className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${categoryStyles[ticket.category] ?? CATEGORY_FALLBACK}`}
@@ -165,7 +164,7 @@ function ListCard({ ticket }: TicketCardProps) {
 					)}
 				</div>
 
-				{/* Col 4 – Deadline (dash placeholder keeps column width stable) */}
+				{/* Col 4 – Deadline (uses "-" as placeholder for tickets with no deadline) */}
 				<div>
 					{formatDate(ticket.deadline) ? (
 						<span
@@ -178,7 +177,7 @@ function ListCard({ ticket }: TicketCardProps) {
 					)}
 				</div>
 
-				{/* Col 5 – Priority pill */}
+				{/* Col 5 – Priority */}
 				<div>
 					<span
 						className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${priorityStyles[ticket.priority]}`}
@@ -187,7 +186,7 @@ function ListCard({ ticket }: TicketCardProps) {
 					</span>
 				</div>
 
-				{/* Col 6 – Status pill (abbreviated to fit fixed column) */}
+				{/* Col 6 – Status */}
 				<div>
 					<span
 						className={`inline-flex items-center text-[11px] font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}
@@ -216,8 +215,7 @@ function ListCard({ ticket }: TicketCardProps) {
 }
 
 // ─── Card view ────────────────────────────────────────────────────────────────
-// Visual card for grid layout — full status name, 2-line title, footer with
-// assignee and deadline always rendered so card heights stay consistent.
+// Visual card for grid layout — 2-line title, footer with assignee and deadline
 
 function CardView({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
@@ -235,13 +233,13 @@ function CardView({ ticket }: TicketCardProps) {
 			onClick={() => navigate(`/tickets/${ticket.id}`)}
 			className="group bg-dc-surface dark:bg-zinc-900 rounded-xl border border-dc-border dark:border-zinc-800 shadow-dc-sm hover:shadow-dc-md hover:border-dc-primary/40 dark:hover:border-dc-primary/60 transition-all cursor-pointer overflow-hidden min-h-[165px] flex flex-col"
 		>
-			{/* Thin top stripe */}
+			{/* Thin top stripe - displays colour corresponding to ticket status */}
 			<div
 				className={`h-0.5 flex-shrink-0 ${ticket.isEscalated ? "bg-red-600" : statusStripeStyles[ticket.status]}`}
 			/>
 
 			<div className="p-3 flex flex-col gap-2 flex-1">
-				{/* Row 1: code + abbreviated status */}
+				{/* Row 1: code + status */}
 				<div className="flex items-center justify-between gap-2">
 					<span className="text-[10px] font-mono tracking-widest text-dc-text-muted leading-none">
 						{ticket.code}
@@ -272,7 +270,7 @@ function CardView({ ticket }: TicketCardProps) {
 					</span>
 				</div>
 
-				{/* Row 4: footer — assignee | deadline — mt-auto keeps it pinned to bottom */}
+				{/* Row 4: footer — assignee + deadline */}
 				<div className="flex items-center justify-between gap-2 mt-auto pt-2 border-t border-dc-border dark:border-zinc-800">
 					{ticket.officer ? (
 						<span
