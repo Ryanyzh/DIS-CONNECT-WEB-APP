@@ -6,9 +6,8 @@ import {
 	type PlacementType,
 	type PlacementStatus,
 	PLACEMENT_STATUSES,
-	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
-import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import { useScholars } from "../../hooks/useScholars";
 import PageShell from "../PageShell";
 
 const EMPTY_FORM: ExchangePlacementFormData = {
@@ -40,6 +39,7 @@ export function ScholarExchangeFormPage() {
 	const navigate = useNavigate();
 	const isEditing = Boolean(id);
 
+	const { scholars } = useScholars();
 	const [form, setForm] = useState<ExchangePlacementFormData>(EMPTY_FORM);
 	const [loading, setLoading] = useState(isEditing);
 	const [submitting, setSubmitting] = useState(false);
@@ -69,25 +69,7 @@ export function ScholarExchangeFormPage() {
 				});
 			})
 			.catch(() => {
-				const mock = MOCK_PLACEMENTS.find((p) => p.id === id);
-				if (mock) {
-					setForm({
-						type: mock.type,
-						scholarId: mock.scholarId,
-						hostInstitution: mock.hostInstitution,
-						country: mock.country,
-						city: mock.city,
-						startDate: mock.startDate,
-						endDate: mock.endDate,
-						status: mock.status,
-						academicCredits: mock.academicCredits?.toString() ?? "",
-						department: mock.department ?? "",
-						supervisorName: mock.supervisorName ?? "",
-						notes: mock.notes ?? "",
-					});
-				} else {
-					setError("Placement not found.");
-				}
+				setError("Placement not found.");
 			})
 			.finally(() => setLoading(false));
 	}, [id, isEditing]);
@@ -102,7 +84,7 @@ export function ScholarExchangeFormPage() {
 		setError(null);
 		setSubmitting(true);
 
-		const scholar = MOCK_SCHOLARS.find((s) => s.id === form.scholarId);
+		const scholar = scholars.find((s) => s.id === form.scholarId);
 		const payload = {
 			...form,
 			scholarName: scholar?.name ?? "",
@@ -213,7 +195,7 @@ export function ScholarExchangeFormPage() {
 										className={selectClass}
 									>
 										<option value="">Select a scholar…</option>
-										{MOCK_SCHOLARS.map((s) => (
+										{scholars.map((s) => (
 											<option key={s.id} value={s.id}>
 												{s.name} — {s.studentId}
 											</option>

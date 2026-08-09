@@ -36,6 +36,7 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
 
 export function TicketInfoPanel({ ticket, officer }: TicketInfoPanelProps) {
     const isOverdue =
+        !!ticket.deadline &&
         new Date(ticket.deadline) < new Date() &&
         ticket.status !== "Resolved" &&
         ticket.status !== "Closed";

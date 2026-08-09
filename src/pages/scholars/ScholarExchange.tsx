@@ -8,7 +8,6 @@ import {
 	type PlacementStatus,
 	placementStatusConfig,
 	placementTypeConfig,
-	MOCK_PLACEMENTS,
 } from "../../types/ExchangePlacement";
 import { getInitials, formatDate } from "../../types/Scholar";
 
@@ -183,8 +182,7 @@ export function ScholarExchangePage() {
 			})
 			.then((data: ExchangePlacement[]) => setPlacements(data))
 			.catch(() => {
-				// Backend not ready — fall back to mock data
-				setPlacements(MOCK_PLACEMENTS);
+				setError("Failed to load placements.");
 			})
 			.finally(() => setLoading(false));
 	}, []);
@@ -208,8 +206,7 @@ export function ScholarExchangePage() {
 			if (!res.ok) throw new Error();
 			setPlacements((prev) => prev.filter((p) => p.id !== placement.id));
 		} catch {
-			// Optimistic remove for mock data
-			setPlacements((prev) => prev.filter((p) => p.id !== placement.id));
+			alert("Failed to delete placement. Please try again.");
 		} finally {
 			setDeletingId(null);
 		}

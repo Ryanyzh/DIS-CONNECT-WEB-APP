@@ -1,12 +1,15 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+	type Scholar,
 	scholarStatusConfig,
 	ticketStatusConfig,
 	ticketCategoryConfig,
 	getInitials,
 	formatDate,
 } from "../../types/Scholar";
-import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import { apiFetch } from "../../lib/apiFetch";
+import { normalizeScholar } from "../../hooks/useScholars";
 import PageShell from "../PageShell";
 
 const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
@@ -32,7 +35,29 @@ export function ScholarDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 
-	const scholar = MOCK_SCHOLARS.find((s) => s.id === id);
+	const [scholar, setScholar] = useState<Scholar | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		if (!id) return;
+		setLoading(true);
+		apiFetch(`/api/v1/scholars/${id}`)
+			.then((res) => {
+				if (!res.ok) throw new Error(`${res.status}`);
+				return res.json();
+			})
+			.then((data) => setScholar(normalizeScholar(data)))
+			.catch(() => setScholar(null))
+			.finally(() => setLoading(false));
+	}, [id]);
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center py-24">
+				<span className="text-zinc-400 text-sm">Loading…</span>
+			</div>
+		);
+	}
 
 	if (!scholar) {
 		return (
