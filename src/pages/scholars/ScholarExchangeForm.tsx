@@ -105,7 +105,7 @@ export function ScholarExchangeFormPage() {
 			if (!res.ok) throw new Error();
 			navigate("/scholars/exchange");
 		} catch {
-			navigate("/scholars/exchange");
+			setError("Failed to save placement. Please try again.");
 		} finally {
 			setSubmitting(false);
 		}
