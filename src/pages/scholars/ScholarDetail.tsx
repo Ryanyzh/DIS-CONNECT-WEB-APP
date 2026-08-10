@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-	type Scholar,
 	scholarStatusConfig,
 	ticketStatusConfig,
 	ticketCategoryConfig,
 	getInitials,
 	formatDate,
 } from "../../types/Scholar";
-import { apiFetch } from "../../lib/apiFetch";
-import { normalizeScholar } from "../../hooks/useScholars";
+import { useScholars } from "../../hooks/useScholars";
 import PageShell from "../PageShell";
 
 const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
@@ -34,27 +31,14 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export function ScholarDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const { scholars, loading } = useScholars();
 
-	const [scholar, setScholar] = useState<Scholar | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		if (!id) return;
-		setLoading(true);
-		apiFetch(`/api/v1/scholars/${id}`)
-			.then((res) => {
-				if (!res.ok) throw new Error(`${res.status}`);
-				return res.json();
-			})
-			.then((data) => setScholar(normalizeScholar(data)))
-			.catch(() => setScholar(null))
-			.finally(() => setLoading(false));
-	}, [id]);
+	const scholar = scholars.find((s) => s.id === id);
 
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center py-24">
-				<span className="text-zinc-400 text-sm">Loading…</span>
+				<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
 			</div>
 		);
 	}
@@ -102,7 +86,7 @@ export function ScholarDetailPage() {
 			{/* Profile hero */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-sm">
 				<div className="flex items-start gap-5">
-					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-semibold flex-shrink-0">
+					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
 						{getInitials(scholar.name)}
 					</div>
 					<div className="flex-1 min-w-0">

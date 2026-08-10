@@ -350,9 +350,9 @@ export function CreateStudentAccountPage() {
 									className={inputClass}
 								>
 									<option value="">Select contact method</option>
-									<option value="email">Email</option>
-									<option value="phone">Phone</option>
-									<option value="sms">SMS</option>
+									<option value="Email">Email</option>
+									<option value="Phone">Phone</option>
+									<option value="SMS">SMS</option>
 								</select>
 							</div>
 							<div>

@@ -12,6 +12,7 @@ export interface ScholarExchange {
 
 export interface ScholarTicket {
 	id: string;
+	code: string; // human-readable ticket code, e.g. TKT-2026-AB1234
 	title: string;
 	category: TicketCategory;
 	status: TicketStatus;
@@ -77,7 +78,9 @@ export const ticketStatusConfig: Record<TicketStatus, { badge: string }> = {
 	},
 };
 
-export const ticketCategoryConfig: Record<TicketCategory, string> = {
+const CATEGORY_BADGE_FALLBACK = "bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700";
+
+const categoryBadgeMap: Record<string, string> = {
 	Reimbursement: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800",
 	Exchange: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800",
 	Policy: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
@@ -85,6 +88,14 @@ export const ticketCategoryConfig: Record<TicketCategory, string> = {
 	Leave: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
 	Scholarship: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800",
 };
+
+// cast to Record<TicketCategory, string> to satisfy typing; the proxy falls back
+// for any unknown category string (e.g. "General Query") so the class never resolves to undefined
+export const ticketCategoryConfig: Record<TicketCategory, string> = new Proxy(categoryBadgeMap, {
+	get(target, key) {
+		return typeof key === "string" ? (target[key] ?? CATEGORY_BADGE_FALLBACK) : CATEGORY_BADGE_FALLBACK;
+	},
+}) as Record<TicketCategory, string>;
 
 export function getInitials(name: string) {
 	return name

@@ -39,7 +39,7 @@ export function ArchivedTicketsPage() {
 							))}
 						</div>
 
-						{/* ── Pagination bar ─────────────────────────────────────── */}
+						{/* pagination bar */}
 						{(totalPages > 1 || closedTickets.length > 10) && (
 							<div className="flex items-center justify-between pt-1">
 								<span className="text-xs text-dc-text-muted">

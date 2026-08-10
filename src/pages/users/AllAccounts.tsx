@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../lib/apiFetch";
+import { getInitials, formatDate } from "../../types/Scholar";
 import PageShell from "../PageShell";
 
 interface Student {
@@ -24,24 +25,6 @@ interface HrOfficer {
 	designation: string;
 	phone: string;
 	createdAt: string;
-}
-
-function getInitials(name: string) {
-	return name
-		.split(" ")
-		.slice(0, 2)
-		.map((w) => w[0])
-		.join("")
-		.toUpperCase();
-}
-
-function formatDate(iso: string) {
-	if (!iso) return "—";
-	return new Date(iso).toLocaleDateString("en-SG", {
-		day: "numeric",
-		month: "short",
-		year: "numeric",
-	});
 }
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
@@ -132,8 +115,18 @@ export function AllAccountsPage() {
 						onClick={() => navigate("/users/create-student")}
 						className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-wise-ink dark:text-zinc-100 text-xs font-semibold px-3 py-2 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
 					>
-						<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+						<svg
+							className="w-3.5 h-3.5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 4v16m8-8H4"
+							/>
 						</svg>
 						New Student
 					</button>
@@ -141,15 +134,24 @@ export function AllAccountsPage() {
 						onClick={() => navigate("/users/create-hr-officer")}
 						className="flex items-center gap-2 btn-gradient text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
 					>
-						<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+						<svg
+							className="w-3.5 h-3.5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 4v16m8-8H4"
+							/>
 						</svg>
 						New HR Officer
 					</button>
 				</>
 			}
 		>
-
 			{/* Stats */}
 			<div className="grid grid-cols-3 gap-4">
 				<StatCard
@@ -221,7 +223,9 @@ export function AllAccountsPage() {
 				{loading ? (
 					<div className="text-center py-16 text-zinc-400 text-sm">Loading accounts…</div>
 				) : error ? (
-					<div className="text-center py-16 text-rose-500 dark:text-rose-400 text-sm">{error}</div>
+					<div className="text-center py-16 text-rose-500 dark:text-rose-400 text-sm">
+						{error}
+					</div>
 				) : activeTab === "students" ? (
 					<>
 						{filteredStudents.length === 0 ? (

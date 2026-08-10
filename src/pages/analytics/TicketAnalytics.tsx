@@ -3,8 +3,7 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/TicketCard";
 
-// colours
-
+// Colours for different ticket statuses and categories
 const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
 	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
 	"In Review": {
@@ -43,8 +42,6 @@ const CATEGORY_TEXT: Record<string, string> = {
 	Leave: "text-teal-600 dark:text-teal-400",
 	Internship: "text-sky-600 dark:text-sky-400",
 };
-
-// sub-components
 
 function StatCard({
 	label,
@@ -123,14 +120,10 @@ function BarRow({
 	);
 }
 
-// main page
-
 export function TicketAnalyticsPage() {
 	const { tickets: liveTickets, loading } = useTickets();
 	const tickets: TicketProps[] = liveTickets;
 
-	// single pass over the ticket list to compute all the numbers the charts need.
-	// useMemo so we don't redo this on every render while the user is just scrolling
 	const m = useMemo(() => {
 		const total = tickets.length;
 		const byStatus: Partial<Record<TicketStatus, number>> = {};
@@ -142,7 +135,7 @@ export function TicketAnalyticsPage() {
 			resolved = 0,
 			active = 0;
 
-		// build the 14-day window before the loop so we can bucket tickets as we scan
+		// Create 14 buckets for the last 14 days, each with a label, date, and count
 		const today = new Date();
 		const dayBuckets: { label: string; date: string; count: number }[] = Array.from(
 			{ length: 14 },
@@ -157,6 +150,7 @@ export function TicketAnalyticsPage() {
 			}
 		);
 
+		// Count tickets by status, category, officer, and day bucket
 		for (const t of tickets) {
 			byStatus[t.status] = (byStatus[t.status] ?? 0) + 1;
 			byCategory[t.category] = (byCategory[t.category] ?? 0) + 1;
@@ -174,7 +168,7 @@ export function TicketAnalyticsPage() {
 				if (t.status === "Resolved" || t.status === "Closed") byOfficer[key].resolved++;
 			}
 
-			// tickets older than 14 days just won't match any bucket, which is fine
+			// Increment the count for the corresponding day bucket based on the ticket's creation date
 			const ticketDay = t.createdAt.substring(0, 10);
 			const bucket = dayBuckets.find((b) => b.date === ticketDay);
 			if (bucket) bucket.count++;
@@ -182,11 +176,10 @@ export function TicketAnalyticsPage() {
 
 		const officers = Object.values(byOfficer).sort((a, b) => b.total - a.total);
 		const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
-		// used to scale the bar chart — guard against all-zero so we don't divide by 0
+		// Find the maximum count in the day buckets for scaling the bar chart
 		const maxDayCount = Math.max(...dayBuckets.map((b) => b.count), 1);
 
-		// priorities 3 and 4 (High + Critical) are both shown as "High" in the chart
-		// since users rarely distinguish them in practice
+		// Count tickets by priority groups: Low (1), Medium (2), High (3+)
 		const priorityGroups = { Low: 0, Medium: 0, High: 0 };
 		for (const t of tickets) {
 			if (t.priority >= 3) priorityGroups.High++;

@@ -10,7 +10,7 @@ import { getInitials } from "../../types/Scholar";
 import { useScholars } from "../../hooks/useScholars";
 import PageShell from "../PageShell";
 
-// ── Icons ──────────────────────────────────────────────────────────────────
+// icons
 
 function EventIcon({ type }: { type: ActivityEventType }) {
 	const cfg = eventConfig[type];
@@ -50,8 +50,7 @@ function EventIcon({ type }: { type: ActivityEventType }) {
 	);
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
+// Helper function to format timestamps into date, time, and relative time
 function formatTimestamp(iso: string): { date: string; time: string; relative: string } {
 	const d = new Date(iso);
 	const now = new Date();
@@ -78,6 +77,7 @@ function formatTimestamp(iso: string): { date: string; time: string; relative: s
 	};
 }
 
+// Helper function to group logs by date for display in the timeline view
 function groupByDate(logs: ActivityLog[]): [string, ActivityLog[]][] {
 	const map = new Map<string, ActivityLog[]>();
 	for (const log of logs) {
@@ -93,8 +93,7 @@ function groupByDate(logs: ActivityLog[]): [string, ActivityLog[]][] {
 	return Array.from(map.entries());
 }
 
-// ── Main component ──────────────────────────────────────────────────────────
-
+// Main page component for displaying scholar activity logs with filtering and grouping by date
 export function ScholarActivityLogsPage() {
 	const [logs, setLogs] = useState<ActivityLog[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -177,7 +176,6 @@ export function ScholarActivityLogsPage() {
 
 	return (
 		<PageShell description="Chronological audit trail of all scholar-related events across the system.">
-
 			{/* Stats */}
 			<div className="grid grid-cols-4 gap-4">
 				{[
