@@ -3,7 +3,7 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/TicketCard";
 
-// ── Colours ───────────────────────────────────────────────────────────────────
+// colours
 
 const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
 	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
@@ -44,7 +44,7 @@ const CATEGORY_TEXT: Record<string, string> = {
 	Internship: "text-sky-600 dark:text-sky-400",
 };
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// sub-components
 
 function StatCard({
 	label,
@@ -123,12 +123,14 @@ function BarRow({
 	);
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// main page
 
 export function TicketAnalyticsPage() {
 	const { tickets: liveTickets, loading } = useTickets();
 	const tickets: TicketProps[] = liveTickets;
 
+	// single pass over the ticket list to compute all the numbers the charts need.
+	// useMemo so we don't redo this on every render while the user is just scrolling
 	const m = useMemo(() => {
 		const total = tickets.length;
 		const byStatus: Partial<Record<TicketStatus, number>> = {};
@@ -140,7 +142,7 @@ export function TicketAnalyticsPage() {
 			resolved = 0,
 			active = 0;
 
-		// Last 14 days bucketed by date string
+		// build the 14-day window before the loop so we can bucket tickets as we scan
 		const today = new Date();
 		const dayBuckets: { label: string; date: string; count: number }[] = Array.from(
 			{ length: 14 },
@@ -172,6 +174,7 @@ export function TicketAnalyticsPage() {
 				if (t.status === "Resolved" || t.status === "Closed") byOfficer[key].resolved++;
 			}
 
+			// tickets older than 14 days just won't match any bucket, which is fine
 			const ticketDay = t.createdAt.substring(0, 10);
 			const bucket = dayBuckets.find((b) => b.date === ticketDay);
 			if (bucket) bucket.count++;
@@ -179,9 +182,11 @@ export function TicketAnalyticsPage() {
 
 		const officers = Object.values(byOfficer).sort((a, b) => b.total - a.total);
 		const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+		// used to scale the bar chart — guard against all-zero so we don't divide by 0
 		const maxDayCount = Math.max(...dayBuckets.map((b) => b.count), 1);
 
-		// Priority grouping (1=Low, 2=Medium, 3=High, 4=Critical → bucketed as High)
+		// priorities 3 and 4 (High + Critical) are both shown as "High" in the chart
+		// since users rarely distinguish them in practice
 		const priorityGroups = { Low: 0, Medium: 0, High: 0 };
 		for (const t of tickets) {
 			if (t.priority >= 3) priorityGroups.High++;
@@ -222,7 +227,7 @@ export function TicketAnalyticsPage() {
 				</div>
 			) : (
 				<div className="space-y-6">
-					{/* ── Stat cards ─────────────────────────────────────────── */}
+					{/* stat cards */}
 					<div className="grid grid-cols-5 gap-4">
 						<StatCard
 							label="Total Tickets"
@@ -337,7 +342,7 @@ export function TicketAnalyticsPage() {
 							}
 						/>
 					</div>
-					{/* ── Status overview stacked bar ──────────────────────── */}
+					{/* status overview stacked bar */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
 						<SectionHeader>Status Overview</SectionHeader>
 
@@ -391,7 +396,7 @@ export function TicketAnalyticsPage() {
 							})}
 						</div>
 					</div>
-					{/* ── Category + Priority ──────────────────────────────── */}
+					{/* category + priority */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Category breakdown */}
 						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
@@ -494,7 +499,7 @@ export function TicketAnalyticsPage() {
 							</div>
 						</div>
 					</div>
-					{/* ── Officer leaderboard + 14-day trend ──────────────── */}
+					{/* officer leaderboard + 14-day trend */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Officer leaderboard */}
 						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">

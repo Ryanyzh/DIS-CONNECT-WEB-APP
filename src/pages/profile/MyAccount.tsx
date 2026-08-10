@@ -8,6 +8,7 @@ import {
 import { auth } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { useRole } from "../../hooks/useRole";
+import { getInitials } from "../../types/Scholar";
 import PageShell from "../PageShell";
 
 const inputClass =
@@ -36,16 +37,6 @@ function avatarClasses(name: string | null): { bg: string; text: string } {
 	return AVATAR_PALETTE[i];
 }
 
-function getInitials(name: string | null): string {
-	if (!name) return "?";
-	return name
-		.split(" ")
-		.slice(0, 2)
-		.map((w) => w[0])
-		.join("")
-		.toUpperCase();
-}
-
 function formatTs(ts: string | undefined): string {
 	if (!ts) return "—";
 	return new Date(ts).toLocaleDateString("en-SG", {
@@ -59,11 +50,11 @@ export function MyAccountPage() {
 	const { user } = useAuth();
 	const { role } = useRole(user?.uid);
 
-	// ── Profile form ──────────────────────────────────────────────────────────
+	// profile form
 	const [displayName, setDisplayName] = useState(user?.displayName ?? "");
 	const [savingProfile, setSavingProfile] = useState(false);
 
-	// ── Password form ─────────────────────────────────────────────────────────
+	// password form
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -71,7 +62,7 @@ export function MyAccountPage() {
 	const [showNew, setShowNew] = useState(false);
 	const [savingPassword, setSavingPassword] = useState(false);
 
-	// ── Toast ─────────────────────────────────────────────────────────────────
+	// toast
 	const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
 	const showToast = (type: "success" | "error", text: string) => {
@@ -79,7 +70,7 @@ export function MyAccountPage() {
 		window.setTimeout(() => setToast(null), 4000);
 	};
 
-	// ── Handlers ──────────────────────────────────────────────────────────────
+	// handlers
 	const handleSaveProfile = async (e: { preventDefault(): void }) => {
 		e.preventDefault();
 		if (!auth.currentUser) return;
@@ -129,12 +120,12 @@ export function MyAccountPage() {
 	};
 
 	const avatar = avatarClasses(user?.displayName ?? user?.email ?? null);
-	const initials = getInitials(user?.displayName ?? user?.email ?? null);
+	const initials = getInitials(user?.displayName ?? user?.email ?? "?");
 
 	return (
 		<PageShell description="Manage your profile information and account security settings.">
 			<div className="grid grid-cols-5 gap-6 items-start">
-				{/* ── Left: Profile summary ──────────────────────────────── */}
+				{/* left: profile summary */}
 				<div className="col-span-2 space-y-4 sticky top-6">
 					{/* Avatar card */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 flex flex-col items-center text-center gap-3">
@@ -182,7 +173,7 @@ export function MyAccountPage() {
 					</div>
 				</div>
 
-				{/* ── Right: Settings forms ──────────────────────────────── */}
+				{/* right: settings forms */}
 				<div className="col-span-3 space-y-5">
 					{/* Personal Information */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
