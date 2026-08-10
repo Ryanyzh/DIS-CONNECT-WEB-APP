@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { type Scholar } from "../types/Scholar";
 import { apiFetch } from "../lib/apiFetch";
 
+// Helper function to normalize scholar data from API response to Scholar type
+const STATUS_ALIASES: Record<string, string> = {
+	"Waiting for Response": "Waiting",
+};
+
+// Helper function to normalize scholar data from API response to Scholar type
 export function normalizeScholar(s: any): Scholar {
 	return {
 		id: s.scholar_id ?? s.id ?? "",
@@ -26,15 +32,20 @@ export function normalizeScholar(s: any): Scholar {
 				}
 			: undefined,
 		tickets: Array.isArray(s.tickets)
-			? s.tickets.map((t: any) => ({
-					id: t.ticket_id ?? t.id ?? "",
-					title: t.subject ?? t.title ?? "",
-					category: t.category?.category_name ?? t.category ?? "General Query",
-					status: t.status?.status_name ?? t.status ?? "Open",
-					priority: t.priority?.level ?? t.priority ?? 1,
-					createdAt: t.created_at ?? t.createdAt ?? "",
-					lastUpdated: t.updated_at ?? t.lastUpdated ?? "",
-				}))
+			? s.tickets.map((t: any) => {
+					const rawStatus = t.status?.status_name ?? t.status ?? "Open";
+					return {
+						id: t.ticket_id ?? t.id ?? "",
+						code: t.ticket_code ?? t.code ?? "",
+						title: t.subject ?? t.title ?? "",
+						category: t.category?.category_name ?? t.category ?? "General Query",
+						status: (STATUS_ALIASES[rawStatus] ??
+							rawStatus) as Scholar["tickets"][number]["status"],
+						priority: t.priority?.level ?? t.priority ?? 1,
+						createdAt: t.created_at ?? t.createdAt ?? "",
+						lastUpdated: t.updated_at ?? t.lastUpdated ?? "",
+					};
+				})
 			: [],
 	};
 }

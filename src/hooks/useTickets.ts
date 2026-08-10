@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { type TicketProps, type TicketStatus } from "../components/TicketCard";
 import { apiFetch } from "../lib/apiFetch";
 
+// Helper function to normalize ticket status from API response to TicketStatus type
 const STATUS_ALIASES: Record<string, TicketStatus> = {
 	"Waiting for Response": "Waiting",
 };
@@ -10,10 +11,11 @@ function normalizeStatus(raw: string): TicketStatus {
 	return (STATUS_ALIASES[raw] ?? raw) as TicketStatus;
 }
 
+// Custom hook to fetch and manage tickets from the API
 export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 	const [tickets, setTickets] = useState<TicketProps[]>([]);
-	const [refresh, setRefresh] = useState(0); // state to trigger refresh when status changes
 	const [loading, setLoading] = useState<boolean>(true);
+	const [refresh, setRefresh] = useState(0);
 
 	const fetchTickets = useCallback(async () => {
 		try {
@@ -29,22 +31,24 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 					id: ticket.ticket_id,
 					code: ticket.ticket_code,
 					title: ticket.subject,
-					category: ticket.category.category_name,
+					category: ticket.category?.category_name ?? "General Query",
 					description: ticket.description,
-					priority: ticket.priority.level,
-					status: normalizeStatus(ticket.status.status_name),
+					priority: ticket.priority?.level ?? 1,
+					status: normalizeStatus(ticket.status?.status_name ?? "Open"),
 					deadline: ticket.due_at,
 					lastUpdated: ticket.updated_at,
 					createdAt: ticket.created_at,
 					isEscalated: ticket.is_escalated,
-					scholar: {
-						...ticket.scholar,
-						studentId: ticket.scholar.student_id,
-						yearOfStudy: ticket.scholar.year_of_study,
-						preferredContact: ticket.scholar.preferred_contact,
-						scholarshipType: ticket.scholar.scholarship_type,
-						tickets: [],
-					},
+					scholar: ticket.scholar
+						? {
+								...ticket.scholar,
+								studentId: ticket.scholar.student_id,
+								yearOfStudy: ticket.scholar.year_of_study,
+								preferredContact: ticket.scholar.preferred_contact,
+								scholarshipType: ticket.scholar.scholarship_type,
+								tickets: [],
+							}
+						: undefined,
 					officer: ticket.assigned_officer,
 					attachments: ticket.attachments ?? [],
 				};
@@ -62,8 +66,8 @@ export function useTickets(endpointUrl: string = "/api/v1/tickets") {
 		fetchTickets();
 	}, [fetchTickets, refresh]);
 
+	// Function to trigger a refresh of the tickets by incrementing the refresh state
 	const triggerRefresh = () => {
-		// increment refresh state by 1 to trigger useEffect to refetch tickets when ticket status is changed
 		setRefresh((prev) => prev + 1);
 	};
 
