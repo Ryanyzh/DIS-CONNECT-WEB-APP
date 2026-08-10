@@ -23,6 +23,21 @@ export function AnnouncementDetailPage() {
 	const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [deleting, setDeleting] = useState(false);
+
+	const handleDelete = async () => {
+		if (!confirm("Delete this announcement? This cannot be undone.")) return;
+		setDeleting(true);
+		try {
+			const res = await apiFetch(`/api/announcements/${id}`, { method: "DELETE" });
+			if (!res.ok) throw new Error();
+			navigate("/announcements/all");
+		} catch {
+			alert("Failed to delete announcement. Please try again.");
+		} finally {
+			setDeleting(false);
+		}
+	};
 
 	useEffect(() => {
 		apiFetch(`/api/announcements/${id}`)
@@ -206,21 +221,38 @@ export function AnnouncementDetailPage() {
 						</div>
 					)}
 
-					{/* Edit action */}
-					<button
-						onClick={() => navigate(`/announcements/${id}/edit`)}
-						className="w-full flex items-center justify-center gap-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
-					>
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-							/>
-						</svg>
-						Edit Announcement
-					</button>
+					{/* Actions */}
+					<div className="flex flex-col gap-2">
+						<button
+							onClick={() => navigate(`/announcements/${id}/edit`)}
+							className="w-full flex items-center justify-center gap-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
+						>
+							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+								/>
+							</svg>
+							Edit Announcement
+						</button>
+						<button
+							onClick={handleDelete}
+							disabled={deleting}
+							className="w-full flex items-center justify-center gap-2 text-sm font-medium text-rose-600 dark:text-rose-400 bg-white dark:bg-zinc-900 border border-rose-200 dark:border-rose-800 rounded-xl px-4 py-3 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+								/>
+							</svg>
+							{deleting ? "Deleting…" : "Delete Announcement"}
+						</button>
+					</div>
 				</div>
 			</div>
 		</PageShell>
