@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
+import { useRole } from "../../hooks/useRole";
 import PageShell from "../PageShell";
 
 const inputClass =
@@ -56,6 +57,7 @@ function formatTs(ts: string | undefined): string {
 
 export function MyAccountPage() {
 	const { user } = useAuth();
+	const { role } = useRole(user?.uid);
 
 	// ── Profile form ──────────────────────────────────────────────────────────
 	const [displayName, setDisplayName] = useState(user?.displayName ?? "");
@@ -147,10 +149,12 @@ export function MyAccountPage() {
 							</p>
 							<p className="text-xs text-zinc-400 mt-0.5">{user?.email ?? "—"}</p>
 						</div>
-						<span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded border bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800">
-							<span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400" />
-							HR Officer
-						</span>
+						{role && (
+							<span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-0.5 rounded border ${role === "hr" ? "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800" : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"}`}>
+								<span className={`w-1.5 h-1.5 rounded-full ${role === "hr" ? "bg-violet-500 dark:bg-violet-400" : "bg-blue-500 dark:bg-blue-400"}`} />
+								{role === "hr" ? "HR Officer" : "Scholar"}
+							</span>
+						)}
 					</div>
 					{/* Account metadata */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5 space-y-0">
