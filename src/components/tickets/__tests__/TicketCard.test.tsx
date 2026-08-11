@@ -32,7 +32,7 @@ describe("TicketCard Unit Tests", () => {
 			"Company has requested I extend my internship by 4 weeks to complete a project handover. Need approval before informing HR.",
 		priority: 3,
 		status: "In Review",
-		deadline: "2026-07-31T00:00:00+00:00",
+		deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(),
 		lastUpdated: "2026-06-26T17:38:25.145519+00:00",
 		createdAt: "2026-06-26T17:27:41.633798+00:00",
 		isEscalated: false,
@@ -71,30 +71,36 @@ describe("TicketCard Unit Tests", () => {
 		render(<TicketCard ticket={baseTicket} view="list" />);
 
 		expect(screen.getByText("TKT-2026-C6A06A")).toBeInTheDocument();
-		expect(screen.getByText("Internship extension request — extra 4 weeks")).toBeInTheDocument();
+		expect(
+			screen.getByText("Internship extension request — extra 4 weeks")
+		).toBeInTheDocument();
 		expect(screen.getByText("In Review")).toBeInTheDocument();
 		expect(screen.getByText("Internship")).toBeInTheDocument();
 		expect(screen.getByText("High")).toBeInTheDocument();
-		expect(screen.getByText("31 Jul 2026")).toBeInTheDocument();
-        expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
+		expect(screen.getByText(formatDate(baseTicket.deadline))).toBeInTheDocument();
+		expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
 
-		cleanup()
+		cleanup();
 
 		render(<TicketCard ticket={baseTicket} view="card" />);
 
 		expect(screen.getByText("TKT-2026-C6A06A")).toBeInTheDocument();
-		expect(screen.getByText("Internship extension request — extra 4 weeks")).toBeInTheDocument();
+		expect(
+			screen.getByText("Internship extension request — extra 4 weeks")
+		).toBeInTheDocument();
 		expect(screen.getByText("In Review")).toBeInTheDocument();
 		expect(screen.getByText("Internship")).toBeInTheDocument();
 		expect(screen.getByText("High")).toBeInTheDocument();
-		expect(screen.getByText("Due 31 Jul 2026")).toBeInTheDocument();
-        expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
+		expect(screen.getByText(`Due ${formatDate(baseTicket.deadline)}`)).toBeInTheDocument();
+		expect(screen.getByText("Daniel Wong")).toBeInTheDocument();
 	});
 
 	it("navigates to the ticket details view route when the ticket card is clicked", () => {
 		render(<TicketCard ticket={baseTicket} view="list" />);
 
-		let cardContainer = screen.getByText("Internship extension request — extra 4 weeks").parentElement!;
+		let cardContainer = screen.getByText(
+			"Internship extension request — extra 4 weeks"
+		).parentElement!;
 		fireEvent.click(cardContainer);
 
 		expect(mockNavigate).toHaveBeenCalledWith("/tickets/1943d175-dcb7-47cd-aa71-2b6b39654452");
@@ -103,7 +109,9 @@ describe("TicketCard Unit Tests", () => {
 
 		render(<TicketCard ticket={baseTicket} view="card" />);
 
-		cardContainer = screen.getByText("Internship extension request — extra 4 weeks").parentElement!;
+		cardContainer = screen.getByText(
+			"Internship extension request — extra 4 weeks"
+		).parentElement!;
 		fireEvent.click(cardContainer);
 
 		expect(mockNavigate).toHaveBeenCalledWith("/tickets/1943d175-dcb7-47cd-aa71-2b6b39654452");
@@ -171,12 +179,14 @@ describe("TicketCard Unit Tests", () => {
 		expect(deadlineElement).toHaveClass("text-dc-text-muted");
 		expect(deadlineElement).not.toHaveClass("text-orange-500 dark:text-orange-400");
 
-        cleanup(); // test for closed ticket next
+		cleanup(); // test for closed ticket next
 
-        // previous ticket should not be on the screen now
-        expect(screen.queryByText(`Due ${formatDate(resolvedOverdueTicket.deadline)}`)).not.toBeInTheDocument();
+		// previous ticket should not be on the screen now
+		expect(
+			screen.queryByText(`Due ${formatDate(resolvedOverdueTicket.deadline)}`)
+		).not.toBeInTheDocument();
 
-        const closedOverdueTicket = {
+		const closedOverdueTicket = {
 			...baseTicket,
 			deadline: new Date(Date.now() - 10 * 60 * 1000).toISOString(), // 10 min ago
 			status: "Closed" as TicketStatus,

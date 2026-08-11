@@ -150,15 +150,16 @@ describe("Conversation Tab Integration Test", () => {
 		render(<ConversationTab ticketId="ticket2" />);
 
 		await waitFor(() => {
+			// check that scholar messages are aligned to the left and officer messages are aligned to the right
 			const scholarBubble = screen.getByText(
 				"this is another message hello hello"
 			).parentElement;
 			const officerBubble = screen.getByText("test message from officer").parentElement;
 
-			expect(scholarBubble).toHaveClass("items-start");
-			expect(scholarBubble?.firstChild).toHaveClass("rounded-tl-none");
-			expect(officerBubble).toHaveClass("items-end");
-			expect(officerBubble?.firstChild).toHaveClass("rounded-tr-none");
+			expect(scholarBubble?.parentElement).toHaveClass("items-start");
+			expect(scholarBubble).toHaveClass("rounded-tl-none");
+			expect(officerBubble?.parentElement).toHaveClass("items-end");
+			expect(officerBubble).toHaveClass("rounded-tr-none");
 		});
 	});
 
@@ -187,7 +188,11 @@ describe("Conversation Tab Integration Test", () => {
 				"/api/v1/tickets/ticket3/messages",
 				expect.objectContaining({
 					method: "POST",
-					body: JSON.stringify({ message_text: "test sending message" }),
+					// verify that the payload contains the correct message text and attachments
+					body: JSON.stringify({
+						message_text: "test sending message",
+						attachments: [],
+					}),
 				})
 			);
 		});
