@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import DisconnectLogo from "../assets/disconnect_logo_transparent.svg";
+import DisconnectWord from "../assets/disconnect_wording_transparent.svg";
 
 const expandableSections = [
 	{
@@ -64,16 +65,13 @@ export default function Sidebar() {
 	return (
 		<aside className="hidden w-full max-w-[280px] shrink-0 border-r border-wise-ink/10 dark:border-wise-canvasSoft/20 lg:flex lg:flex-col overflow-y-auto">
 			{/* Logo */}
-			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-5 py-3.5 flex items-center">
+			<div className="border-b border-wise-ink/10 dark:border-wise-canvasSoft/20 px-5 py-5 flex items-center">
 				<div className="flex items-center justify-center flex-shrink-0">
-					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-10 w-auto" />
+					<img src={DisconnectLogo} alt="Disconnect Logo" className="h-8 w-auto" />
 				</div>
-				<span
-					style={{ fontFamily: "'Poppins', sans-serif" }}
-					className="ml-2 text-2xl font-semibold tracking-tight text-wise-ink dark:text-wise-canvas"
-				>
-					dis-connect
-				</span>
+				<div className="flex items-center justify-center flex-shrink-0 ml-2">
+					<img src={DisconnectWord} alt="Disconnect Word" className="h-7 w-auto" />
+				</div>
 			</div>
 
 			<div className="flex-1 p-3 space-y-1.5">
