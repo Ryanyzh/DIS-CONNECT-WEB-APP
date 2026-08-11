@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getCurrentUser } from "../lib/authRepository";
+import { getCurrentUser } from "../../lib/authRepository";
 import type { TicketProps, TicketStatus } from "./TicketCard";
 import { AssignOfficerModal } from "./AssignOfficerModal";
 

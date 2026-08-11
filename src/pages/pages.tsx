@@ -47,9 +47,7 @@ export { CreateFaqPage } from "./faq/CreateFaq";
 
 // Analytics
 export { TicketAnalyticsPage } from "./analytics/TicketAnalytics";
-export const SlaAnalyticsPage = createPage(
-	"Review SLA metrics for service performance and compliance."
-);
+export { SlaAnalyticsPage } from "./analytics/SlaAnalytics";
 
 // Notifications
 export const InboxPage = createPage("View all incoming notifications and messages.");

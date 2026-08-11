@@ -7,18 +7,27 @@ import {
 	priorityStyles,
 	priorityLabels,
 	type TicketStatus,
-} from "../../components/TicketCard";
-import { useState, useEffect, useCallback } from "react";
+} from "../../components/tickets/TicketCard";
+import type { TicketAttachment } from "../../types/TicketAttachment";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "../../lib/firebase";
-import { ActionsPanel } from "../../components/ActionsPanel";
-import { TicketInfoPanel } from "../../components/TicketInfoPanel";
+import { ActionsPanel } from "../../components/tickets/ActionsPanel";
+import { TicketInfoPanel } from "../../components/tickets/TicketInfoPanel";
 import { useRole } from "../../hooks/useRole";
 import { useStatuses } from "../../hooks/useStatuses";
-import { ActivityTab } from "../../components/ActivityTab";
-import { ConversationTab } from "../../components/ConversationTab";
-import { formatDate, getInitials } from "../../types/Scholar";
+import { ActivityTab } from "../../components/tickets/ActivityTab";
+import { ConversationTab } from "../../components/tickets/ConversationTab";
+import { formatDate } from "../../types/Scholar";
 import { apiFetch } from "../../lib/apiFetch";
+import { ScholarInfoPanel } from "../../components/tickets/ScholarInfoPanel";
+
+const STATUS_ALIASES: Record<string, TicketStatus> = {
+	"Waiting for Response": "Waiting",
+};
+function normalizeStatus(raw: string): TicketStatus {
+	return (STATUS_ALIASES[raw] ?? raw) as TicketStatus;
+}
 
 type TabType = "Details" | "Conversation" | "Attachments" | "Activity";
 
@@ -26,8 +35,6 @@ const handleAttachmentPreview = async (filePath: string) => {
 	try {
 		const fileRef = ref(storage, filePath);
 		const previewUrl = await getDownloadURL(fileRef);
-
-		// open preview of attachment in browser
 		window.open(previewUrl, "_blank", "noopener,noreferrer");
 	} catch (error) {
 		console.error("Error previewing attachment: ", error);
@@ -44,58 +51,55 @@ export function TicketDetailsPage() {
 	const [ticket, setTicket] = useState<TicketProps>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const [refresh, setRefresh] = useState<number>(0);
-
 	const [activeTab, setActiveTab] = useState<TabType>("Details");
+
+	const [isScholarPanelOpen, setIsScholarPanelOpen] = useState<boolean>(false);
+	const [isScholarPanelHovered, setIsScholarPanelHovered] = useState<boolean>(false);
+	// Timer for hovering to display scholar panel
+	const hoverTimeoutRef = useRef<number | null>(null);
+
+	// Clean up the hover timer when the page unmounts
+	useEffect(() => {
+		return () => {
+			if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+		};
+	}, []);
+
+	const [showErrorPopup, setShowErrorPopup] = useState<boolean>(false);
+	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	const getTicketData = useCallback(async () => {
 		try {
 			setLoading(true);
-
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}`);
-
-			if (!response.ok) {
-				throw new Error(`Error retrieving tickets: ${response.status}`);
-			}
+			if (!response.ok) throw new Error(`Error retrieving tickets: ${response.status}`);
 			const data = await response.json();
 
 			const formattedTicket: TicketProps = {
 				id: data.ticket_id,
 				code: data.ticket_code,
 				title: data.subject,
-				category: data.category.category_name,
+				category: data.category?.category_name ?? "General Query",
 				description: data.description,
-				priority: data.priority.level,
-				status: data.status.status_name,
+				priority: data.priority?.level ?? 1,
+				status: normalizeStatus(data.status?.status_name ?? "Open"),
 				deadline: data.due_at,
 				lastUpdated: data.updated_at,
 				createdAt: data.created_at,
-				isEscalated: data.is_escalated ?? false,
+				isEscalated: data.is_escalated,
+				escalatedAt: data.escalated_at,
+				resolvedAt: data.resolved_at,
 				scholar: data.scholar
 					? {
-							id: data.scholar.id,
-							name: data.scholar.name,
-							email: data.scholar.email,
-							phone: data.scholar.phone ?? "",
-							studentId: data.scholar.student_id ?? "",
-							faculty: data.scholar.faculty ?? "",
-							program: data.scholar.program ?? "",
-							yearOfStudy: data.scholar.year_of_study ?? "",
-							preferredContact: data.scholar.preferred_contact ?? "Email",
-							scholarshipType: data.scholar.scholarship_type ?? "",
-							status: data.scholar.status ?? "Active",
-							createdAt: data.scholar.created_at ?? "",
+							...data.scholar,
+							studentId: data.scholar.student_id,
+							yearOfStudy: data.scholar.year_of_study,
+							preferredContact: data.scholar.preferred_contact,
+							scholarshipType: data.scholar.scholarship_type,
 							tickets: [],
 						}
 					: undefined,
-				officer: data.assigned_officer
-					? {
-							id: data.assigned_officer.id,
-							name: data.assigned_officer.name,
-							email: data.assigned_officer.email,
-							role: data.assigned_officer.role ?? "hr",
-							initials: getInitials(data.assigned_officer.name ?? ""),
-						}
-					: undefined,
+				officer: data.assigned_officer,
 				attachments: data.attachments ?? [],
 			};
 			setTicket(formattedTicket);
@@ -104,7 +108,7 @@ export function TicketDetailsPage() {
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [ticketId]);
 
 	useEffect(() => {
 		getTicketData();
@@ -112,24 +116,29 @@ export function TicketDetailsPage() {
 
 	async function handleExecuteAction(nextStatus: TicketStatus, metadata?: Record<string, any>) {
 		if (!ticketId) return;
-
 		const nextStatusId = statusIdMap[nextStatus];
 		if (!nextStatusId) {
 			console.error(`No status ID found for ${nextStatus}`);
 			return;
 		}
-
 		try {
+			setLoading(true);
 			const response = await apiFetch(`/api/v1/tickets/${ticketId}/status`, {
 				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					status_id: nextStatusId,
-					...metadata,
-				}),
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ status_id: nextStatusId, ...metadata }),
 			});
+
+			if (response.status == 403) {
+				setErrorMessage("Action denied: You are not the assigned officer for this ticket.");
+				setShowErrorPopup(true);
+
+				setTimeout(() => {
+					setShowErrorPopup(false);
+				}, 4000); // after 4 seconds close the popup
+
+				return;
+			}
 
 			if (!response.ok) {
 				throw new Error(`Error executing action: ${response.status}`);
@@ -138,187 +147,315 @@ export function TicketDetailsPage() {
 			setRefresh((prev) => prev + 1);
 		} catch (error) {
 			console.error("Failed to execute action: ", error);
+		} finally {
+			setLoading(false);
 		}
 	}
 
 	if (loading || roleLoading) {
 		return (
-			<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-col items-center justify-center">
-				<div className="flex flex-col items-center gap-3">
-					<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
-				</div>
+			<div className="h-full w-full flex items-center justify-center">
+				<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-dc-border-dark border-t-dc-primary" />
 			</div>
 		);
 	}
 
 	if (!ticket || !ticket.scholar) {
 		return (
-			<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-col gap-4 p-6 text-3xl font-semibold">
+			<div className="h-full w-full flex flex-col gap-4 p-6">
 				<button
 					onClick={() => navigate(-1)}
-					className="w-fit block text-sm border rounded-md p-2 hover:border-zinc-400 transition-all font-normal"
+					className="w-fit text-sm font-medium text-dc-text-muted dark:text-dc-text-subtle hover:text-dc-primary dark:hover:text-dc-primary transition-colors flex items-center gap-1.5"
 				>
-					Back to tickets
+					← Back to tickets
 				</button>
-				<span className="text-center">This ticket could not be found.</span>
+				<span className="text-xl font-semibold text-dc-text dark:text-white text-center mt-8">
+					This ticket could not be found.
+				</span>
 			</div>
 		);
 	}
 
 	return (
-		<div className="bg-wise-canvas h-full w-full md:w-[75vw] flex flex-row gap-4">
-			<div className="bg-wise-canvas h-full w-full min-w-[50vw] flex flex-col gap-4">
+		<div className="h-full w-full flex flex-row gap-4">
+			{/* Main content */}
+			<div className="h-full w-full min-w-0 flex flex-col gap-4 flex-1">
 				<button
 					onClick={() => navigate(-1)}
-					className="w-fit block text-sm border rounded-md p-2 hover:border-zinc-400 transition-all font-normal mb-4"
+					className="w-fit text-sm font-medium text-dc-text-muted dark:text-dc-text-subtle hover:text-dc-primary dark:hover:text-dc-primary transition-colors flex items-center gap-1.5"
 				>
-					Back to tickets
+					← Back to tickets
 				</button>
 
-				<div className="font-semibold">{ticket.code}</div>
+				<span className="font-mono text-xs tracking-wider text-dc-text-muted">
+					{ticket.code}
+				</span>
 
-				{/* Ticket title and status */}
-				<div className="flex flex-row items-center text-xl font-semibold line-clamp-2 justify-between">
-					<span>{ticket.title}</span>
+				{/* Title and status */}
+				<div className="flex flex-row items-start gap-3 justify-between">
+					<span className="text-xl font-bold text-dc-text dark:text-white leading-snug">
+						{ticket.title}
+					</span>
 					<span
-						className={`line-clamp-2 flex font-semibold w-fit min-h-0 text-sm leading-snug tracking-tight ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg} px-2.5 py-1.5 rounded-md`}
+						className={`shrink-0 text-sm font-semibold px-2.5 py-1 rounded-md ${statusStyles[ticket.status].text} ${statusStyles[ticket.status].bg}`}
 					>
 						{ticket.status}
 					</span>
 				</div>
 
-				{/* Ticket category and priority */}
-				<div className="flex flex-row items-center justify-start gap-3">
+				{/* Category and priority badges */}
+				<div className="flex flex-row items-center gap-2">
 					<span
-						className={`text-sm px-2 py-1 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
+						className={`text-xs px-2 py-0.5 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
 					>
 						{ticket.category}
 					</span>
 					<span
-						className={`text-sm px-2 py-1 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
+						className={`text-xs px-2 py-0.5 rounded-md font-semibold ${priorityStyles[ticket.priority]}`}
 					>
 						{priorityLabels[ticket.priority]}
 					</span>
 				</div>
 
-				{/* Scholar, created at, assigned officer */}
-				<div className="flex flex-row w-full text-center items-center justify-between divide-x">
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{ticket.scholar.name}</div>
-						<div className="text-sm text-zinc-400">Scholar</div>
-					</div>
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">{formatDate(ticket.createdAt)}</div>
-						<div className="text-sm text-zinc-400">Created</div>
-					</div>
-					<div className="flex-1 flex-col">
-						<div className="text-lg mb-1">
-							{ticket.officer ? ticket.officer.name : "Unassigned"}
-						</div>
-						<div className="text-sm text-zinc-400">Assigned Officer</div>
-					</div>
+				{/* Scholar / Created / Officer summary */}
+				<div className="flex flex-row w-full border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden divide-x divide-dc-border dark:divide-dc-border-dark">
+					{[
+						{ value: ticket.scholar.name, label: "Scholar" },
+						{ value: formatDate(ticket.createdAt), label: "Created" },
+						{ value: ticket.officer?.name ?? "Unassigned", label: "Officer" },
+					].map(({ value, label }) => {
+						const isScholar = label === "Scholar";
+						const isShowingScholar = isScholarPanelOpen || isScholarPanelHovered;
+
+						return (
+							<div
+								key={label}
+								onClick={
+									isScholar
+										? () => {
+												// If user clicks, then clear hover timers and set scholar panel to open/close permanently
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+												setIsScholarPanelHovered(false);
+												setIsScholarPanelOpen(!isScholarPanelOpen);
+											}
+										: undefined
+								}
+								onMouseEnter={
+									isScholar
+										? () => {
+												// Clear any existing timers
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+
+												// Wait 400ms before setting that scholar panel is hovered (only if panel is not already open)
+												if (!isScholarPanelOpen) {
+													hoverTimeoutRef.current = setTimeout(() => {
+														setIsScholarPanelHovered(true);
+													}, 400);
+												}
+											}
+										: undefined
+								}
+								onMouseLeave={
+									isScholar
+										? () => {
+												// Clear any existing timers
+												if (hoverTimeoutRef.current)
+													clearTimeout(hoverTimeoutRef.current);
+
+												// Since the user's mouse is off the button, set that the scholar panel is not hovered
+												setIsScholarPanelHovered(false);
+											}
+										: undefined
+								}
+								className={`flex-1 flex flex-col items-center py-3 transition-colors ${isScholar ? `cursor-pointer select-none group ${isShowingScholar ? "bg-dc-primary/5 dark:bg-dc-primary/10" : "hover:bg-dc-elevated/40 dark:hover:bg-zinc-800/40"}` : ""}`}
+								role={isScholar ? "button" : undefined}
+							>
+								<span
+									className={`text-sm font-semibold flex items-center gap-1.5 transition-colors ${isScholar && isShowingScholar ? "text-dc-primary" : "text-dc-text dark:text-white"}`}
+								>
+									{value}
+									{isScholar && (
+										<span
+											className={`flex items-center text-sm text-dc-text-muted group-hover:text-dc-primary transition-colors ${
+												isScholarPanelOpen ? "scale-x-[-1]" : ""
+											} transform duration-200`}
+										>
+											&rsaquo;
+										</span>
+									)}
+								</span>
+								<span
+									className={`text-xs mt-0.5 transition-colors ${isScholar && isShowingScholar ? "text-dc-primary/85" : "text-dc-text-muted"}`}
+								>
+									{label}
+								</span>
+							</div>
+						);
+					})}
 				</div>
 
-				{/* Tabs for more info: Details, Conversation, Attachments, Activity (only details and attachments for now) */}
-				<div className="w-full flex flex-row items-center gap-6 text-sm text-zinc-400 px-2 pt-2 justify-start">
+				{/* Tabs */}
+				<div className="flex flex-row gap-1 border-b border-dc-border dark:border-dc-border-dark">
 					{(["Details", "Conversation", "Attachments", "Activity"] as TabType[]).map(
 						(tab) => {
-							const isActive = activeTab == tab;
-
-							// counts for conversation and attachments
-							let count: number | undefined;
-							if (tab == "Attachments") {
-								count = ticket.attachments.length;
-							}
+							const isActive = activeTab === tab;
+							const count =
+								tab === "Attachments" ? ticket.attachments.length : undefined;
 
 							return (
 								<button
 									key={tab}
 									onClick={() => setActiveTab(tab)}
-									className={`relative pb-2 transition-all hover:text-blue-600 ${isActive ? "text-blue-600 font-semibold border-b-2 border-blue-600" : "text-zinc-500 border-b-2 border-zinc-400"}`}
+									className={`relative px-3 pb-2 text-sm transition-colors flex items-center gap-1.5 border-b-2 -mb-px ${
+										isActive
+											? "text-dc-primary font-semibold border-dc-primary"
+											: "text-dc-text-muted border-transparent hover:text-dc-text dark:hover:text-white"
+									}`}
 								>
-									<div className="flex items-center gap-1.5">
-										<span>{tab}</span>
-										{count != undefined && (
-											<span className="text-xs bg-zinc-500/15 px-1.5 py-0.25 rounded-full text-zinc-600">
-												{count}
-											</span>
-										)}
-									</div>
+									<span>{tab}</span>
+									{count !== undefined && (
+										<span className="text-xs bg-dc-elevated dark:bg-dc-elevated-dark text-dc-text-muted px-1.5 py-0.5 rounded-full font-medium">
+											{count}
+										</span>
+									)}
 								</button>
 							);
 						}
 					)}
 				</div>
 
-				{/* Body of information */}
-				<div className="h-full w-full flex flex-col gap-3">
-					{activeTab == "Details" && (
-						<div className="h-full w-full flex flex-col gap-3">
-							<div className="font-semibold">Description</div>
-							<div className="mb-4">{ticket.description}</div>
-
-							<div className="flex flex-row justify-start gap-40">
-								<div className="flex flex-col gap-3">
-									<div className="font-semibold">Category</div>
-									<div>{ticket.category}</div>
+				{/* Tab content */}
+				<div className="flex-1 min-h-0 w-full overflow-y-auto">
+					{activeTab === "Details" && (
+						<div className="flex flex-col gap-5">
+							<div>
+								<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-2">
+									Description
+								</span>
+								<p className="text-sm text-dc-text dark:text-white leading-relaxed">
+									{ticket.description}
+								</p>
+							</div>
+							<div className="flex flex-row gap-12">
+								<div>
+									<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1 mr-2">
+										Category
+									</span>
+									<span
+										className={`text-xs px-2 py-0.5 rounded-md font-semibold ${categoryStyles[ticket.category]}`}
+									>
+										{ticket.category}
+									</span>
 								</div>
-
-								<div className="flex flex-col gap-3">
-									<div className="font-semibold">Due Date</div>
-									<div>{formatDate(ticket.deadline)}</div>
+								<div>
+									<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted mb-1 mr-2">
+										Due Date
+									</span>
+									<span className="text-sm text-dc-text dark:text-white">
+										{formatDate(ticket.deadline) || "—"}
+									</span>
 								</div>
 							</div>
 						</div>
 					)}
 
-					{activeTab == "Conversation" && <ConversationTab ticketId={ticketId} />}
+					{activeTab === "Conversation" && <ConversationTab ticketId={ticketId} />}
 
-					{activeTab == "Attachments" && (
-						<div className="h-full w-full flex flex-col gap-3">
-							<div className="font-semibold">
+					{activeTab === "Attachments" && (
+						<div className="flex flex-col gap-3">
+							<span className="text-xs font-semibold uppercase tracking-widest text-dc-text-muted">
 								Files Uploaded ({ticket.attachments.length})
-							</div>
+							</span>
 							{ticket.attachments.length > 0 ? (
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-									{ticket.attachments.map((file: any) => (
+								<div className="flex flex-wrap gap-2.5">
+									{ticket.attachments.map((file: TicketAttachment) => (
 										<div
 											key={file.attachment_id}
 											onClick={() => handleAttachmentPreview(file.file_path)}
-											data-testid="attachment-preview"
-											className="border border-zinc-400 p-3 rounded-lg flex justify-between items-center text-sm select-none cursor-pointer hover:bg-zinc-100 transition-all"
+											className="border border-dc-border dark:border-dc-border-dark bg-dc-surface dark:bg-dc-surface-dark hover:border-dc-primary/40 dark:hover:border-dc-primary/60 hover:shadow-dc-sm p-3 rounded-xl flex justify-between items-center text-sm cursor-pointer transition-all"
 											role="button"
 										>
-											<span className="line-clamp-2">{file.file_name}</span>
-											<span className="text-xs text-zinc-500">
+											<span className="line-clamp-2 text-dc-text dark:text-white text-xs">
+												{file.file_name}
+											</span>
+											<span className="text-xs text-dc-text-muted shrink-0 ml-2">
 												{(file.file_size / 1024).toFixed(2)} KB
 											</span>
 										</div>
 									))}
 								</div>
 							) : (
-								<div className="text-sm">No attachments found.</div>
+								<p className="text-sm text-dc-text-muted py-6 text-center">
+									No attachments found.
+								</p>
 							)}
 						</div>
 					)}
 
-					{activeTab == "Activity" && (
+					{activeTab === "Activity" && (
 						<ActivityTab ticketId={ticketId} refresh={refresh} />
 					)}
 				</div>
 			</div>
 
-			{/* Ticket information and actions panel */}
-			<div className="h-full w-full flex flex-col border rounded-lg">
-				<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
-				{role == "hr" && (
-					<ActionsPanel
-						ticket={ticket}
-						currentStatus={ticket.status}
-						onAction={handleExecuteAction}
-					/>
+			<div className="h-full flex flex-row items-stretch shrink-0 relative">
+				{/* Scholar info hover preview (Absolute overlay, floats above other content) */}
+				{!isScholarPanelOpen && isScholarPanelHovered && (
+					<div className="absolute right-full mr-4 top-0 bottom-0 h-full z-50 drop-shadow-2xl">
+						<ScholarInfoPanel
+							ticket={ticket}
+							isOpen={true}
+							onClose={() => setIsScholarPanelHovered(false)}
+						/>
+					</div>
 				)}
+
+				{/* Scholar info clicked state (opens right-to-left, pushes content) */}
+				<div
+					className={`h-full flex justify-start items-stretch transition-all duration-300 ease-in-out ${
+						isScholarPanelOpen
+							? "w-[20vw] mr-4 opacity-100"
+							: "w-0 mr-0 opacity-0 overflow-hidden"
+					}`}
+				>
+					<div className="h-full shrink-0">
+						<ScholarInfoPanel
+							ticket={ticket}
+							isOpen={isScholarPanelOpen}
+							onClose={() => setIsScholarPanelOpen(false)}
+						/>
+					</div>
+				</div>
+
+				{/* Ticket Info + Actions Sidebar */}
+				<div className="h-full flex flex-col border border-dc-border dark:border-dc-border-dark rounded-xl overflow-hidden bg-dc-surface dark:bg-dc-surface-dark shadow-dc-sm min-w-[14rem] max-w-[18rem] shrink-0">
+					<TicketInfoPanel ticket={ticket} officer={ticket.officer} />
+					{role === "hr" && (
+						<ActionsPanel
+							ticket={ticket}
+							currentStatus={ticket.status}
+							onAction={handleExecuteAction}
+						/>
+					)}
+				</div>
 			</div>
+
+			{/* Error popup for non-assigned officers */}
+			{showErrorPopup && (
+				<div className="fixed bottom-5 left-5 z-50 flex items-center gap-3 bg-red-600 text-white px-5 py-3 rounded-lg shadow-xl animate-fade-in-up border border-red-700">
+					<div className="flex flex-col text-sm">{errorMessage}</div>
+
+					{/* Manual Close Button */}
+					<button
+						onClick={() => setShowErrorPopup(false)}
+						className="ml-2 text-white hover:text-red-200 transition-colors focus:outline-none"
+					>
+						&times;
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }

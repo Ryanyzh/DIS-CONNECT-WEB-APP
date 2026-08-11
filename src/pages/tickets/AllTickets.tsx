@@ -10,10 +10,11 @@ import TicketCard, {
 	priorityLabels,
 	priorityStyles,
 	LIST_GRID_COLS,
-} from "../../components/TicketCard";
+} from "../../components/tickets/TicketCard";
 import { useTickets } from "../../hooks/useTickets";
 import { useCategories } from "../../hooks/useCategories";
 import { formatDate } from "../../types/Scholar";
+import { useOfficers } from "../../hooks/useOfficers";
 
 type ViewMode = "list" | "card" | "table";
 
@@ -169,8 +170,12 @@ function IconTable({ active }: { active: boolean }) {
 export function AllTicketsPage() {
 	const { tickets, loading } = useTickets();
 	const categories = useCategories();
+	const { officers } = useOfficers();
 	const [statusFilter, setStatusFilter] = useState<string>("All");
 	const [categoryFilter, setCategoryFilter] = useState<string>("All");
+	const [officerFilter, setOfficerFilter] = useState<string>("All");
+	const [includeClosed, setIncludeClosed] = useState<boolean>(false);
+
 	const [viewMode, setViewMode] = useState<ViewMode>("list");
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(10);
@@ -203,6 +208,7 @@ export function AllTicketsPage() {
 	];
 
 	const filteredTickets = tickets
+		.filter((t) => includeClosed || t.status !== "Closed")
 		.filter(
 			(t) =>
 				statusFilter === "All" ||
@@ -210,6 +216,11 @@ export function AllTicketsPage() {
 				(statusFilter === "Escalated" && t.isEscalated)
 		)
 		.filter((t) => categoryFilter === "All" || t.category === categoryFilter)
+		.filter((t) => {
+			if (officerFilter === "All") return true;
+			if (officerFilter === "Unassigned") return !t.officer;
+			return t.officer?.name === officerFilter;
+		})
 		.toSorted((a, b) => b.priority - a.priority);
 
 	// Reset to page 1 whenever filters, view, or per-page count changes
@@ -223,7 +234,7 @@ export function AllTicketsPage() {
 
 	if (loading) {
 		return (
-			<PageShell description="View every ticket in the system and filter by status, category, or owner.">
+			<PageShell description="View every ticket in the system and filter by status, category, or officer.">
 				<div className="flex items-center justify-center h-48">
 					<div className="h-8 w-8 animate-spin rounded-full border-2 border-dc-border dark:border-zinc-800 border-t-dc-primary" />
 				</div>
@@ -232,7 +243,7 @@ export function AllTicketsPage() {
 	}
 
 	return (
-		<PageShell description="View every ticket in the system and filter by status, category, or owner.">
+		<PageShell description="View every ticket in the system and filter by status, category, or officer.">
 			<div className="flex flex-col gap-4">
 				{/* status summary banner */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl overflow-hidden shadow-dc-sm">
@@ -340,6 +351,45 @@ export function AllTicketsPage() {
 							/>
 						</svg>
 					</div>
+
+					<div className="relative">
+						<select
+							value={officerFilter}
+							onChange={(e) => setOfficerFilter(e.target.value)}
+							className="appearance-none text-xs font-medium border border-dc-border dark:border-zinc-700 rounded-lg pl-3 pr-8 py-1.5 bg-white dark:bg-zinc-800 text-dc-text dark:text-white focus:outline-none focus:ring-2 focus:ring-dc-primary/30 focus:border-dc-primary transition-colors"
+						>
+							<option value="All">Officer: All</option>
+							<option value="Unassigned">Officer: Unassigned</option>
+							{officers.map((off) => (
+								<option key={off.id} value={off.name}>
+									Officer: {off.name}
+								</option>
+							))}
+						</select>
+						<svg
+							className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-dc-text-muted"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
+						</svg>
+					</div>
+
+					<label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-dc-text dark:text-zinc-300 select-none">
+						<input
+							type="checkbox"
+							checked={includeClosed}
+							onChange={(e) => setIncludeClosed(e.target.checked)}
+							className="h-3.5 w-3.5 rounded border-dc-border dark:border-zinc-700 text-dc-primary focus:ring-dc-primary/30 dark:bg-zinc-800 transition-all cursor-pointer"
+						/>
+						<span>Include Closed Tickets</span>
+					</label>
 
 					{/* Right side: count + view toggles */}
 					<div className="ml-auto flex items-center gap-3">

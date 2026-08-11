@@ -9,7 +9,7 @@ interface PageShellProps {
 export default function PageShell({ description, actions, children }: PageShellProps) {
 	const hasHeader = description || actions;
 	return (
-		<section className="w-full space-y-5">
+		<section className="w-full space-y-5 max-w-[75vw]">
 			{hasHeader && (
 				<div className="flex items-center justify-between gap-4">
 					{description ? (
