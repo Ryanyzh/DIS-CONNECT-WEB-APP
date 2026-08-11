@@ -6,7 +6,7 @@ import {
 	getInitials,
 	formatDate,
 } from "../../types/Scholar";
-import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import { useScholars } from "../../hooks/useScholars";
 import PageShell from "../PageShell";
 
 const PRIORITY_LABEL: Record<number, { label: string; color: string }> = {
@@ -31,8 +31,17 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export function ScholarDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const { scholars, loading } = useScholars();
 
-	const scholar = MOCK_SCHOLARS.find((s) => s.id === id);
+	const scholar = scholars.find((s) => s.id === id);
+
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center py-24">
+				<div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600" />
+			</div>
+		);
+	}
 
 	if (!scholar) {
 		return (
@@ -77,7 +86,7 @@ export function ScholarDetailPage() {
 			{/* Profile hero */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-sm">
 				<div className="flex items-start gap-5">
-					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-semibold flex-shrink-0">
+					<div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
 						{getInitials(scholar.name)}
 					</div>
 					<div className="flex-1 min-w-0">

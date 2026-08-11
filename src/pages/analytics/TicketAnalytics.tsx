@@ -3,414 +3,15 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/tickets/TicketCard";
 
-// ── Mock fallback data ────────────────────────────────────────────────────────
-
-// const daysAgo = (n: number) => {
-// 	const d = new Date();
-// 	d.setDate(d.getDate() - n);
-// 	return d.toISOString();
-// };
-
-// const OFFICERS = [
-// 	{
-// 		id: "o1",
-// 		name: "Sarah Lim",
-// 		email: "sarah@hr.sg",
-// 		role: "hr",
-// 		initials: "SL",
-// 		department: "Scholar Relations",
-// 	},
-// 	{
-// 		id: "o2",
-// 		name: "James Tan",
-// 		email: "james@hr.sg",
-// 		role: "hr",
-// 		initials: "JT",
-// 		department: "Finance",
-// 	},
-// 	{
-// 		id: "o3",
-// 		name: "Priya Menon",
-// 		email: "priya@hr.sg",
-// 		role: "hr",
-// 		initials: "PM",
-// 		department: "Exchange & Internship",
-// 	},
-// ];
-
-// const MOCK_TICKETS: TicketProps[] = [
-// 	{
-// 		id: "1",
-// 		code: "TKT-001",
-// 		title: "ETH Zürich housing reimbursement claim",
-// 		category: "Reimbursement",
-// 		description: "",
-// 		priority: 5,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-5),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(28),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "2",
-// 		code: "TKT-002",
-// 		title: "Allowance disbursement delay – May",
-// 		category: "Finance",
-// 		description: "",
-// 		priority: 8,
-// 		status: "In Review",
-// 		deadline: daysAgo(-2),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(25),
-// 		isEscalated: false,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "3",
-// 		code: "TKT-003",
-// 		title: "Bond obligation terms clarification",
-// 		category: "Policy",
-// 		description: "",
-// 		priority: 3,
-// 		status: "Closed",
-// 		deadline: daysAgo(-14),
-// 		lastUpdated: daysAgo(5),
-// 		createdAt: daysAgo(30),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "4",
-// 		code: "TKT-004",
-// 		title: "Leave of absence documentation request",
-// 		category: "Leave",
-// 		description: "",
-// 		priority: 6,
-// 		status: "Waiting for Response",
-// 		deadline: daysAgo(3),
-// 		lastUpdated: daysAgo(2),
-// 		createdAt: daysAgo(20),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "5",
-// 		code: "TKT-005",
-// 		title: "Stipend suspension during leave period",
-// 		category: "Finance",
-// 		description: "",
-// 		priority: 9,
-// 		status: "Escalated",
-// 		deadline: daysAgo(-1),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(18),
-// 		isEscalated: true,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "6",
-// 		code: "TKT-006",
-// 		title: "Post-graduation bond service query",
-// 		category: "Policy",
-// 		description: "",
-// 		priority: 2,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-20),
-// 		lastUpdated: daysAgo(10),
-// 		createdAt: daysAgo(35),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "7",
-// 		code: "TKT-007",
-// 		title: "Google internship approval documentation",
-// 		category: "Internship",
-// 		description: "",
-// 		priority: 5,
-// 		status: "Open",
-// 		deadline: daysAgo(7),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(10),
-// 		isEscalated: false,
-// 		officer: undefined,
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "8",
-// 		code: "TKT-008",
-// 		title: "Amsterdam exchange credit transfer",
-// 		category: "Exchange",
-// 		description: "",
-// 		priority: 4,
-// 		status: "In Review",
-// 		deadline: daysAgo(10),
-// 		lastUpdated: daysAgo(2),
-// 		createdAt: daysAgo(14),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "9",
-// 		code: "TKT-009",
-// 		title: "Medical reimbursement abroad",
-// 		category: "Reimbursement",
-// 		description: "",
-// 		priority: 7,
-// 		status: "Waiting for Response",
-// 		deadline: daysAgo(4),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(12),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "10",
-// 		code: "TKT-010",
-// 		title: "Faculty exchange pre-approval",
-// 		category: "Exchange",
-// 		description: "",
-// 		priority: 3,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-7),
-// 		lastUpdated: daysAgo(8),
-// 		createdAt: daysAgo(22),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "11",
-// 		code: "TKT-011",
-// 		title: "Scholarship renewal inquiry",
-// 		category: "General Query",
-// 		description: "",
-// 		priority: 2,
-// 		status: "Closed",
-// 		deadline: daysAgo(-15),
-// 		lastUpdated: daysAgo(12),
-// 		createdAt: daysAgo(32),
-// 		isEscalated: false,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "12",
-// 		code: "TKT-012",
-// 		title: "NUS travel insurance claim",
-// 		category: "Reimbursement",
-// 		description: "",
-// 		priority: 6,
-// 		status: "Open",
-// 		deadline: daysAgo(5),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(6),
-// 		isEscalated: false,
-// 		officer: undefined,
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "13",
-// 		code: "TKT-013",
-// 		title: "Internship start date deferral request",
-// 		category: "Internship",
-// 		description: "",
-// 		priority: 8,
-// 		status: "Escalated",
-// 		deadline: daysAgo(1),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(8),
-// 		isEscalated: true,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "14",
-// 		code: "TKT-014",
-// 		title: "Dissertation leave approval",
-// 		category: "Leave",
-// 		description: "",
-// 		priority: 5,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-10),
-// 		lastUpdated: daysAgo(6),
-// 		createdAt: daysAgo(24),
-// 		isEscalated: false,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "15",
-// 		code: "TKT-015",
-// 		title: "Exchange GPA waiver policy",
-// 		category: "Policy",
-// 		description: "",
-// 		priority: 4,
-// 		status: "Open",
-// 		deadline: daysAgo(8),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(7),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "16",
-// 		code: "TKT-016",
-// 		title: "Monthly living allowance discrepancy",
-// 		category: "Finance",
-// 		description: "",
-// 		priority: 7,
-// 		status: "In Review",
-// 		deadline: daysAgo(2),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(5),
-// 		isEscalated: false,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "17",
-// 		code: "TKT-017",
-// 		title: "General enquiry on bond obligations",
-// 		category: "General Query",
-// 		description: "",
-// 		priority: 1,
-// 		status: "Closed",
-// 		deadline: daysAgo(-25),
-// 		lastUpdated: daysAgo(18),
-// 		createdAt: daysAgo(40),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "18",
-// 		code: "TKT-018",
-// 		title: "McKinsey internship documentation check",
-// 		category: "Internship",
-// 		description: "",
-// 		priority: 5,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-3),
-// 		lastUpdated: daysAgo(3),
-// 		createdAt: daysAgo(16),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "19",
-// 		code: "TKT-019",
-// 		title: "Compassionate leave for family emergency",
-// 		category: "Leave",
-// 		description: "",
-// 		priority: 9,
-// 		status: "Open",
-// 		deadline: daysAgo(1),
-// 		lastUpdated: daysAgo(0),
-// 		createdAt: daysAgo(3),
-// 		isEscalated: false,
-// 		officer: undefined,
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "20",
-// 		code: "TKT-020",
-// 		title: "Tuition fee payment schedule query",
-// 		category: "Finance",
-// 		description: "",
-// 		priority: 3,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-8),
-// 		lastUpdated: daysAgo(7),
-// 		createdAt: daysAgo(26),
-// 		isEscalated: false,
-// 		officer: OFFICERS[1],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "21",
-// 		code: "TKT-021",
-// 		title: "Flight reimbursement for exchange programme",
-// 		category: "Reimbursement",
-// 		description: "",
-// 		priority: 6,
-// 		status: "In Review",
-// 		deadline: daysAgo(6),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(9),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "22",
-// 		code: "TKT-022",
-// 		title: "Scholarship deferment policy clarification",
-// 		category: "Policy",
-// 		description: "",
-// 		priority: 2,
-// 		status: "Resolved",
-// 		deadline: daysAgo(-12),
-// 		lastUpdated: daysAgo(9),
-// 		createdAt: daysAgo(29),
-// 		isEscalated: false,
-// 		officer: OFFICERS[0],
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "23",
-// 		code: "TKT-023",
-// 		title: "General query: contact for bond waiver",
-// 		category: "General Query",
-// 		description: "",
-// 		priority: 1,
-// 		status: "Open",
-// 		deadline: daysAgo(14),
-// 		lastUpdated: daysAgo(2),
-// 		createdAt: daysAgo(4),
-// 		isEscalated: false,
-// 		officer: undefined,
-// 		attachments: [],
-// 	},
-// 	{
-// 		id: "24",
-// 		code: "TKT-024",
-// 		title: "Exchange host university visa support",
-// 		category: "Exchange",
-// 		description: "",
-// 		priority: 5,
-// 		status: "Waiting for Response",
-// 		deadline: daysAgo(3),
-// 		lastUpdated: daysAgo(1),
-// 		createdAt: daysAgo(11),
-// 		isEscalated: false,
-// 		officer: OFFICERS[2],
-// 		attachments: [],
-// 	},
-// ];
-
-// ── Colours ───────────────────────────────────────────────────────────────────
-
-export const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
+// Colours for different ticket statuses and categories
+const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
 	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
 	"In Review": {
 		label: "In Review",
 		bar: "bg-indigo-500",
 		text: "text-indigo-600 dark:text-indigo-400",
 	},
-	"Waiting": {
+	Waiting: {
 		label: "Waiting",
 		bar: "bg-amber-400",
 		text: "text-amber-600 dark:text-amber-400",
@@ -441,8 +42,6 @@ const CATEGORY_TEXT: Record<string, string> = {
 	Leave: "text-teal-600 dark:text-teal-400",
 	Internship: "text-sky-600 dark:text-sky-400",
 };
-
-// ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCard({
 	label,
@@ -521,8 +120,6 @@ function BarRow({
 	);
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
-
 export function TicketAnalyticsPage() {
 	const { tickets: liveTickets, loading } = useTickets();
 	const tickets: TicketProps[] = liveTickets;
@@ -538,7 +135,7 @@ export function TicketAnalyticsPage() {
 			resolved = 0,
 			active = 0;
 
-		// Last 14 days bucketed by date string
+		// Create 14 buckets for the last 14 days, each with a label, date, and count
 		const today = new Date();
 		const dayBuckets: { label: string; date: string; count: number }[] = Array.from(
 			{ length: 14 },
@@ -553,6 +150,7 @@ export function TicketAnalyticsPage() {
 			}
 		);
 
+		// Count tickets by status, category, officer, and day bucket
 		for (const t of tickets) {
 			byStatus[t.status] = (byStatus[t.status] ?? 0) + 1;
 			byCategory[t.category] = (byCategory[t.category] ?? 0) + 1;
@@ -570,6 +168,7 @@ export function TicketAnalyticsPage() {
 				if (t.status === "Resolved" || t.status === "Closed") byOfficer[key].resolved++;
 			}
 
+			// Increment the count for the corresponding day bucket based on the ticket's creation date
 			const ticketDay = t.createdAt.substring(0, 10);
 			const bucket = dayBuckets.find((b) => b.date === ticketDay);
 			if (bucket) bucket.count++;
@@ -577,9 +176,10 @@ export function TicketAnalyticsPage() {
 
 		const officers = Object.values(byOfficer).sort((a, b) => b.total - a.total);
 		const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+		// Find the maximum count in the day buckets for scaling the bar chart
 		const maxDayCount = Math.max(...dayBuckets.map((b) => b.count), 1);
 
-		// Priority grouping (1=Low, 2=Medium, 3=High, 4=Critical → bucketed as High)
+		// Count tickets by priority groups: Low (1), Medium (2), High (3+)
 		const priorityGroups = { Low: 0, Medium: 0, High: 0 };
 		for (const t of tickets) {
 			if (t.priority >= 3) priorityGroups.High++;
@@ -620,7 +220,7 @@ export function TicketAnalyticsPage() {
 				</div>
 			) : (
 				<div className="space-y-6">
-					{/* ── Stat cards ─────────────────────────────────────────── */}
+					{/* stat cards */}
 					<div className="grid grid-cols-5 gap-4">
 						<StatCard
 							label="Total Tickets"
@@ -735,7 +335,7 @@ export function TicketAnalyticsPage() {
 							}
 						/>
 					</div>
-					{/* ── Status overview stacked bar ──────────────────────── */}
+					{/* status overview stacked bar */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
 						<SectionHeader>Status Overview</SectionHeader>
 
@@ -789,7 +389,7 @@ export function TicketAnalyticsPage() {
 							})}
 						</div>
 					</div>
-					{/* ── Category + Priority ──────────────────────────────── */}
+					{/* category + priority */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Category breakdown */}
 						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
@@ -892,7 +492,7 @@ export function TicketAnalyticsPage() {
 							</div>
 						</div>
 					</div>
-					{/* ── Officer leaderboard + 14-day trend ──────────────── */}
+					{/* officer leaderboard + 14-day trend */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Officer leaderboard */}
 						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">

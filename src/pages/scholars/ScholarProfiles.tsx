@@ -8,7 +8,7 @@ import {
 	getInitials,
 	formatDate,
 } from "../../types/Scholar";
-import { MOCK_SCHOLARS } from "../../data/mockScholars";
+import { useScholars } from "../../hooks/useScholars";
 
 const STATUSES: (ScholarStatus | "All")[] = ["All", "Active", "On Leave", "Graduated", "Inactive"];
 
@@ -100,8 +100,9 @@ export function ScholarProfilesPage() {
 	const navigate = useNavigate();
 	const [search, setSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState<ScholarStatus | "All">("All");
+	const { scholars, loading } = useScholars();
 
-	const filtered = MOCK_SCHOLARS.filter((s) => {
+	const filtered = scholars.filter((s) => {
 		const matchesSearch =
 			s.name.toLowerCase().includes(search.toLowerCase()) ||
 			s.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -111,7 +112,7 @@ export function ScholarProfilesPage() {
 		return matchesSearch && matchesStatus;
 	});
 
-	const counts = MOCK_SCHOLARS.reduce<Record<string, number>>((acc, s) => {
+	const counts = scholars.reduce<Record<string, number>>((acc, s) => {
 		acc[s.status] = (acc[s.status] ?? 0) + 1;
 		return acc;
 	}, {});
@@ -123,7 +124,7 @@ export function ScholarProfilesPage() {
 			<div className="flex flex-wrap gap-2">
 				{STATUSES.map((s) => {
 					const active = statusFilter === s;
-					const count = s === "All" ? MOCK_SCHOLARS.length : (counts[s] ?? 0);
+					const count = s === "All" ? scholars.length : (counts[s] ?? 0);
 					return (
 						<button
 							key={s}
@@ -176,7 +177,9 @@ export function ScholarProfilesPage() {
 
 			{/* Table */}
 			<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm overflow-hidden">
-				{filtered.length === 0 ? (
+				{loading ? (
+					<div className="text-center py-16 text-zinc-400 text-sm">Loading scholars…</div>
+				) : filtered.length === 0 ? (
 					<div className="text-center py-16 text-zinc-400 text-sm">
 						No scholars match your search.
 					</div>

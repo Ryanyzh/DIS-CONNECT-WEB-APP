@@ -18,7 +18,7 @@ import { useOfficers } from "../../hooks/useOfficers";
 
 type ViewMode = "list" | "card" | "table";
 
-// ─── Table row ────────────────────────────────────────────────────────────────
+// table row
 
 function TableRow({ ticket, striped }: { ticket: TicketProps; striped: boolean }) {
 	const navigate = useNavigate();
@@ -109,7 +109,7 @@ function TableRow({ ticket, striped }: { ticket: TicketProps; striped: boolean }
 	);
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// icons
 
 function IconList({ active }: { active: boolean }) {
 	return (
@@ -165,7 +165,7 @@ function IconTable({ active }: { active: boolean }) {
 	);
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// page
 
 export function AllTicketsPage() {
 	const { tickets, loading } = useTickets();
@@ -200,6 +200,10 @@ export function AllTicketsPage() {
 		{
 			status: "Closed" as TicketStatus,
 			count: tickets.filter((t) => t.status === "Closed").length,
+		},
+		{
+			status: "Escalated" as TicketStatus,
+			count: tickets.filter((t) => t.isEscalated).length,
 		},
 	];
 
@@ -241,7 +245,7 @@ export function AllTicketsPage() {
 	return (
 		<PageShell description="View every ticket in the system and filter by status, category, or officer.">
 			<div className="flex flex-col gap-4">
-				{/* ── Status summary banner ─────────────────────────────────── */}
+				{/* status summary banner */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl overflow-hidden shadow-dc-sm">
 					<div className="grid grid-cols-6 divide-x divide-dc-border dark:divide-zinc-800">
 						{stats.map(({ status, count }) => (
@@ -269,7 +273,7 @@ export function AllTicketsPage() {
 					</div>
 				</div>
 
-				{/* ── Filter bar ────────────────────────────────────────────── */}
+				{/* filter bar */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl px-4 py-2.5 flex items-center gap-3">
 					{/* Filter label */}
 					<div className="flex items-center gap-1.5 text-dc-text-muted flex-shrink-0">
@@ -418,7 +422,7 @@ export function AllTicketsPage() {
 					</div>
 				</div>
 
-				{/* ── Ticket content ────────────────────────────────────────── */}
+				{/* ticket content */}
 				{filteredTickets.length === 0 ? (
 					<p className="text-sm text-dc-text-muted py-10 text-center">
 						No tickets match the current filters.
@@ -498,7 +502,7 @@ export function AllTicketsPage() {
 							</div>
 						)}
 
-						{/* ── Pagination bar ─────────────────────────────────────── */}
+						{/* pagination bar */}
 						{totalPages > 1 || filteredTickets.length > 10 ? (
 							<div className="flex items-center justify-between pt-1">
 								{/* Showing info */}

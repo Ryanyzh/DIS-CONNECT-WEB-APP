@@ -5,7 +5,6 @@ import { formatDate, type Scholar } from "../../types/Scholar";
 
 export type TicketStatus = "Open" | "In Review" | "Waiting" | "Resolved" | "Closed" | "Escalated";
 
-// ticket categories
 export type TicketCategory =
 	| "Reimbursement"
 	| "Exchange"
@@ -79,7 +78,6 @@ export const statusStripeStyles: Record<TicketStatus, string> = {
 	Escalated: "bg-rose-500",
 };
 
-// Abbreviated labels for compact list/table cells
 export const statusShort: Record<TicketStatus, string> = {
 	Open: "Open",
 	"In Review": "In Review",
@@ -102,9 +100,6 @@ export const priorityStyles: Record<number, string> = {
 	3: "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/15",
 	4: "text-violet-700 bg-violet-50 dark:text-violet-400 dark:bg-violet-400/15",
 };
-
-// ─── List view ────────────────────────────────────────────────────────────────
-// Uses a CSS grid with fixed column widths so every row aligns properly even with missing values
 
 function ListCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
@@ -213,9 +208,6 @@ function ListCard({ ticket }: TicketCardProps) {
 		</div>
 	);
 }
-
-// ─── Card view ────────────────────────────────────────────────────────────────
-// Visual card for grid layout — 2-line title, footer with assignee and deadline
 
 function CardView({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();

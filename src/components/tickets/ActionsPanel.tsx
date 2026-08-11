@@ -68,7 +68,7 @@ export function ActionsPanel({ ticket, currentStatus, onAction }: ActionsPanelPr
 
 			{currentStatus === "In Review" && (
 				<div className="flex flex-col gap-2.5">
-					<ActionButton variant="primary" onClick={() => onAction("Waiting", { action: "Waiting" })}>
+					<ActionButton variant="primary" onClick={() => onAction("Waiting", { action: "Waiting for Response" })}>
 						Request Info
 					</ActionButton>
 					<ActionButton variant="success" onClick={() => onAction("Resolved", { action: "Resolved" })}>
