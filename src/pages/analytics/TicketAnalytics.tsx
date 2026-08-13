@@ -620,7 +620,7 @@ export function TicketAnalyticsPage() {
 				</div>
 			) : (
 				<div className="space-y-6">
-					{/* ── Stat cards ─────────────────────────────────────────── */}
+					{/* Stat cards */}
 					<div className="grid grid-cols-5 gap-4">
 						<StatCard
 							label="Total Tickets"
@@ -735,7 +735,7 @@ export function TicketAnalyticsPage() {
 							}
 						/>
 					</div>
-					{/* ── Status overview stacked bar ──────────────────────── */}
+					{/* Status overview stacked bar */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
 						<SectionHeader>Status Overview</SectionHeader>
 
@@ -789,7 +789,7 @@ export function TicketAnalyticsPage() {
 							})}
 						</div>
 					</div>
-					{/* ── Category + Priority ──────────────────────────────── */}
+					{/* Category + Priority */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Category breakdown */}
 						<div className="col-span-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">
@@ -892,7 +892,7 @@ export function TicketAnalyticsPage() {
 							</div>
 						</div>
 					</div>
-					{/* ── Officer leaderboard + 14-day trend ──────────────── */}
+					{/* Officer leaderboard + 14-day trend */}
 					<div className="grid grid-cols-5 gap-6">
 						{/* Officer leaderboard */}
 						<div className="col-span-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-5">

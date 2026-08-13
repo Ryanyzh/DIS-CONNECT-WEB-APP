@@ -239,7 +239,7 @@ export function AllTicketsPage() {
 	return (
 		<PageShell description="View every ticket in the system and filter by status, category, or officer.">
 			<div className="flex flex-col gap-4">
-				{/* ── Status summary banner ─────────────────────────────────── */}
+				{/* Status summary banner */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl overflow-hidden shadow-dc-sm">
 					<div className="grid grid-cols-6 divide-x divide-dc-border dark:divide-zinc-800">
 						{stats.map(({ status, count }) => (
@@ -267,7 +267,7 @@ export function AllTicketsPage() {
 					</div>
 				</div>
 
-				{/* ── Filter bar ────────────────────────────────────────────── */}
+				{/* Filter bar */}
 				<div className="bg-dc-surface dark:bg-zinc-900 border border-dc-border dark:border-zinc-800 rounded-xl px-4 py-2.5 flex items-center gap-3">
 					{/* Filter label */}
 					<div className="flex items-center gap-1.5 text-dc-text-muted flex-shrink-0">
@@ -416,7 +416,7 @@ export function AllTicketsPage() {
 					</div>
 				</div>
 
-				{/* ── Ticket content ────────────────────────────────────────── */}
+				{/* Ticket content */}
 				{filteredTickets.length === 0 ? (
 					<p className="text-sm text-dc-text-muted py-10 text-center">
 						No tickets match the current filters.
@@ -496,7 +496,7 @@ export function AllTicketsPage() {
 							</div>
 						)}
 
-						{/* ── Pagination bar ─────────────────────────────────────── */}
+						{/* Pagination bar */}
 						{totalPages > 1 || filteredTickets.length > 10 ? (
 							<div className="flex items-center justify-between pt-1">
 								{/* Showing info */}

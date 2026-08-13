@@ -132,7 +132,7 @@ export function MyAccountPage() {
 	return (
 		<PageShell description="Manage your profile information and account security settings.">
 			<div className="grid grid-cols-5 gap-6 items-start">
-				{/* ── Left: Profile summary ──────────────────────────────── */}
+				{/* Left: Profile summary */}
 				<div className="col-span-2 space-y-4 sticky top-6">
 					{/* Avatar card */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm p-6 flex flex-col items-center text-center gap-3">
@@ -178,7 +178,7 @@ export function MyAccountPage() {
 					</div>
 				</div>
 
-				{/* ── Right: Settings forms ──────────────────────────────── */}
+				{/* Right: Settings forms */}
 				<div className="col-span-3 space-y-5">
 					{/* Personal Information */}
 					<div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
