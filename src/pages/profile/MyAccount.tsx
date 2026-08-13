@@ -57,11 +57,11 @@ function formatTs(ts: string | undefined): string {
 export function MyAccountPage() {
 	const { user } = useAuth();
 
-	// ── Profile form ──────────────────────────────────────────────────────────
+	// Profile form
 	const [displayName, setDisplayName] = useState(user?.displayName ?? "");
 	const [savingProfile, setSavingProfile] = useState(false);
 
-	// ── Password form ─────────────────────────────────────────────────────────
+	// Password form
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
@@ -69,7 +69,7 @@ export function MyAccountPage() {
 	const [showNew, setShowNew] = useState(false);
 	const [savingPassword, setSavingPassword] = useState(false);
 
-	// ── Toast ─────────────────────────────────────────────────────────────────
+	// Toast
 	const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
 	const showToast = (type: "success" | "error", text: string) => {
@@ -77,7 +77,7 @@ export function MyAccountPage() {
 		window.setTimeout(() => setToast(null), 4000);
 	};
 
-	// ── Handlers ──────────────────────────────────────────────────────────────
+	// Handlers
 	const handleSaveProfile = async (e: { preventDefault(): void }) => {
 		e.preventDefault();
 		if (!auth.currentUser) return;

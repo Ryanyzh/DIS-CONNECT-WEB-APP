@@ -18,7 +18,7 @@ import { useOfficers } from "../../hooks/useOfficers";
 
 type ViewMode = "list" | "card" | "table";
 
-// ─── Table row ────────────────────────────────────────────────────────────────
+// Table row
 
 function TableRow({ ticket, striped }: { ticket: TicketProps; striped: boolean }) {
 	const navigate = useNavigate();
@@ -109,7 +109,7 @@ function TableRow({ ticket, striped }: { ticket: TicketProps; striped: boolean }
 	);
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// Icons
 
 function IconList({ active }: { active: boolean }) {
 	return (
@@ -164,8 +164,6 @@ function IconTable({ active }: { active: boolean }) {
 		</svg>
 	);
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function AllTicketsPage() {
 	const { tickets, loading } = useTickets();

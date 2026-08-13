@@ -3,7 +3,7 @@ import PageShell from "../PageShell";
 import { useTickets } from "../../hooks/useTickets";
 import type { TicketProps, TicketStatus } from "../../components/tickets/TicketCard";
 
-// ── Mock fallback data ────────────────────────────────────────────────────────
+// Mock fallback data
 
 // const daysAgo = (n: number) => {
 // 	const d = new Date();
@@ -401,7 +401,7 @@ import type { TicketProps, TicketStatus } from "../../components/tickets/TicketC
 // 	},
 // ];
 
-// ── Colours ───────────────────────────────────────────────────────────────────
+// Colours
 
 export const STATUS_META: Record<TicketStatus, { label: string; bar: string; text: string }> = {
 	Open: { label: "Open", bar: "bg-blue-500", text: "text-blue-600 dark:text-blue-400" },
@@ -442,7 +442,7 @@ const CATEGORY_TEXT: Record<string, string> = {
 	Internship: "text-sky-600 dark:text-sky-400",
 };
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// Sub-components
 
 function StatCard({
 	label,
@@ -521,7 +521,7 @@ function BarRow({
 	);
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// Main page
 
 export function TicketAnalyticsPage() {
 	const { tickets: liveTickets, loading } = useTickets();

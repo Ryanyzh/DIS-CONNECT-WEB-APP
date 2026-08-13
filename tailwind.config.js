@@ -6,7 +6,7 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				// ── Dis-Connect brand palette ────────────────────────────────
+				// Dis-Connect brand palette
 				dc: {
 					// Backgrounds
 					bg:            "#F7F5FF",  // light page background
@@ -44,7 +44,7 @@ export default {
 					"error-dark":   "#F43F5E",
 				},
 
-				// ── Legacy wise tokens (kept for non-ticket pages) ───────────
+				// Legacy wise tokens (kept for non-ticket pages)
 				wise: {
 					green: "#9fe870",
 					active: "#cdffad",

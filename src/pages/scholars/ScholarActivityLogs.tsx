@@ -11,7 +11,7 @@ import { getInitials } from "../../types/Scholar";
 import { MOCK_SCHOLARS } from "../../data/mockScholars";
 import PageShell from "../PageShell";
 
-// ── Icons ──────────────────────────────────────────────────────────────────
+// Icons
 
 function EventIcon({ type }: { type: ActivityEventType }) {
 	const cfg = eventConfig[type];
@@ -51,7 +51,7 @@ function EventIcon({ type }: { type: ActivityEventType }) {
 	);
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// Helpers
 
 function formatTimestamp(iso: string): { date: string; time: string; relative: string } {
 	const d = new Date(iso);
@@ -94,7 +94,7 @@ function groupByDate(logs: ActivityLog[]): [string, ActivityLog[]][] {
 	return Array.from(map.entries());
 }
 
-// ── Main component ──────────────────────────────────────────────────────────
+// Main component
 
 export function ScholarActivityLogsPage() {
 	const [logs, setLogs] = useState<ActivityLog[]>([]);

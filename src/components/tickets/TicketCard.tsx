@@ -103,9 +103,6 @@ export const priorityStyles: Record<number, string> = {
 	4: "text-violet-700 bg-violet-50 dark:text-violet-400 dark:bg-violet-400/15",
 };
 
-// ─── List view ────────────────────────────────────────────────────────────────
-// Uses a CSS grid with fixed column widths so every row aligns properly even with missing values
-
 function ListCard({ ticket }: TicketCardProps) {
 	const navigate = useNavigate();
 
@@ -214,7 +211,7 @@ function ListCard({ ticket }: TicketCardProps) {
 	);
 }
 
-// ─── Card view ────────────────────────────────────────────────────────────────
+// Card view
 // Visual card for grid layout — 2-line title, footer with assignee and deadline
 
 function CardView({ ticket }: TicketCardProps) {
